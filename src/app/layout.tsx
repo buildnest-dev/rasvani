@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: '#2b0a10', width: 'device-width', initialScale: 1 };
 
 /* Runs before first paint: content is never hidden unless motion is allowed (04-AI-RULES §5.7). */
-const MOTION_GATE = `(function(){var d=document.documentElement;try{var r=/(?:^|; )ys-reduce=1/.test(document.cookie)||localStorage.getItem('ys-reduce')==='1';var ok=matchMedia('(prefers-reduced-motion: no-preference)').matches&&!r;if(r)d.classList.add('reduce-motion');if(ok){d.classList.add('motion-ready');if(!sessionStorage.getItem('ys-intro'))d.classList.add('has-intro');}}catch(e){}})();`;
+const MOTION_GATE = `(function(){var d=document.documentElement;try{var r=/(?:^|; )ys-reduce=1/.test(document.cookie)||localStorage.getItem('ys-reduce')==='1';var ok=matchMedia('(prefers-reduced-motion: no-preference)').matches&&!r;if(r)d.classList.add('reduce-motion');if(ok){d.classList.add('motion-ready');if(!sessionStorage.getItem('rv-intro'))d.classList.add('has-intro');}}catch(e){}})();`;
 
 const JSON_LD = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'Rasvani', slogan: 'The taste of home, wherever you are.' });
 

@@ -149,13 +149,18 @@ html.motion-ready [data-split] { visibility: hidden; animation: show-fallback 0s
 .site-header__bar { height: 100%; display: flex; align-items: center; gap: 24px; }
 .site-header__strip { display: none; }
 .logo { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
-.logo__mark { width: 40px; height: 40px; flex: none; --mark-core: var(--color-maroon-950); }
+.logo__mark { width: 44px; height: 44px; flex: none; }
 .logo__word { font-family: var(--font-display); font-weight: 800; font-variation-settings: "opsz" 72; font-size: 1.25rem; letter-spacing: .035em; text-transform: uppercase; line-height: 1; white-space: nowrap; }
-.wordmark { display: inline-flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--forest-900, #15301f); line-height: 1; flex: none; }
-.wordmark__en { font-family: var(--font-display); font-weight: 400; font-variation-settings: "opsz" 72; font-size: 1.85rem; letter-spacing: .2em; white-space: nowrap; }
-.wordmark__en i { font-style: italic; color: #c4553a; letter-spacing: .18em; display: inline-block; transition: transform var(--dur-fast) var(--ease-out-expo); }
-.wordmark:hover .wordmark__en i { transform: translateY(-2px) rotate(-6deg); }
-.wordmark__hi { font-family: var(--font-deva), serif; font-weight: 600; font-size: .78rem; color: #c4553a; }
+.wordmark { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--color-maroon-900); line-height: 1; flex: none; --mark-front: var(--color-maroon-900); }
+.wordmark__mark { width: 44px; height: 44px; flex: none; transition: transform var(--dur-base) var(--ease-out-expo); }
+.wordmark:hover .wordmark__mark { transform: translateY(-2px) scale(1.06); }
+.wordmark__text { display: flex; flex-direction: column; gap: 5px; }
+.wordmark__en { font-family: var(--font-display); font-weight: 600; font-variation-settings: "opsz" 72; font-size: 1.9rem; letter-spacing: .01em; white-space: nowrap; }
+.wordmark__hi { font-family: var(--font-deva), serif; font-weight: 600; font-size: .78rem; color: var(--color-maroon-700); letter-spacing: .04em; }
+.mark-steam path { animation: steam-rise 3.2s ease-in-out infinite; transform-box: fill-box; }
+.mark-steam path:nth-child(2) { animation-delay: .5s; }
+.mark-steam path:nth-child(3) { animation-delay: 1s; }
+@keyframes steam-rise { 0%, 100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(-4px); opacity: .7; } }
 .nav { display: flex; gap: clamp(18px, 2.2vw, 32px); margin-left: auto; font-size: .92rem; color: rgb(44 58 47 / .8); }
 .nav a { text-decoration: none; padding: 8px 2px; position: relative; white-space: nowrap; transition: color var(--dur-fast); }
 .nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 2px; height: 2px; background: #c4553a; transform: scaleX(0); transform-origin: left; transition: transform var(--dur-fast) var(--ease-out-expo); }
@@ -477,7 +482,7 @@ html.motion-ready .hero-rv { opacity: 0; animation: rv-fallback 0s 3.2s forwards
 }
 @media (max-width: 640px) {
   .logo__word { font-size: 1.05rem; }
-  .wordmark__en { font-size: 1.15rem; letter-spacing: .12em; }
+  .wordmark__en { font-size: 1.4rem; } .wordmark__mark { width: 36px; height: 36px; }
   .icon-btn--extra { display: none; }
   .pin-chip span { max-width: 9.5em; overflow: hidden; text-overflow: ellipsis; }
   .pincheck__row { flex-direction: column; }
@@ -488,10 +493,10 @@ html.motion-ready .hero-rv { opacity: 0; animation: rv-fallback 0s 3.2s forwards
 
 /* Reduced motion: OS setting or in-site toggle */
 @media (prefers-reduced-motion: reduce) {
-  .spark, .state-panel, .route__halo, .jcard__script { animation: none !important; }
+  .mark-steam path, .spark, .state-panel, .route__halo, .jcard__script { animation: none !important; }
   .scard, .btn { transition: none !important; }
 }
-html.reduce-motion .spark, html.reduce-motion .state-panel, html.reduce-motion html.reduce-motion .route__halo, html.reduce-motion .jcard__script { animation: none !important; }
+html.reduce-motion .mark-steam path, html.reduce-motion .spark, html.reduce-motion .state-panel, html.reduce-motion .route__halo, html.reduce-motion .jcard__script { animation: none !important; }
 html.reduce-motion .shape, html.reduce-motion .scard, html.reduce-motion .btn { transition: none !important; }
 html.reduce-motion .progress { display: none; }
 @media (prefers-reduced-motion: reduce) { .progress { display: none; } }

@@ -1,4 +1,4 @@
-/* Shared SVG symbols: eight-petal mark (full + simplified), veg mark, diya. Mounted once in the layout. */
+/* Shared SVG symbols: Rasvani mark (bowl + steam), petal pattern (decorative), veg mark, diya. Mounted once in the layout. */
 const FULL = [0, 45, 90, 135, 180, 225, 270, 315];
 const BACK = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5];
 
@@ -11,19 +11,15 @@ export function Sprite() {
         <path id="petal-s" d="M0,-40 C110,-150 110,-290 0,-390 C-110,-290 -110,-150 0,-40Z" />
         <path id="petal-sb" d="M0,-40 C80,-120 90,-190 0,-260 C-90,-190 -80,-120 0,-40Z" />
       </defs>
-      <symbol id="mark" viewBox="0 0 800 800">
-        <g transform="translate(400 400)">
-          <g fill="var(--mark-back,#e8c56e)">
-            {BACK.map((r) => (
-              <use key={r} href="#petal-b" transform={`rotate(${r})`} />
-            ))}
+      <symbol id="mark" viewBox="0 0 200 200">
+        <g fill="var(--mark-front,#d9a441)" stroke="var(--mark-front,#d9a441)">
+          <g className="mark-steam" fill="none" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M70 104 C54 92 56 80 68 70 C80 60 80 48 68 38" />
+            <path d="M104 98 C118 82 118 56 104 40" />
+            <path d="M128 106 C150 84 150 54 128 32" />
           </g>
-          <g fill="var(--mark-front,#d9a441)">
-            {FULL.map((r) => (
-              <use key={r} href="#petal" transform={`rotate(${r})`} />
-            ))}
-          </g>
-          <circle r="44" fill="var(--mark-core,#2b0a10)" />
+          <path d="M30 118 H170 C170 158 140 180 100 180 C60 180 30 158 30 118 Z" />
+          <rect x="74" y="186" width="52" height="10" rx="5" />
         </g>
       </symbol>
       <symbol id="mark-s" viewBox="0 0 800 800">
@@ -51,7 +47,7 @@ export function Sprite() {
 
 export function Mark({ className, simple }: { className?: string; simple?: boolean }) {
   return (
-    <svg className={className} viewBox="0 0 800 800" aria-hidden="true">
+    <svg className={className} viewBox={simple ? '0 0 800 800' : '0 0 200 200'} aria-hidden="true">
       <use href={simple ? '#mark-s' : '#mark'} />
     </svg>
   );

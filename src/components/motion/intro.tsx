@@ -21,14 +21,14 @@ export function Intro() {
         return;
       }
       try {
-        sessionStorage.setItem('ys-intro', '1');
+        sessionStorage.setItem('rv-intro', '1');
       } catch {
         /* storage blocked */
       }
       gsap.set(el, { clipPath: 'inset(0% 0% 0% 0%)' });
       gsap
         .timeline({ onComplete: () => void (el.style.display = 'none') })
-        .from('.intro__mark', { scale: 0.5, rotation: -45, opacity: 0, duration: 0.45, ease: 'expo.out' })
+        .from('.intro__mark', { scale: 0.7, y: 18, opacity: 0, duration: 0.45, ease: 'expo.out' })
         .from('.intro__word', { opacity: 0, y: 10, duration: 0.25 }, 0.15)
         .to(el, { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.4, ease: 'power3.inOut' }, 0.4)
         .call(setIntroDone, undefined, 0.55);
@@ -38,7 +38,7 @@ export function Intro() {
 
   return (
     <div ref={ref} className="intro" aria-hidden="true">
-      <svg className="intro__mark" viewBox="0 0 800 800">
+      <svg className="intro__mark" viewBox="0 0 200 200">
         <use href="#mark" />
       </svg>
       <p className="intro__word">Rasvani</p>

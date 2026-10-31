@@ -7,6 +7,7 @@ import { useUi } from '@/lib/ui-store';
 import Link from 'next/link';
 import { NavLink } from '@/components/motion/nav-link';
 import { useMotion } from '@/components/motion/motion-provider';
+import { Mark } from '@/components/brand/sprite';
 
 function ScrollProgress() {
   const bar = useRef<HTMLSpanElement>(null);
@@ -74,11 +75,12 @@ export function Header() {
     <header className="site-header" id="header" data-scrolled={scrolled}>
       <div className="site-header__bar container">
         <NavLink className="wordmark" href="#top" aria-label="Rasvani, back to top">
-          <span className="wordmark__en">
-            RAS<i>VANI</i>
-          </span>
-          <span className="wordmark__hi" lang="hi">
-            रसवाणी
+          <Mark className="wordmark__mark" simple={false} />
+          <span className="wordmark__text">
+            <span className="wordmark__en">Rasvani</span>
+            <span className="wordmark__hi" lang="hi">
+              रसवाणी
+            </span>
           </span>
         </NavLink>
         <nav className="nav" aria-label="Primary">
