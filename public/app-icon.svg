@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Maroon 900 square, corner radius 22.5% of the side, mark at 70% -->
+  <rect width="512" height="512" rx="115" fill="#4a0f17"/>
+  <defs>
+    <path id="p" d="M0,-55 C95,-150 95,-290 0,-385 C-95,-290 -95,-150 0,-55Z"/>
+    <path id="b" d="M0,-55 C70,-120 80,-190 0,-250 C-80,-190 -70,-120 0,-55Z"/>
+  </defs>
+  <g transform="translate(256 256) scale(.4375)">
+    <g fill="#e8c56e">
+      <use href="#b" transform="rotate(22.5)"/><use href="#b" transform="rotate(67.5)"/>
+      <use href="#b" transform="rotate(112.5)"/><use href="#b" transform="rotate(157.5)"/>
+      <use href="#b" transform="rotate(202.5)"/><use href="#b" transform="rotate(247.5)"/>
+      <use href="#b" transform="rotate(292.5)"/><use href="#b" transform="rotate(337.5)"/>
+    </g>
+    <g fill="#d9a441">
+      <use href="#p"/><use href="#p" transform="rotate(45)"/><use href="#p" transform="rotate(90)"/>
+      <use href="#p" transform="rotate(135)"/><use href="#p" transform="rotate(180)"/>
+      <use href="#p" transform="rotate(225)"/><use href="#p" transform="rotate(270)"/>
+      <use href="#p" transform="rotate(315)"/>
+    </g>
+    <circle r="44" fill="#2b0a10"/>
+  </g>
+</svg>
