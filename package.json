@@ -15,6 +15,7 @@
     "node": "22.x"
   },
   "overrides": {
-    "postcss": "^8.5.32"
+    "postcss": "^8.5.32",
+    "jwks-rsa": "3.2.2"
   }
 }
