@@ -67,8 +67,8 @@ begin
   return v_product;
 end;
 $$;
-revoke all on function public.submit_producer_product(text,text,uuid,text,text[],text,text,text,text,text,text) from public,anon;
-grant execute on function public.submit_producer_product(text,text,uuid,text,text[],text,text,text,text,text,text) to authenticated;
+revoke all on function public.submit_producer_product(text,text,uuid,text,text[],text,text,text,text,text) from public,anon;
+grant execute on function public.submit_producer_product(text,text,uuid,text,text[],text,text,text,text,text) to authenticated;
 
 create or replace function public.get_my_producer_products()
 returns table(product_id uuid, sku text, name text, category_name text, approval_status public.record_status,
@@ -84,5 +84,5 @@ language sql stable security definer set search_path=public,auth as $$
 $$;
 revoke all on function public.get_my_producer_products() from public,anon;
 grant execute on function public.get_my_producer_products() to authenticated;
-comment on function public.submit_producer_product(text,text,uuid,text,text[],text,text,text,text,text,text) is
+comment on function public.submit_producer_product(text,text,uuid,text,text[],text,text,text,text,text) is
   'Submits a product for independent review for the authenticated approved producer. Does not approve or publish it.';
