@@ -1,17 +1,36 @@
 'use client';
 
 import Link from 'next/link';
-import { useActionState, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useAuth } from '@/components/auth-provider';
 import { useCart } from '@/components/cart-provider';
+import { placeOrderAction } from '@/app/actions/session';
 import { biharDistricts } from '@/lib/bihar-districts';
 import { formatPaise } from '@/lib/money';
-import { placeOrderAction, type CheckoutState } from './actions';
-
-const initial: CheckoutState = {};
 
 export function CheckoutForm() {
   const { lines, ready, subtotalPaise } = useCart();
-  const [state, action, pending] = useActionState(placeOrderAction, initial);
+  const { getToken } = useAuth();
+  const router = useRouter();
+  const [state, setState] = useState<{ error?: string }>({});
+  const [pending, setPending] = useState(false);
+
+  async function submit(form: HTMLFormElement) {
+    const data = new FormData(form);
+    const text = (key: string) => String(data.get(key) ?? '');
+    setPending(true); setState({});
+    try {
+      const result = await placeOrderAction(await getToken(), {
+        method: text('method'), name: text('name'), phone: text('phone'), district: text('district'), pincode: text('pincode'),
+        address: text('address'), landmark: text('landmark'), notes: text('notes'), payment: text('payment'),
+        lat: coords ? Number(coords.lat) : null, lng: coords ? Number(coords.lng) : null,
+        lines: lines.map((line) => ({ productId: line.productId, qty: line.qty })),
+      });
+      if (result.ok) router.push('/account/orders?placed=1'); else setState({ error: result.error });
+    } catch { setState({ error: 'Something went wrong. Please try again.' }); }
+    setPending(false);
+  }
   const [method, setMethod] = useState<'delivery' | 'pickup'>('delivery');
   const [coords, setCoords] = useState<{ lat: string; lng: string } | null>(null);
   const [locationMessage, setLocationMessage] = useState('');
@@ -29,9 +48,8 @@ export function CheckoutForm() {
     );
   }
 
-  const payload = JSON.stringify(lines.map((line) => ({ productId: line.productId, qty: line.qty })));
   return <div className="cart-layout">
-    <form className="form-shell checkout-form" action={action}>
+    <form className="form-shell checkout-form" onSubmit={(event) => { event.preventDefault(); void submit(event.currentTarget); }}>
       <fieldset className="checkout-methods"><legend>How do you want your order?</legend>
         <label className={`method-card ${method === 'delivery' ? 'is-selected' : ''}`}><input type="radio" name="method" value="delivery" checked={method === 'delivery'} onChange={() => setMethod('delivery')} /><strong>Home delivery</strong><span>Bihar only, selected areas</span></label>
         <label className={`method-card ${method === 'pickup' ? 'is-selected' : ''}`}><input type="radio" name="method" value="pickup" checked={method === 'pickup'} onChange={() => setMethod('pickup')} /><strong>Order online, collect from shop</strong><span>We confirm the pickup point by phone</span></label>
@@ -52,14 +70,12 @@ export function CheckoutForm() {
         <button type="button" className="btn secondary" onClick={shareLocation}>Use my current location</button>
         <span className="notice" role="status">{locationMessage || 'Optional. Only used to find your address for this order.'}</span>
       </div>
-      <input type="hidden" name="lat" value={coords?.lat ?? ''} /><input type="hidden" name="lng" value={coords?.lng ?? ''} />
       <label htmlFor="co-notes">Note for Rasvani (optional)</label>
       <textarea id="co-notes" name="notes" rows={2} maxLength={400} />
       <fieldset className="checkout-methods"><legend>Payment</legend>
         <label className="method-card"><input type="radio" name="payment" value="pay_on_receipt" defaultChecked /><strong>Pay when I receive / collect</strong><span>Cash or UPI at handover</span></label>
         <label className="method-card"><input type="radio" name="payment" value="pay_upi_after_call" /><strong>Pay by UPI after confirmation</strong><span>We share payment details on the call</span></label>
       </fieldset>
-      <input type="hidden" name="lines" value={payload} />
       {state.error && <p className="status" role="alert">{state.error}</p>}
       <button className="btn" type="submit" disabled={pending}>{pending ? 'Placing your order…' : 'Place order'}</button>
       <p className="notice">No online payment is taken on this page. Rasvani confirms your order, the final amount, and delivery or pickup by phone.</p>

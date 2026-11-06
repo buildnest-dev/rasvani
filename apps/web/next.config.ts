@@ -10,11 +10,12 @@ const MAP_GLYPHS = 'https://fonts.openmaptiles.org';
 const csp = [
   "default-src 'self'",
   // Next.js injects inline bootstrap scripts; a nonce-based policy is the next hardening step.
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
+  `script-src 'self' 'unsafe-inline' https://apis.google.com${isDev ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
-  "img-src 'self' data: blob: https://*.supabase.co",
-  `connect-src 'self' https://*.supabase.co wss://*.supabase.co ${MAP_TILES} ${MAP_GLYPHS}${isDev ? ' ws:' : ''}`,
+  "img-src 'self' data: blob: https://*.googleusercontent.com",
+  `connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.googleapis.com ${MAP_TILES} ${MAP_GLYPHS}${isDev ? ' ws:' : ''}`,
+  "frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://appleid.apple.com",
   "worker-src 'self' blob:",
   "child-src 'self' blob:",
   "object-src 'none'",
@@ -27,7 +28,8 @@ const csp = [
 const securityHeaders = [
   { key: 'Content-Security-Policy', value: csp },
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
-  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+  // same-origin-allow-popups is required so the Google / Apple sign-in popup can report back.
+  { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'X-Frame-Options', value: 'DENY' },

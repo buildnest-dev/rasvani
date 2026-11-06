@@ -1,0 +1,48 @@
+rules_version = '2';
+
+// Rasvani Firestore rules.
+// Every WRITE happens on the server (Next.js server actions using the Admin SDK, which verifies the
+// caller's Firebase token and role). Browsers may only READ what they are entitled to see.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function roleOf(uid) {
+      return exists(/databases/$(database)/documents/roles/$(uid))
+        ? get(/databases/$(database)/documents/roles/$(uid)).data.role
+        : 'none';
+    }
+    function isAdmin() { return signedIn() && roleOf(request.auth.uid) == 'admin'; }
+
+    // A user may read only their own role document. Admins may list roles (to assign bakers).
+    match /roles/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if false;
+    }
+
+    // Public may read products that are visible. Admins may read all products.
+    match /products/{productId} {
+      allow read: if resource.data.visible == true || isAdmin();
+      allow write: if false;
+    }
+
+    // Customers read their own orders; bakers read orders assigned to them; admins read all.
+    match /orders/{orderId} {
+      allow read: if signedIn() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.bakerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow write: if false;
+    }
+
+    match /bakerInvites/{email} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -18,7 +18,7 @@ const KEY = 'rasvani-cart-v1';
 export const MAX_QTY = 20;
 const CartContext = createContext<CartValue | null>(null);
 const clampQty = (qty: number) => Math.max(1, Math.min(MAX_QTY, Math.floor(Number.isFinite(qty) ? qty : 1)));
-const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const uuid = /^[A-Za-z0-9]{10,40}$/;
 
 function sanitise(raw: unknown): CartLine[] {
   if (!Array.isArray(raw)) return [];
