@@ -11,7 +11,7 @@ import { biharDrySnackByDistrict } from '@/lib/bihar-dry-snacks';
 import { BiharDistrictFoodTrails } from '@/components/bihar-district-food-trails';
 import { SiwanDistrictExperience } from '@/components/siwan-district-experience';
 import { BiharTouristPlacesSection } from '@/components/bihar-tourist-places-section';
-import { DistrictAbout, DistrictGallery, DistrictMotion, DistrictSpotlight, DistrictTaste } from '@/components/district-showcase';
+import { DistrictAbout, DistrictGallery, DistrictHeroArt, DistrictMotion, DistrictSpotlight, DistrictTaste } from '@/components/district-showcase';
 import { biharHomeFoodItems } from '@/lib/bihar-home-food-items';
 import { biharTouristPlaces } from '@/lib/bihar-tourist-places';
 
@@ -63,7 +63,7 @@ export default async function DistrictPage({ params }: { params: Promise<{ regio
         <div className="eyebrow">DISTRICT FOOD ATLAS · {region.toUpperCase()}</div><h1>{districtName}</h1>
         <p className="section-intro district-guide-intro">{district?.introduction ?? `Discover the traditional vegetarian food culture, local flavours, food-making traditions and notable places of ${districtName}.`}</p>
         <div className="district-hero-bottom"><span>VEGETARIAN FOOD DISCOVERY</span><span>ONE DISTRICT · ITS MANY FLAVOURS</span></div>
-      </div><div className="district-hero-art" aria-label={`${districtName} district visual introduction`}><div className="district-hero-art-orbit"><span>✳</span><i></i><b></b></div><div className="district-hero-art-caption"><small>RASVANI DISTRICT ATLAS</small><strong>{districtName}</strong><span>Food · Heritage · Places</span></div></div></div>
+      </div><DistrictHeroArt district={districtName} foods={showcaseFoods} /></div>
     </div></header>
     <main className="wrap district-main-content">
       <nav className="district-section-nav" aria-label={`${districtName} page sections`}>

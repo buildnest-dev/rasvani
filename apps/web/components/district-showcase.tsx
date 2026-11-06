@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export type ShowcaseFood = { name: string; image: string; alt: string };
 
@@ -70,4 +70,22 @@ export function DistrictAbout({ district, otherDistrictsHref }: { district: stri
     <p>{district} is one of the 38 districts of Bihar. Use this page to explore its traditional foods and notable places, then order Bihar&apos;s home-made foods from our local bakers.</p>
     <div className="cta-row"><Link className="btn secondary" href={otherDistrictsHref}>See all Bihar districts</Link><Link className="text-link" href="/bihar">Bihar famous foods →</Link></div>
   </article>;
+}
+
+/** Hero panel: a slideshow of this district's foods (slow zoom + crossfade) so every district opens with food photos. */
+export function DistrictHeroArt({ district, foods }: { district: string; foods: ShowcaseFood[] }) {
+  const list = foods.filter((food, index) => foods.findIndex((other) => other.image === food.image) === index).slice(0, 6);
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    if (list.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setInterval(() => setActive((value) => (value + 1) % list.length), 3400);
+    return () => window.clearInterval(timer);
+  }, [list.length]);
+  const current = list[active];
+  return <div className="district-hero-art dh-art" aria-label={`${district} district food photos`}>
+    {list.map((food, index) => <Image key={food.image} className={`dh-slide ${index === active ? 'is-on' : ''}`} src={food.image} alt={index === active ? food.alt : ''} fill priority={index === 0} sizes="(max-width: 900px) 100vw, 45vw" />)}
+    <div className="dh-shade" aria-hidden="true" />
+    <div className="district-hero-art-caption"><small>RASVANI DISTRICT ATLAS</small><strong>{district}</strong><span>{current ? `Now showing: ${current.name}` : 'Food · Heritage · Places'}</span></div>
+    {list.length > 1 && <div className="dh-dots" aria-hidden="true">{list.map((food, index) => <i key={food.image} className={index === active ? 'is-on' : ''} />)}</div>}
+  </div>;
 }
