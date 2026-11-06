@@ -48,10 +48,11 @@ export async function signUpAction(_previous: AuthActionState, formData: FormDat
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
+    ...(process.env.NEXT_PUBLIC_SITE_URL ? { options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '')}/auth/callback` } } : {}),
   });
   if (error) return { error: 'We could not create the account. Please check your details or try again later.' };
   if (data.session) redirect(safeNext(formData));
-  return { success: 'If registration is enabled, check your email for the verification message before signing in.' };
+  return { success: 'We sent a verification link to your email. Open it to finish signing up, then sign in.' };
 }
 
 export async function signOutAction() {

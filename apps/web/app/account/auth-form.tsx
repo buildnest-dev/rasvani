@@ -2,6 +2,7 @@
 import { LocalizedCopy } from '@/components/localized-copy';
 
 import { useActionState } from 'react';
+import { SocialSignIn } from './social-sign-in';
 import { signInAction, signUpAction, type AuthActionState } from './actions';
 
 const initialState: AuthActionState = {};
@@ -10,7 +11,7 @@ export function AuthForm({ next }: { next?: string } = {}) {
   const [signInState, signIn, signInPending] = useActionState(signInAction, initialState);
   const [signUpState, signUp, signUpPending] = useActionState(signUpAction, initialState);
 
-  return <LocalizedCopy><div className="cards" style={{ marginTop: 22 }}>
+  return <LocalizedCopy><SocialSignIn next={next} /><div className="cards" style={{ marginTop: 22 }}>
     <form className="form-shell" action={signIn}>
       <h2>Sign in</h2>
       {next && <input type="hidden" name="next" value={next} />}

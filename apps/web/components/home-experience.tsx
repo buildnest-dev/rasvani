@@ -71,6 +71,7 @@ export function HomeExperience() {
       <div className="wrap home-hero-grid">
         <div className="home-hero-copy">
           <div className="eyebrow"><span className="eyebrow-sun">✳</span> {t('heroEyebrow')} · RASVANI</div>
+          <p className="hero-live-badge"><span className="launch-dot" aria-hidden="true" /> Ordering is live in <b>Bihar</b> today · <b>All of India</b> is coming</p>
           <p className="hero-overline">{locale === 'en' ? 'INDIA IS MORE THAN A PLACE · IT IS A THOUSAND FLAVOURS OF HOME' : t('heroEyebrow')}</p>
           <h1 id="home-title">{t('heroTitle')}</h1>
           {locale === 'en' ? <>
@@ -82,7 +83,7 @@ export function HomeExperience() {
             <Link className="btn btn-ornament" href="/india-map">{t('discoverMap')} <span aria-hidden="true">↗</span></Link>
             <Link className="text-link" href="/shop">{t('shopCollection')} <span aria-hidden="true">→</span></Link>
           </div>
-          <div className="hero-signature"><span className="signature-line"/><span>ROOTED IN PLACE · OPEN TO INDIA</span></div>
+          <div className="hero-signature"><span className="signature-line"/><span>ROOTED IN PLACE · LIVE IN BIHAR · OPEN TO INDIA</span></div>
           <div className="hero-trust-row"><span><b>36</b> regions</span><i/><span><b>12</b> language options</span><i/><span><b>100%</b> vegetarian discovery</span></div>
         </div>
         <div className="home-hero-image-wrap home-orbit-stage home-hero-cinematic-stage" aria-label="A cinematic, interactive three-dimensional showcase of traditional Bihar foods">
