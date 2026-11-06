@@ -946,3 +946,5 @@ html[data-motion-ready="true"] .footer{position:relative;isolation:isolate;}
 .brand-logo{width:auto;height:46px;flex:none;margin-right:10px;filter:drop-shadow(0 2px 4px rgba(90,31,36,.18))}
 .footer-logo-tile{display:inline-grid;place-items:center;background:#fff8ec;border-radius:12px;padding:4px 8px;margin-right:12px;vertical-align:middle}.footer-logo-tile .brand-logo{height:40px;margin:0;filter:none}
 @media(max-width:420px){.brand-logo{height:36px;margin-right:6px}}
+
+.footer-heading{color:#f0d8b4;font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}.footer-founder{margin:0 0 18px;font-size:17px;color:#fff1d8}
