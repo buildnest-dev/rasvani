@@ -14,7 +14,11 @@ const friendly = (code: string) => {
   if (/weak-password/.test(code)) return 'Choose a stronger password (at least 8 characters).';
   if (/too-many-requests/.test(code)) return 'Too many attempts. Please wait a few minutes and try again.';
   if (/operation-not-allowed|configuration/.test(code)) return 'This sign-in option is not switched on yet.';
-  return 'Sign-in did not work. Please try again.';
+  if (/unauthorized-domain/.test(code)) return 'This website address is not allowed yet in Firebase (Authentication > Settings > Authorized domains).';
+  if (/api-key-not-valid|invalid-api-key/.test(code)) return 'The Firebase API key on this site is wrong or missing.';
+  if (/popup-blocked/.test(code)) return 'Your browser blocked the Google window. Allow pop-ups for this site and try again.';
+  if (/network-request-failed/.test(code)) return 'Network problem. Check your internet and try again.';
+  return `Sign-in did not work (${code || 'unknown error'}). Please try again.`;
 };
 
 export function AuthPanel({ audience = 'customer' }: { audience?: 'customer' | 'admin' | 'baker' }) {
