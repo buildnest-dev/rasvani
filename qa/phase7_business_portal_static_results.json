@@ -1,0 +1,67 @@
+{
+  "suite": "phase7_business_portal",
+  "passed": 15,
+  "total": 15,
+  "checks": [
+    {
+      "check": "business portal route exists",
+      "passed": true
+    },
+    {
+      "check": "private workspace RPC used",
+      "passed": true
+    },
+    {
+      "check": "registration workflow form",
+      "passed": true
+    },
+    {
+      "check": "GSTIN format validation",
+      "passed": true
+    },
+    {
+      "check": "business registration RPC used",
+      "passed": true
+    },
+    {
+      "check": "enquiry action calls ownership-checked RPC",
+      "passed": true
+    },
+    {
+      "check": "quote response action uses controlled RPC",
+      "passed": true
+    },
+    {
+      "check": "quote accept and decline UI",
+      "passed": true
+    },
+    {
+      "check": "business application defaults pending review",
+      "passed": true
+    },
+    {
+      "check": "only owner sees business workspace",
+      "passed": true
+    },
+    {
+      "check": "public execution revoked",
+      "passed": true
+    },
+    {
+      "check": "authenticated execution granted",
+      "passed": true
+    },
+    {
+      "check": "audit event on application",
+      "passed": true
+    },
+    {
+      "check": "account links business workspace",
+      "passed": true
+    },
+    {
+      "check": "retailer landing page links live portal",
+      "passed": true
+    }
+  ]
+}

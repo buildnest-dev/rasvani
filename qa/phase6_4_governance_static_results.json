@@ -1,0 +1,22 @@
+{
+  "checks": {
+    "application_review_admin_only": true,
+    "producer_role_assigned_only_after_approval": true,
+    "application_profile_linked": true,
+    "facility_requires_approved_producer": true,
+    "facility_approval_date_bounds": true,
+    "claim_review_role_gated": true,
+    "product_requires_approved_producer": true,
+    "product_requires_approved_facility": true,
+    "product_requires_active_category": true,
+    "all_claims_must_be_approved": true,
+    "publication_is_separate_from_approval": true,
+    "publication_role_gated": true,
+    "audit_events_written": true,
+    "all_rpc_public_execution_revoked": true
+  },
+  "passed": 14,
+  "total": 14,
+  "status": "PASS",
+  "scope": "Static source checks only; no PostgreSQL execution."
+}

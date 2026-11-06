@@ -1,0 +1,29 @@
+{
+  "suite": "Producer product self-service submission",
+  "passed": 20,
+  "total": 20,
+  "status": "PASS",
+  "checks": {
+    "product submission route exists and is producer protected": true,
+    "only active categories are offered": true,
+    "product form captures SKU, name and category": true,
+    "product form captures description and ingredient/allergen details": true,
+    "storage conditions are constrained to configured enum values": true,
+    "claim evidence is optional and separately reviewed": true,
+    "producer can see only own product status via RPC": true,
+    "server action requires producer role": true,
+    "server action validates all submitted field lengths and paired claim fields": true,
+    "server action uses narrowly scoped database submission function": true,
+    "database function requires authenticated producer role": true,
+    "database function requires approved producer profile": true,
+    "database function requires active category": true,
+    "submission inserts product in pending review": true,
+    "claim is created as pending review and not auto-approved": true,
+    "submission does not publish product or assign role": true,
+    "audit event is written": true,
+    "RPC permissions are restricted to authenticated": true,
+    "producer application links to product workspace after approval": true,
+    "page clearly distinguishes submission from approval and publication": true
+  },
+  "scope": "Static source checks only; no live Supabase execution or end-to-end producer onboarding is implied."
+}

@@ -1,0 +1,25 @@
+{
+  "checks": {
+    "order_requires_authenticated_customer": true,
+    "order_requires_nonempty_bounded_lines": true,
+    "order_requires_shipping_address": true,
+    "order_uses_published_catalogue": true,
+    "order_uses_current_price": true,
+    "order_does_not_claim_payment_capture": true,
+    "cancellation_releases_active_reservations": true,
+    "cancellation_is_pre_dispatch_only": true,
+    "business_review_admin_gated": true,
+    "trade_enquiry_requires_verified_owner": true,
+    "trade_enquiry_product_must_be_published": true,
+    "trade_quote_role_gated": true,
+    "trade_quote_requires_terms_and_future_validity": true,
+    "quote_response_checks_business_ownership": true,
+    "audit_events_for_commerce_and_b2b": true,
+    "rpc_execution_revoked_from_public_anon": true,
+    "no_b2b_manager_undefined_role": true
+  },
+  "passed": 17,
+  "total": 17,
+  "status": "PASS",
+  "scope": "Static source checks only; no PostgreSQL execution."
+}

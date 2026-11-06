@@ -1,0 +1,223 @@
+{
+  "suite": "Bihar exact vegetarian dry-snack atlas and India map \u2014 source scope cleanup",
+  "passed": 43,
+  "total": 43,
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "38 district rows transcribed",
+      "status": "PASS",
+      "detail": "Found 38 records"
+    },
+    {
+      "check": "District snack names match all 38 supplied PDF rows exactly",
+      "status": "PASS",
+      "detail": "103 snack entries parsed; compare the EXPECTED matrix for row-level differences"
+    },
+    {
+      "check": "All 32 distinct display-name variants from the PDF are represented",
+      "status": "PASS",
+      "detail": "32 distinct names"
+    },
+    {
+      "check": "District numbering is sequential 1\u201338",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "All research rows align with canonical district navigation",
+      "status": "PASS",
+      "detail": "The PDF display label Kaimur maps to the canonical Kaimur (Bhabua) route"
+    },
+    {
+      "check": "No duplicate district rows",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Every snack artwork path resolves",
+      "status": "PASS",
+      "detail": "30 artwork mappings resolve"
+    },
+    {
+      "check": "Illustrations are explicitly not producer product photos",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Shelf-life evidence disclaimer is visible",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Bihar-wide fallback distinction is visible",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Fresh-fruit-linked districts are not treated as snack origin",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "ODOP chilli, turmeric, mentha and honey do not become snack origin claims",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Recipe-specific shelf-life cautions retained for Belgrami, Batisa and Papdi",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Excluded wet/fresh/non-vegetarian foods are documented",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage is item-first, not district-card-first",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage item cards feature item title and image",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Districts are secondary associations on item cards",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Food item search includes aliases and associated place names",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage has food-source filters rather than district filters",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Food-first aggregation imports the exact PDF snack list",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Food-first aggregation retains all original Siwan food entries",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Food-first aggregation retains all six original research leads",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Name variants are retained as aliases when items are consolidated",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Kheer-Makhana remains distinct from dry-snack list and notes its exclusion",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Every homepage item image source is defined in preserved food data",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Food cards identify research and product imagery as illustrative",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage keeps the exact PDF source, fallback and shelf-life caveats",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Homepage offers the India map separately as a place-first path",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Responsive item-first food grid styles exist",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "India map selected Bihar district uses exact dry-snack data",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "India map labels linked and fallback snacks separately",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "India map preserves the non-sale approval notice",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Map remains dedicated to India map route",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "All 36 regions remain available",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "District boundary map still builds district index from loaded tiles",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Map boundary snapshot is still disclosed",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Separate ODOP spotlight module removed",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Separate ODOP dataset removed",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "No district ODOP spotlight is rendered",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Original Siwan food entries remain in the shared data module",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Original Bihar research leads remain",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Snack art filenames no longer expose ODOP programme labels",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "check": "Original ZIP spelling Doodh Laddoo is preserved",
+      "status": "PASS",
+      "detail": ""
+    }
+  ]
+}

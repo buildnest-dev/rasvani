@@ -1,0 +1,21 @@
+{
+  "suite": "Phase 10 quality-controlled product recall workspace",
+  "passed": 12,
+  "total": 12,
+  "status": "PASS",
+  "checks": {
+    "quality-only recall selector RPC exists": true,
+    "recall selector returns products with eligible inventory only": true,
+    "recall selector is bounded": true,
+    "RPC grants authenticated only": true,
+    "recall form appears only for quality reviewers and admins": true,
+    "recall form requires product and reason": true,
+    "server action checks quality role and input": true,
+    "server action calls existing product recall transition": true,
+    "recall result count is validated and reported": true,
+    "existing database recall marks batches and records movement": true,
+    "recall is audited and restricted to quality or admin roles": true,
+    "recall UI responsive": true
+  },
+  "scope": "Static source checks only; no live database recall, order traceability or authenticated UI test is implied."
+}

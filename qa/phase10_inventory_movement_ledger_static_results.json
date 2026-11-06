@@ -1,0 +1,22 @@
+{
+  "suite": "Phase 10 read-only inventory movement ledger",
+  "passed": 13,
+  "total": 13,
+  "status": "PASS",
+  "checks": {
+    "ledger RPC is stable and read-only": true,
+    "ledger is restricted to warehouse, quality and admin roles": true,
+    "anonymous and public execution revoked": true,
+    "ledger joins movement to batch product and warehouse": true,
+    "ledger includes source and destination bins": true,
+    "ledger includes movement reason and operational reference": true,
+    "ledger is bounded to 200 recent rows": true,
+    "ledger excludes customer identity and contact fields": true,
+    "warehouse page calls the protected ledger RPC": true,
+    "warehouse page renders movement date product batch warehouse bins and quantity": true,
+    "movement reason and reference are rendered": true,
+    "page states ledger cap and no stock mutation": true,
+    "warehouse migration dependency is updated": true
+  },
+  "scope": "Static source checks only; no live database, authenticated UI, stock reconciliation or deployment test is implied."
+}

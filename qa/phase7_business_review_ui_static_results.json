@@ -1,0 +1,47 @@
+{
+  "suite": "phase7_business_review_ui",
+  "passed": 10,
+  "total": 10,
+  "checks": [
+    {
+      "check": "admin queue calls protected RPC",
+      "passed": true
+    },
+    {
+      "check": "queue omits tax details",
+      "passed": true
+    },
+    {
+      "check": "queue limited to 100",
+      "passed": true
+    },
+    {
+      "check": "admin role enforced in SQL",
+      "passed": true
+    },
+    {
+      "check": "public execution revoked",
+      "passed": true
+    },
+    {
+      "check": "authenticated execution granted",
+      "passed": true
+    },
+    {
+      "check": "review server action requires admin",
+      "passed": true
+    },
+    {
+      "check": "review action calls existing audited transition",
+      "passed": true
+    },
+    {
+      "check": "review reason mandatory",
+      "passed": true
+    },
+    {
+      "check": "approve and reject controls visible",
+      "passed": true
+    }
+  ]
+}

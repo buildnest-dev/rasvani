@@ -1,0 +1,152 @@
+{
+  "suite": "Phase 1 complete visual and interactive redesign",
+  "passed": 48,
+  "total": 48,
+  "status": "PASS",
+  "checks": {
+    "Homepage uses the existing Next.js route and React component": {
+      "passed": true
+    },
+    "Prominent search submits to the existing regional search route": {
+      "passed": true
+    },
+    "Brand hero carries the Rasvani regional brand statement": {
+      "passed": true
+    },
+    "Homepage hero uses five item-specific foods in the cinematic 3D stage": {
+      "passed": true
+    },
+    "Homepage has an over-the-top cinematic 3D food theatre": {
+      "passed": true
+    },
+    "Featured editorial themes use distinct source artwork": {
+      "passed": true
+    },
+    "Featured regional food section precedes stories, producers and Better Choices": {
+      "passed": true
+    },
+    "Homepage contains a dedicated regional stories section": {
+      "passed": true
+    },
+    "Homepage contains producer partnership section without invented identities": {
+      "passed": true
+    },
+    "Homepage contains Better Choices": {
+      "passed": true
+    },
+    "Explore India appears after the other homepage editorial sections": {
+      "passed": true
+    },
+    "Homepage map preview links to the dedicated map route": {
+      "passed": true
+    },
+    "Homepage remains within the existing App Router project": {
+      "passed": true
+    },
+    "India Map has its own dedicated route": {
+      "passed": true
+    },
+    "Explore India remains an independent route": {
+      "passed": true
+    },
+    "Map journey remains within one page with three states": {
+      "passed": true
+    },
+    "Canonical 36 regions are included from the project region directory": {
+      "passed": true
+    },
+    "Map uses MapLibre GL and PMTiles rather than a static or schematic map image": {
+      "passed": true
+    },
+    "Map loads LGD state and district vector archives": {
+      "passed": true
+    },
+    "Map uses state LGD code to filter district polygons": {
+      "passed": true
+    },
+    "Map includes interactive hover, highlight and click handling": {
+      "passed": true
+    },
+    "Map labels use one anchored State/UT label and collision-managed district labels": {
+      "passed": true
+    },
+    "Map has a visible attribution and graceful network fallback": {
+      "passed": true
+    },
+    "State and district map journey supports bounds/zoom into selection": {
+      "passed": true
+    },
+    "Bihar has 38 district navigation records": {
+      "passed": true
+    },
+    "District food stage does not pair a generic feast image with a district name": {
+      "passed": true
+    },
+    "District food content remains pending when no approved associations exist": {
+      "passed": true
+    },
+    "District stage keeps vegetarian-only framing": {
+      "passed": true
+    },
+    "Regional state and district pages remain server-backed and approval-filtered": {
+      "passed": true
+    },
+    "Regional products require approved vegetarian/vegan dietary classification": {
+      "passed": true
+    },
+    "Actual approved product photos are fetched from the approved media RPC": {
+      "passed": true
+    },
+    "District route does not invent dish imagery or product names": {
+      "passed": true
+    },
+    "Vegetarian classification schema defaults to unverified": {
+      "passed": true
+    },
+    "Dietary approval requires quality reviewer role and evidence reference": {
+      "passed": true
+    },
+    "Regional catalogue filter requires approved vegetarian or vegan records": {
+      "passed": true
+    },
+    "Explore India includes search, region directory and editorial links": {
+      "passed": true
+    },
+    "State route and District route are separate real server-rendered routes": {
+      "passed": true
+    },
+    "All twelve requested language locales remain in the shared locale provider": {
+      "passed": true
+    },
+    "Language choice persists across navigation": {
+      "passed": true
+    },
+    "Global header continues to use supported locales and locale-aware navigation": {
+      "passed": true
+    },
+    "Distinct motion classes and 3D image treatments are styled": {
+      "passed": true
+    },
+    "Navigation, map, homepage and discovery pages have responsive styles": {
+      "passed": true
+    },
+    "Reduced-motion accessibility is respected": {
+      "passed": true
+    },
+    "MapLibre and PMTiles are declared as application dependencies": {
+      "passed": true
+    },
+    "Existing public shop and product detail routes are preserved": {
+      "passed": true
+    },
+    "Commerce is not falsely presented as live checkout or payment": {
+      "passed": true
+    },
+    "Original governing 29-page PDF remains in the project": {
+      "passed": true
+    },
+    "Latest project notes preserve original scope and describe the real boundary map": {
+      "passed": true
+    }
+  }
+}

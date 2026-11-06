@@ -1,0 +1,92 @@
+{
+  "status": "PASS",
+  "passed": 28,
+  "total": 28,
+  "checks": {
+    "homepage_does_not_embed_full_interactive_map": {
+      "passed": true
+    },
+    "homepage_has_a_separate_map_call_to_action": {
+      "passed": true
+    },
+    "explore_india_preview_remains_late_and_separate": {
+      "passed": true
+    },
+    "hero_search_remains_prominent_before_hero": {
+      "passed": true
+    },
+    "cinematic_food_hero_has_interactive_3d_carousel": {
+      "passed": true
+    },
+    "homepage_uses_translated_hero_and_search": {
+      "passed": true
+    },
+    "homepage_featured_food_and_story_sections_remain": {
+      "passed": true
+    },
+    "dedicated_map_route_uses_full_discovery_component": {
+      "passed": true
+    },
+    "dedicated_map_component_keeps_36_region_directory": {
+      "passed": true
+    },
+    "state_hover_preview_and_map_highlight_are_wired": {
+      "passed": true
+    },
+    "map_hover_uses_animated_highlight": {
+      "passed": true
+    },
+    "map_labels_remain_enabled": {
+      "passed": true
+    },
+    "state_labels_use_one_anchor_per_region": {
+      "passed": true
+    },
+    "one_label_anchor_exists_for_each_of_the_36_regions": {
+      "passed": true
+    },
+    "map_label_collision_detection_is_enabled": {
+      "passed": true
+    },
+    "map_labels_have_adaptive_placement": {
+      "passed": true
+    },
+    "map_label_zoom_hint_is_visible": {
+      "passed": true
+    },
+    "state_selection_opens_district_step": {
+      "passed": true
+    },
+    "district_selection_opens_food_step": {
+      "passed": true
+    },
+    "bihar_38_districts_are_selectable": {
+      "passed": true
+    },
+    "district_foods_are_not_fabricated_when_unapproved": {
+      "passed": true
+    },
+    "12_language_selector_remains_visible_and_functional": {
+      "passed": true
+    },
+    "palette_uses_requested_cream_maroon_terracotta_green_gold": {
+      "passed": true
+    },
+    "map_component_remains_dedicated_and_not_home_embedded": {
+      "passed": true
+    },
+    "responsive_map_and_district_indexes_defined": {
+      "passed": true
+    },
+    "map_is_linked_from_shared_navigation": {
+      "passed": true
+    },
+    "explore_india_is_linked_from_shared_navigation": {
+      "passed": true
+    },
+    "homepage_no_longer_places_full_map_before_featured_foods": {
+      "passed": true
+    }
+  },
+  "scope": "Static source checks that the homepage remains a preview-only entry point and the complete interactive India map stays on its dedicated route; does not claim live browser, network map, backend, or commerce verification."
+}

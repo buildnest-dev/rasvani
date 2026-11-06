@@ -1,0 +1,28 @@
+{
+  "suite": "Phase 10 private warehouse receiving photo evidence",
+  "passed": 19,
+  "total": 19,
+  "status": "PASS",
+  "checks": {
+    "private receiving evidence migration exists": true,
+    "dedicated bucket is private": true,
+    "bucket restricts uploads to JPEG PNG and WebP": true,
+    "bucket caps each object at five megabytes": true,
+    "only warehouse operators and administrators can upload": true,
+    "quality and warehouse staff have private read access": true,
+    "uploader can clean up own failed batch uploads": true,
+    "receiving form accepts multiple evidence photos": true,
+    "photo constraints are disclosed to staff": true,
+    "server action limits count and MIME types": true,
+    "server action limits each photo size": true,
+    "upload path scopes evidence to user and receipt": true,
+    "uploads use private bucket and no upsert": true,
+    "uploaded paths are passed to atomic receiving RPC": true,
+    "failed upload cleans up earlier files": true,
+    "failed receiving RPC cleans up uploaded evidence": true,
+    "receiving inspections persist photo paths": true,
+    "public catalogue media is not reused": true,
+    "migration dependency is documented in workspace": true
+  },
+  "scope": "Static source checks only; no live Supabase Storage upload, signed URL, role-policy execution, database migration or browser test is implied."
+}

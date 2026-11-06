@@ -1,0 +1,82 @@
+{
+  "suite": "Phase 2 static foundation checks",
+  "checks": [
+    {
+      "check": "36 unique state/UT taxonomy entries",
+      "passed": true,
+      "detail": "36 entries; 36 unique"
+    },
+    {
+      "check": "28 states + 8 UT ordering",
+      "passed": true,
+      "detail": "first 28 records states; final 8 records UTs"
+    },
+    {
+      "check": "server-only role authorization helper",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no client-metadata role escalation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "all required public route files exist",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "route resilience components exist",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Supabase server helper uses request cookies",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no committed service-role secret",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "RLS enabled on all Phase 2 identity tables",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "new signup gets customer role only",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "role assignment is not client writable",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "decorative image use is documented internally without customer-facing AI labels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "account actions validate credentials server-side",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "account forms use server actions and accessible feedback",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "account sign-out is server-side",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "passed": 15,
+  "failed": 0
+}

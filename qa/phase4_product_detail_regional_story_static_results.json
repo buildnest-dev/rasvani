@@ -1,0 +1,28 @@
+{
+  "suite": "phase4_product_detail_regional_story",
+  "passed": 20,
+  "total": 20,
+  "status": "PASS",
+  "checks": {
+    "product_detail_requires_approved_and_published_product": true,
+    "regional_associations_are_scoped_to_current_product": true,
+    "only_approved_associations_are_queried": true,
+    "all_four_schema_relationship_types_have_labels": true,
+    "canonical_region_directory_drives_region_names": true,
+    "unknown_region_ids_are_not_rendered": true,
+    "districts_are_loaded_only_for_associated_ids": true,
+    "districts_must_be_approved": true,
+    "district_must_match_association_region": true,
+    "district_link_uses_approved_slug": true,
+    "region_link_uses_canonical_region_id_slug": true,
+    "reviewed_relationship_note_is_visible": true,
+    "internal_evidence_and_reviewer_notes_are_not_selected": true,
+    "approved_product_media_rpc_remains_the_photo_source": true,
+    "no_unapproved_product_media_fallback_is_used": true,
+    "product_private_and_commercial_fields_are_not_selected": true,
+    "relationship_disclaimer_rejects_exclusivity_assumption": true,
+    "regional_association_policy_requires_approved_product_and_district": true,
+    "responsive_regional_relationship_cards_exist": true,
+    "implementation_documentation_covers_guardrails": true
+  }
+}

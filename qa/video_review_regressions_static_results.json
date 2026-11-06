@@ -1,0 +1,95 @@
+{
+  "status": "PASS",
+  "passed": 29,
+  "total": 29,
+  "checks": {
+    "map_load_has_bounded_timeout": {
+      "passed": true
+    },
+    "map_error_handler_is_attached_before_load": {
+      "passed": true
+    },
+    "map_error_can_fallback_after_initial_ready": {
+      "passed": true
+    },
+    "map_canvas_remains_mounted_for_cleanup": {
+      "passed": true
+    },
+    "map_loading_state_is_visible": {
+      "passed": true
+    },
+    "map_error_state_is_visible_and_retryable": {
+      "passed": true
+    },
+    "bihar_districts_are_available_in_map_fallback": {
+      "passed": true
+    },
+    "all_bihar_district_navigation_is_visible_without_database": {
+      "passed": true
+    },
+    "known_bihar_district_routes_resolve_without_database": {
+      "passed": true
+    },
+    "region_page_keeps_district_index_outside_database_conditional": {
+      "passed": true
+    },
+    "district_page_has_nonempty_pending_collection_state": {
+      "passed": true
+    },
+    "missing_supabase_role_lookup_does_not_throw": {
+      "passed": true
+    },
+    "error_boundary_offers_recovery_navigation": {
+      "passed": true
+    },
+    "food_story_pillars_have_real_image_elements": {
+      "passed": true
+    },
+    "homepage_no_longer_shows_producer_art_disclaimer": {
+      "passed": true
+    },
+    "footer_no_longer_discloses_image_creation_method": {
+      "passed": true
+    },
+    "catalogue_not_configured_copy_is_customer_friendly": {
+      "passed": true
+    },
+    "product_detail_fallback_is_customer_friendly": {
+      "passed": true
+    },
+    "shop_prelaunch_state_has_editorial_recovery_links": {
+      "passed": true
+    },
+    "product_unavailable_state_has_catalogue_recovery": {
+      "passed": true
+    },
+    "account_setup_state_returns_visitors_to_public_pages": {
+      "passed": true
+    },
+    "regional_search_no_longer_mentions_environment_setup": {
+      "passed": true
+    },
+    "account_setup_copy_avoids_local_environment_instructions": {
+      "passed": true
+    },
+    "map_loading_uses_one_overlaid_panel": {
+      "passed": true
+    },
+    "map_fallback_district_grid_has_no_duplicate_bihar_section": {
+      "passed": true
+    },
+    "public_ui_uses_no_illustrative_creation_disclosures": {
+      "passed": true
+    },
+    "explore_search_copy_does_not_reference_machine_generated_translations": {
+      "passed": true
+    },
+    "all_referenced_public_images_exist": {
+      "passed": true
+    },
+    "no_customer_facing_ai_creation_labels_or_disclaimers": {
+      "passed": true
+    }
+  },
+  "scope": "Static source checks for regressions identified in the 252-second user screen recording; not a live browser, backend, map-network, or checkout test."
+}

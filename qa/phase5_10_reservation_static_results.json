@@ -1,0 +1,19 @@
+{
+  "checks": {
+    "reservation_capped_by_order_line_quantity": true,
+    "order_row_locked_for_reservation_guard": true,
+    "order_owner_or_warehouse_release_authorized": true,
+    "release_writes_ledger": true,
+    "expired_reservation_cleanup_exists": true,
+    "expired_cleanup_not_browser_executable": true,
+    "dispatch_requires_warehouse_role": true,
+    "dispatch_rechecks_batch_eligibility": true,
+    "dispatch_decrements_physical_stock": true,
+    "dispatch_consumes_reservations_atomically": true,
+    "functions_revoke_public_execution": true
+  },
+  "passed": 11,
+  "total": 11,
+  "status": "PASS",
+  "scope": "Static source checks only; no PostgreSQL execution."
+}

@@ -1,0 +1,20 @@
+{
+  "passed": 12,
+  "total": 12,
+  "checks": {
+    "canonical_bihar_districts_38": true,
+    "tourism_place_records_38": true,
+    "tourism_records_cover_all_districts": true,
+    "bihar_region_page_embeds_interactive_district_map": true,
+    "map_component_links_each_district": true,
+    "generic_district_pages_render_places": true,
+    "siwan_special_route_renders_places": true,
+    "homepage_adds_perukia": true,
+    "homepage_adds_gujiya": true,
+    "homepage_excludes_kadhi_and_litti": true,
+    "perukia_image_exists": true,
+    "gujiya_image_exists": true
+  },
+  "missing_place_keys": [],
+  "unexpected_place_keys": []
+}

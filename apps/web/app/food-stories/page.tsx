@@ -1,0 +1,16 @@
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+export const metadata: Metadata = { title: 'Food Stories', description: 'A regional food journal for ingredients, traditions and carefully reviewed stories.' };
+export default function StoriesPage() {
+  return <div className="journal-page">
+    <section className="journal-hero"><div className="wrap journal-hero-grid"><div><div className="eyebrow">RASVANI JOURNAL / FIELD NOTES</div><h1>Every flavour<br/>has a <em>somewhere.</em></h1><p>Food stories are more than recipes. They are the places, ingredients, practices and memories that give a table its meaning.</p><Link className="btn" href="/explore-india">Explore the regional atlas ↗</Link></div><div className="journal-hero-image"><Image src="/images/rasvani-editorial-vegetarian-feast.webp" alt="A richly arranged vegetarian Indian food still life" fill sizes="(max-width: 850px) 100vw, 55vw"/></div></div></section>
+    <section className="wrap journal-intro"><div><span className="eyebrow">THE EDITORIAL PROMISE</span><h2>Curiosity, with care.</h2></div><p>Rasvani stories will be published after factual review, consent and rights checks. Recipes, interviews, historical context, food names and regional associations will not be invented to fill a page.</p></section>
+    <section className="journal-collection"><div className="wrap"><div className="section-heading-premium"><div><div className="eyebrow">THE JOURNAL, IN THREE LAYERS</div><h2>What we look closer at.</h2></div><p>Editorial pillars for the upcoming regional journal.</p></div><div className="journal-pillar-grid">
+      <article><span>01 / INGREDIENTS</span><div className="journal-pillar-art art-spice"><Image src="/images/rasvani-editorial-spice-pantry.webp" alt="Indian grains, pulses, spices and fresh ingredients" fill sizes="(max-width: 700px) 90vw, 30vw"/></div><h3>From soil to spice box</h3><p>Ingredient notes and foodways, with sources and context attached.</p><small>EDITORIAL CONTENT PENDING</small></article>
+      <article><span>02 / TRADITIONS</span><div className="journal-pillar-art art-table"><Image src="/images/rasvani-editorial-vegetarian-feast.webp" alt="A generous vegetarian table arranged with brass vessels and regional dishes" fill sizes="(max-width: 700px) 90vw, 30vw"/></div><h3>The rituals around a meal</h3><p>Traditions and practices shared with care, attribution and cultural context.</p><small>EDITORIAL CONTENT PENDING</small></article>
+      <article><span>03 / PEOPLE</span><div className="journal-pillar-art art-craft"><Image src="/images/rasvani-editorial-snack-feast.webp" alt="A curated assortment of Indian vegetarian snacks arranged on brass serving ware" fill sizes="(max-width: 700px) 90vw, 30vw"/></div><h3>The craft behind every table</h3><p>Preparation techniques and everyday kitchen practices, presented with care and context.</p><small>EDITORIAL CONTENT PENDING</small></article>
+    </div></div></section>
+    <section className="journal-bottom-cta"><div className="wrap"><h2>Start with a place.</h2><p>Follow the map into states, districts and the vegetarian foods associated with them.</p><Link className="btn btn-ornament" href="/india-map">Explore the India map ↗</Link></div></section>
+  </div>;
+}

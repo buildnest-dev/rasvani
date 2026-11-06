@@ -1,0 +1,68 @@
+{
+  "suite": "Producer facility self-service and staff review workspace",
+  "passed": 20,
+  "total": 20,
+  "status": "PASS",
+  "checks": {
+    "migration 019 exists": {
+      "passed": true
+    },
+    "submission function requires authenticated producer role": {
+      "passed": true
+    },
+    "submission validates approved producer profile": {
+      "passed": true
+    },
+    "submission validates known region": {
+      "passed": true
+    },
+    "submission validates six digit postal code": {
+      "passed": true
+    },
+    "submission validates facility type and storage array": {
+      "passed": true
+    },
+    "submission audit event exists": {
+      "passed": true
+    },
+    "producer status RPC scoped to own account": {
+      "passed": true
+    },
+    "staff queue requires reviewer role": {
+      "passed": true
+    },
+    "staff queue is bounded": {
+      "passed": true
+    },
+    "producer page is role protected": {
+      "passed": true
+    },
+    "producer page renders review status": {
+      "passed": true
+    },
+    "form collects address and facility details": {
+      "passed": true
+    },
+    "server action validates PIN and region": {
+      "passed": true
+    },
+    "server action calls narrow facility RPC": {
+      "passed": true
+    },
+    "review page is role protected": {
+      "passed": true
+    },
+    "review action calls existing audited transition": {
+      "passed": true
+    },
+    "review action validates date range": {
+      "passed": true
+    },
+    "admin links facility review queue": {
+      "passed": true
+    },
+    "producer portal links facility management": {
+      "passed": true
+    }
+  }
+}

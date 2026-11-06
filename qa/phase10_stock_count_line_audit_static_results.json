@@ -1,0 +1,23 @@
+{
+  "suite": "Physical stock-count line audit",
+  "passed": 16,
+  "total": 16,
+  "checks": {
+    "replaces_protected_count_line_rpc": true,
+    "requires_warehouse_or_admin_role": true,
+    "locks_count_header": true,
+    "locks_existing_count_line": true,
+    "rejects_non_open_count": true,
+    "rejects_unscoped_batch": true,
+    "records_first_entry_event": true,
+    "records_correction_event": true,
+    "captures_previous_quantity": true,
+    "captures_new_quantity": true,
+    "captures_previous_notes": true,
+    "captures_new_notes": true,
+    "captures_previous_counter_and_time": true,
+    "states_no_inventory_change": true,
+    "revokes_public_execution": true,
+    "grants_authenticated_execution": true
+  }
+}

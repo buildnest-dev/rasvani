@@ -1,0 +1,22 @@
+{
+  "suite": "phase10_stock_count_variance_investigation",
+  "passed": 15,
+  "total": 15,
+  "checks": {
+    "stock_count_line_component_imports_investigation_action": true,
+    "variance_lines_offer_independent_investigation": true,
+    "finding_options_cover_supported_review_methods": true,
+    "investigation_note_is_required_and_bounded": true,
+    "existing_investigation_is_displayed": true,
+    "server_action_checks_quality_role": true,
+    "server_action_validates_ids_finding_and_note": true,
+    "server_action_calls_protected_rpc": true,
+    "database_requires_independent_reviewer": true,
+    "database_only_allows_submitted_variance_lines": true,
+    "database_persists_review_audit_metadata": true,
+    "approval_blocks_uninvestigated_variances": true,
+    "critical_variance_still_requires_admin": true,
+    "database_rpc_is_authenticated_only": true,
+    "success_feedback_is_wired": true
+  }
+}

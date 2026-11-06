@@ -1,0 +1,23 @@
+{
+  "suite": "phase4_regional_catalogue_filters",
+  "passed": 16,
+  "total": 16,
+  "checks": {
+    "shop_imports_canonical_region_directory": true,
+    "region_filter_is_validated_against_canonical_regions": true,
+    "approved_districts_populate_district_filter": true,
+    "regional_product_filter_requires_approved_association": true,
+    "district_filter_requires_published_district_record": true,
+    "region_filter_applies_to_alias_matches": true,
+    "category_filter_remains_available": true,
+    "search_filter_remains_available": true,
+    "invalid_region_or_district_does_not_return_unscoped_products": true,
+    "filter_form_exposes_region_and_district": true,
+    "district_filter_disabled_without_region": true,
+    "clear_filters_resets_all_filter_dimensions": true,
+    "mobile_filters_stack_without_horizontal_overflow": true,
+    "disabled_district_control_has_visual_state": true,
+    "documentation_explains_approved_association_scope": true,
+    "documentation_disclaims_delivery_and_stock_promises": true
+  }
+}

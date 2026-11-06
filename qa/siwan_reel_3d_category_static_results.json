@@ -1,0 +1,96 @@
+{
+  "suite": "Siwan original ZIP foods, 3D carousel, pending Bihar research leads and India map",
+  "passed": 22,
+  "total": 22,
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "Siwan route resolves to its dedicated district experience",
+      "status": "PASS"
+    },
+    {
+      "check": "Official Siwan district foods are all included",
+      "status": "PASS"
+    },
+    {
+      "check": "Locally covered sweet-shop foods remain separately represented",
+      "status": "PASS"
+    },
+    {
+      "check": "All ten food entries map to their own image assets",
+      "status": "PASS"
+    },
+    {
+      "check": "All ten image files exist in the public image directory",
+      "status": "PASS"
+    },
+    {
+      "check": "Food entries clearly distinguish official district references from local coverage",
+      "status": "PASS"
+    },
+    {
+      "check": "Search and all food category filters remain interactive",
+      "status": "PASS"
+    },
+    {
+      "check": "Every food card renders its exact item image and descriptive alt text",
+      "status": "PASS"
+    },
+    {
+      "check": "A dedicated 3D food carousel is mounted in the Siwan hero",
+      "status": "PASS"
+    },
+    {
+      "check": "3D carousel uses perspective and preserve-3d transforms",
+      "status": "PASS"
+    },
+    {
+      "check": "3D carousel supports pointer drag and touch interaction",
+      "status": "PASS"
+    },
+    {
+      "check": "3D carousel supports keyboard and previous/next controls",
+      "status": "PASS"
+    },
+    {
+      "check": "3D carousel respects reduced-motion preference",
+      "status": "PASS"
+    },
+    {
+      "check": "Hero has a direct link to the dedicated interactive India map",
+      "status": "PASS"
+    },
+    {
+      "check": "Producer, stories and About Siwan sections remain present",
+      "status": "PASS"
+    },
+    {
+      "check": "No unsupported sale or shelf-life promise is made",
+      "status": "PASS"
+    },
+    {
+      "check": "No misleading AI-generation label is shown in the customer interface",
+      "status": "PASS"
+    },
+    {
+      "check": "All six Bihar research leads have a dedicated matching illustration asset",
+      "status": "PASS"
+    },
+    {
+      "check": "All six Bihar research-lead illustrations exist",
+      "status": "PASS"
+    },
+    {
+      "check": "Research-lead images render in the district review cards",
+      "status": "PASS"
+    },
+    {
+      "check": "Research-lead artwork is explicitly not product photography",
+      "status": "PASS"
+    },
+    {
+      "check": "Illustrations do not promote pending leads as approved foods",
+      "status": "PASS"
+    }
+  ]
+}

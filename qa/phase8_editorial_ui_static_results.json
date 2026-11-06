@@ -1,0 +1,22 @@
+{
+  "suite": "Phase 8 protected editorial workspace UI",
+  "passed": 13,
+  "total": 13,
+  "status": "PASS",
+  "checks": {
+    "editorial workspace route exists": true,
+    "route has server-side editor role guard": true,
+    "queue uses scoped database RPC": true,
+    "draft action validates slug and content type": true,
+    "draft body is structured JSON": true,
+    "review actions call database transition RPCs": true,
+    "review requires a reason": true,
+    "publishing requires editor/admin role": true,
+    "queue function checks roles and omits personal details": true,
+    "queue function has bounded result set": true,
+    "translation status is shown separately": true,
+    "unpublished approved content has explicit publish action": true,
+    "responsive editor styles exist": true
+  },
+  "scope": "Static source checks only; not runtime, Supabase authorization integration, visual QA or framework build."
+}

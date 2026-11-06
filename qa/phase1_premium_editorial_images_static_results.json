@@ -1,0 +1,24 @@
+{
+  "suite": "phase1_premium_editorial_images",
+  "passed": 16,
+  "total": 16,
+  "checks": {
+    "rasvani-editorial-vegetarian-feast.webp exists with approved source dimensions": true,
+    "rasvani-editorial-vegetarian-feast.webp is WebP": true,
+    "rasvani-editorial-sweets-brass.webp exists with approved source dimensions": true,
+    "rasvani-editorial-sweets-brass.webp is WebP": true,
+    "rasvani-editorial-spice-pantry.webp exists with approved source dimensions": true,
+    "rasvani-editorial-spice-pantry.webp is WebP": true,
+    "rasvani-editorial-snack-feast.webp exists with approved source dimensions": true,
+    "rasvani-editorial-snack-feast.webp is WebP": true,
+    "homepage hero uses five item-specific foods in the cinematic 3D stage": true,
+    "featured food cards use distinct editorial food imagery": true,
+    "homepage food cards use Next image optimization": true,
+    "food stories uses premium editorial images": true,
+    "producer page image does not claim to depict a named producer": true,
+    "Explore India hero uses a general food-spread visual": true,
+    "editorial visuals are explicitly excluded from product evidence": true,
+    "product pages retain approved product media workflow": true
+  },
+  "scope": "Asset existence, dimensions, format and source wiring only; not a subjective visual-quality or browser-rendering audit."
+}

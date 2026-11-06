@@ -1,0 +1,27 @@
+{
+  "suite": "Phase 6 producer self-service portal",
+  "passed": 18,
+  "total": 18,
+  "status": "PASS",
+  "checks": {
+    "protected producer portal route exists": true,
+    "application summary uses own-user RPC": true,
+    "status is displayed without claiming approval from submission": true,
+    "all 36 regions are selectable": true,
+    "form captures legal name, region and contact": true,
+    "form collects business introduction without sensitive ID numbers": true,
+    "server action role-checks signed-in applicants": true,
+    "server action validates region allowlist": true,
+    "server action validates email format": true,
+    "server action invokes narrowly scoped submission RPC": true,
+    "migration requires authenticated session": true,
+    "submission serializes concurrent requests per account": true,
+    "migration validates legal name and region": true,
+    "migration does not assign producer role on submission": true,
+    "migration restricts own application status": true,
+    "RPC execute grants are authenticated-only": true,
+    "producer landing page links to portal": true,
+    "responsive producer form styles exist": true
+  },
+  "scope": "Static source checks only; no Supabase migration execution, authenticated browser session, document verification or operational onboarding is implied."
+}

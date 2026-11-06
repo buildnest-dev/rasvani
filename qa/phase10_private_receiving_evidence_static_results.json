@@ -1,0 +1,22 @@
+{
+  "suite": "Phase 10 private receiving evidence review",
+  "passed": 13,
+  "total": 13,
+  "status": "PASS",
+  "checks": {
+    "evidence review is loaded only for pending quarantined batches": true,
+    "evidence RPC is protected by warehouse or quality roles": true,
+    "evidence RPC bounds batch request size": true,
+    "evidence RPC returns checklist outcome and notes": true,
+    "evidence RPC returns private photo paths only": true,
+    "evidence storage bucket remains private": true,
+    "private object reads remain role-gated": true,
+    "signed URLs are created server-side with short expiry": true,
+    "raw private object paths are not rendered in markup": true,
+    "evidence photos have descriptive alt text": true,
+    "checklist pass and fail states are displayed distinctly": true,
+    "evidence UI has responsive thumbnail styling": true,
+    "workspace documents evidence migration dependency": true
+  },
+  "scope": "Static source checks only; signed URL generation and storage RLS were not exercised against a live Supabase project."
+}

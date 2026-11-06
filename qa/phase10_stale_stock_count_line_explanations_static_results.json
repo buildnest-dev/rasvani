@@ -1,0 +1,25 @@
+{
+  "suite": "Line-level stale stock-count explanations",
+  "passed": 18,
+  "total": 18,
+  "checks": {
+    "protected_detail_rpc_replaced": true,
+    "warehouse_quality_role_gate": true,
+    "admin_role_gate": true,
+    "missing_batch_reason": true,
+    "quantity_change_reason": true,
+    "disposed_batch_reason": true,
+    "other_attribute_reason": true,
+    "only_active_counts_marked_stale": true,
+    "current_quantity_exposed": true,
+    "current_stock_status_exposed": true,
+    "inspection_status_exposed": true,
+    "stale_reasons_exposed": true,
+    "read_only_no_inventory_mutation": true,
+    "authenticated_execute_grant": true,
+    "ui_declares_reason_fields": true,
+    "ui_explains_line_level_reasons": true,
+    "ui_displays_current_stock_state": true,
+    "deployment_lists_migration_042": true
+  }
+}

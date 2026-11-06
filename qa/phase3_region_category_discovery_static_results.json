@@ -1,0 +1,23 @@
+{
+  "suite": "phase3_region_category_discovery",
+  "passed": 16,
+  "total": 16,
+  "checks": {
+    "regional_product_query_uses_approved_associations": true,
+    "product_category_id_is_read_with_association": true,
+    "categories_are_limited_to_associated_ids": true,
+    "only_active_categories_are_used": true,
+    "category_order_is_stable": true,
+    "no_categories_are_seeded": true,
+    "category_count_uses_unique_product_ids": true,
+    "category_links_target_shop_filter": true,
+    "shop_consumes_category_filter": true,
+    "category_labels_are_shown_on_region_food_cards": true,
+    "association_relationship_labels_are_preserved": true,
+    "category_navigation_has_accessible_heading": true,
+    "empty_regional_category_section_is_omitted": true,
+    "responsive_category_grid_exists": true,
+    "keyboard_focus_is_visible": true,
+    "documentation_states_publication_guardrails": true
+  }
+}

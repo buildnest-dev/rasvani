@@ -1,0 +1,21 @@
+{
+  "suite": "Public catalogue and product detail UI",
+  "passed": 13,
+  "total": 13,
+  "status": "PASS",
+  "checks": {
+    "shop queries only approved products": true,
+    "shop requires published timestamp": true,
+    "shop search is bounded": true,
+    "category filter uses active categories": true,
+    "catalogue has no invented price or stock": true,
+    "public page explains checkout is disabled": true,
+    "product details route exists": true,
+    "detail route enforces approved publication": true,
+    "detail exposes ingredient and allergen fields": true,
+    "detail does not expose internal SKU or producer data": true,
+    "unconfigured Supabase state is handled": true,
+    "responsive catalogue styles exist": true,
+    "public product RLS policy is approval-gated": true
+  }
+}

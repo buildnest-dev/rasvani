@@ -1,0 +1,171 @@
+{
+  "suite": "sitewide locale, image clarity and cinematic homepage motion",
+  "passed": 27,
+  "total": 27,
+  "status": "PASS",
+  "checks": {
+    "global locale provider still exposes all twelve Indian language options": {
+      "passed": true
+    },
+    "locale choice is restored from and saved to local storage": {
+      "passed": true
+    },
+    "active document language is updated": {
+      "passed": true
+    },
+    "provider exposes a shared translation function": {
+      "passed": true
+    },
+    "sitewide copy layer translates nested text and accessibility attributes": {
+      "passed": true
+    },
+    "main route content and shared footer are inside the locale-aware layer": {
+      "passed": true
+    },
+    "all six original Rasvani navigation tabs use active-language labels": {
+      "passed": true
+    },
+    "home hero and home UI are wrapped for live locale updates": {
+      "passed": true
+    },
+    "India map and boundary map are locale-aware client experiences": {
+      "passed": true
+    },
+    "Explore India and the region directory are locale-aware": {
+      "passed": true
+    },
+    "district food pages and the food-stage controls are locale-aware": {
+      "passed": true
+    },
+    "account sign-in and district switcher copy are locale-aware": {
+      "passed": true
+    },
+    "English source food names are intentionally preserved by the phrase glossary": {
+      "passed": true
+    },
+    "long product, ingredient, allergen and legal statements are marked for qualified translation review": {
+      "passed": true
+    },
+    "translated collection label preserves the Rasvani brand spelling": {
+      "passed": true
+    },
+    "translation glossary returns localized navigation, district headings and actions in all eleven non-English languages": {
+      "passed": true
+    },
+    "food names remain unchanged in all supported non-English languages": {
+      "passed": true
+    },
+    "all snack and research thumbnails are at least 1000 pixels wide after image cleanup": {
+      "passed": true
+    },
+    "Buxar Batisa and Papdi retain separate food-specific photo assets": {
+      "passed": true
+    },
+    "homepage food cards no longer force unoptimized local thumbnails": {
+      "passed": true
+    },
+    "India-map food thumbnails no longer force unoptimized local images": {
+      "passed": true
+    },
+    "3D food stage images use Next image optimisation": {
+      "passed": true
+    },
+    "homepage hero renders the five-food cinematic stage": {
+      "passed": true
+    },
+    "hero stage supports animated 3D rotation, dragging, keyboard and pause": {
+      "passed": true
+    },
+    "cinematic hero uses layered light, orbit and floating-map treatments": {
+      "passed": true
+    },
+    "cinematic hero responds to tablet and mobile breakpoints": {
+      "passed": true
+    },
+    "cinematic hero and thumbnails respect reduced-motion preference": {
+      "passed": true
+    }
+  },
+  "translation_probe": {
+    "hi": {
+      "nav": "स्वादों का घर",
+      "district": "Buxar के पारंपरिक खाद्य पदार्थ",
+      "action": "भारत देखें↗",
+      "food": "Thekua",
+      "brand": "Rasvani संग्रह"
+    },
+    "bn": {
+      "nav": "স্বাদের ঠিকানা",
+      "district": "Buxar জেলার ঐতিহ্যবাহী খাবার",
+      "action": "ভারত অন্বেষণ করুন↗",
+      "food": "Thekua",
+      "brand": "Rasvani সংগ্রহ"
+    },
+    "ta": {
+      "nav": "சுவைகளின் இல்லம்",
+      "district": "Buxar பாரம்பரிய உணவுகள்",
+      "action": "இந்தியாவை ஆராயுங்கள்↗",
+      "food": "Thekua",
+      "brand": "Rasvani தொகுப்பு"
+    },
+    "te": {
+      "nav": "రుచుల ఇల్లు",
+      "district": "Buxar సంప్రదాయ ఆహారాలు",
+      "action": "భారత్‌ను అన్వేషించండి↗",
+      "food": "Thekua",
+      "brand": "Rasvani సేకరణ"
+    },
+    "mr": {
+      "nav": "चवींचे घर",
+      "district": "Buxar येथील पारंपरिक खाद्यपदार्थ",
+      "action": "भारत एक्सप्लोर करा↗",
+      "food": "Thekua",
+      "brand": "Rasvani संग्रह"
+    },
+    "gu": {
+      "nav": "સ્વાદોનું ઘર",
+      "district": "Buxar ના પરંપરાગત ખોરાક",
+      "action": "ભારતની શોધખોળ કરો↗",
+      "food": "Thekua",
+      "brand": "Rasvani સંગ્રહ"
+    },
+    "pa": {
+      "nav": "ਸੁਆਦਾਂ ਦਾ ਘਰ",
+      "district": "Buxar ਦੇ ਰਵਾਇਤੀ ਭੋਜਨ",
+      "action": "ਭਾਰਤ ਦੀ ਖੋਜ ਕਰੋ↗",
+      "food": "Thekua",
+      "brand": "Rasvani ਸੰਗ੍ਰਹਿ"
+    },
+    "kn": {
+      "nav": "ರುಚಿಗಳ ಮನೆ",
+      "district": "Buxar ಸಾಂಪ್ರದಾಯಿಕ ಆಹಾರಗಳು",
+      "action": "ಭಾರತ ಅನ್ವೇಷಿಸಿ↗",
+      "food": "Thekua",
+      "brand": "Rasvani ಸಂಗ್ರಹ"
+    },
+    "ml": {
+      "nav": "രുചികളുടെ വീട്",
+      "district": "Buxar പരമ്പരാഗത ഭക്ഷണങ്ങൾ",
+      "action": "ഇന്ത്യ പര്യവേക്ഷണം ചെയ്യുക↗",
+      "food": "Thekua",
+      "brand": "Rasvani ശേഖരം"
+    },
+    "or": {
+      "nav": "ସ୍ୱାଦର ଘର",
+      "district": "Buxarର ପାରମ୍ପରିକ ଖାଦ୍ୟ",
+      "action": "ଭାରତ ଅନ୍ୱେଷଣ କରନ୍ତୁ↗",
+      "food": "Thekua",
+      "brand": "Rasvani ସଂଗ୍ରହ"
+    },
+    "as": {
+      "nav": "সোৱাদৰ ঘৰ",
+      "district": "Buxarৰ পৰম্পৰাগত খাদ্য",
+      "action": "ভাৰত অন্বেষণ কৰক↗",
+      "food": "Thekua",
+      "brand": "Rasvani সংগ্ৰহ"
+    }
+  },
+  "image_asset_count": 37,
+  "minimum_image_width": 1024,
+  "scope": "Static checks and pure phrase-translation exercises. Does not imply reviewed legal/food-label translations or a live browser render."
+}

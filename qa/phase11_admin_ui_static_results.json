@@ -1,0 +1,20 @@
+{
+  "suite": "Phase 11 protected admin UI",
+  "passed": 11,
+  "total": 11,
+  "status": "PASS",
+  "checks": {
+    "admin route exists": true,
+    "route enforces server-side admin role": true,
+    "summary uses approved aggregate RPC": true,
+    "warehouse report uses role-gated RPC": true,
+    "locale report uses role-gated RPC": true,
+    "review queue renders all 13 aggregates": true,
+    "warehouse table exposes aggregate counts only": true,
+    "locale table exposes review aggregates": true,
+    "unavailable backend is explained without fabricated data": true,
+    "read-only aggregate disclaimer is visible": true,
+    "dashboard has responsive layout styles": true
+  },
+  "scope": "Static source checks only; not a runtime, database, authorization integration or visual browser test."
+}

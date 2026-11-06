@@ -1,0 +1,27 @@
+{
+  "suite": "phase10_stock_count_workspace",
+  "passed": 20,
+  "total": 20,
+  "checks": {
+    "workspace_imports_stock_count_actions": true,
+    "workspace_loads_count_register": true,
+    "selected_count_loads_batch_lines": true,
+    "warehouse_role_can_start_count": true,
+    "every_batch_line_has_physical_quantity_entry": true,
+    "count_notes_are_captured": true,
+    "submit_is_disabled_until_all_lines_counted": true,
+    "quality_review_roles_are_separate": true,
+    "review_has_approve_and_reject": true,
+    "server_actions_recheck_warehouse_role": true,
+    "server_actions_validate_nonnegative_precision": true,
+    "server_actions_call_database_rpc": true,
+    "count_creator_cannot_review_in_database": true,
+    "database_snapshot_detects_stock_movement": true,
+    "database_blocks_count_below_reserved_quantity": true,
+    "database_adjustments_write_movement_ledger": true,
+    "database_audit_logs_count_lifecycle": true,
+    "tables_are_not_directly_accessible": true,
+    "responsive_stock_count_layout_exists": true,
+    "movement_ledger_explains_approved_adjustments": true
+  }
+}

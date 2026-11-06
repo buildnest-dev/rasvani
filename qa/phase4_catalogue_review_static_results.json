@@ -1,0 +1,67 @@
+{
+  "suite": "phase4_catalogue_review",
+  "passed": 15,
+  "total": 15,
+  "checks": [
+    {
+      "check": "catalogue review route exists",
+      "passed": true
+    },
+    {
+      "check": "claim queue is role-gated",
+      "passed": true
+    },
+    {
+      "check": "product queue role-gated",
+      "passed": true
+    },
+    {
+      "check": "queue execution revoked from public and anon",
+      "passed": true
+    },
+    {
+      "check": "queue execution granted to authenticated",
+      "passed": true
+    },
+    {
+      "check": "product queue bounded",
+      "passed": true
+    },
+    {
+      "check": "claim queue bounded",
+      "passed": true
+    },
+    {
+      "check": "claim queue returns only pending claims",
+      "passed": true
+    },
+    {
+      "check": "claim review uses audited existing RPC",
+      "passed": true
+    },
+    {
+      "check": "product approval uses existing audited RPC",
+      "passed": true
+    },
+    {
+      "check": "publication uses existing eligibility-checked RPC",
+      "passed": true
+    },
+    {
+      "check": "server actions require staff roles",
+      "passed": true
+    },
+    {
+      "check": "review reasons are length-validated",
+      "passed": true
+    },
+    {
+      "check": "publication is separate from product approval",
+      "passed": true
+    },
+    {
+      "check": "admin dashboard links to workspace",
+      "passed": true
+    }
+  ]
+}

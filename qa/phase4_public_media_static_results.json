@@ -1,0 +1,73 @@
+{
+  "status": "PASS",
+  "passed": 22,
+  "total": 22,
+  "checks": {
+    "public media migration exists": {
+      "passed": true
+    },
+    "private bucket is not changed to public": {
+      "passed": true
+    },
+    "media approval required for storage read": {
+      "passed": true
+    },
+    "owning product approval required for storage read": {
+      "passed": true
+    },
+    "owning product publication required for storage read": {
+      "passed": true
+    },
+    "storage public-read policy is bucket-scoped": {
+      "passed": true
+    },
+    "storage gate checks exact object path": {
+      "passed": true
+    },
+    "public-media RPC is security definer": {
+      "passed": true
+    },
+    "public-media RPC bounds product IDs": {
+      "passed": true
+    },
+    "public-media RPC bounds image count": {
+      "passed": true
+    },
+    "public-media RPC returns only approved published media": {
+      "passed": true
+    },
+    "public-media RPC has explicit grants": {
+      "passed": true
+    },
+    "shop still filters approved and published products": {
+      "passed": true
+    },
+    "shop asks for public media using product IDs": {
+      "passed": true
+    },
+    "shop mints short-lived signed image URLs": {
+      "passed": true
+    },
+    "shop uses only approved photo lookup for cards": {
+      "passed": true
+    },
+    "detail still filters approved and published product": {
+      "passed": true
+    },
+    "detail requests bounded approved photo set": {
+      "passed": true
+    },
+    "detail mints short-lived signed image URLs": {
+      "passed": true
+    },
+    "detail includes safe photo fallback": {
+      "passed": true
+    },
+    "responsive no-crop product photo presentation exists": {
+      "passed": true
+    },
+    "public prices and inventory remain undisclosed": {
+      "passed": true
+    }
+  }
+}

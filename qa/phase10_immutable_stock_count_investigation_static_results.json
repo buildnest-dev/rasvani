@@ -1,0 +1,17 @@
+{
+  "suite": "phase10_immutable_stock_count_investigation",
+  "passed": 10,
+  "total": 10,
+  "checks": {
+    "migration_replaces_existing_protected_investigation_rpc": true,
+    "migration_locks_submitted_count": true,
+    "migration_requires_independent_reviewer": true,
+    "migration_rejects_second_investigation": true,
+    "immutable_guard_has_clear_error": true,
+    "finding_and_note_validation_preserved": true,
+    "first_investigation_still_audited": true,
+    "authenticated_only_execute_grant": true,
+    "warehouse_ui_does_not_offer_edit_after_saved_finding": true,
+    "server_action_still_uses_protected_rpc": true
+  }
+}

@@ -1,0 +1,47 @@
+# Rasvani website video review and remediation
+
+**Review source:** user-uploaded WhatsApp screen recording, 4 minutes 12 seconds (252 seconds), recorded on 3 November 2026.  
+**Review method:** sampled the complete recording at one frame per second (252 timeline frames), then inspected higher-resolution frames around the India Map, Bihar region, Shop, Producer Application and error transitions. The observations below are limited to what the recording shows and the corresponding current project code.
+
+## Timeline review
+
+| Time in recording | Page / interaction visible | Observation | Remediation in this update |
+|---|---|---|---|
+| 00:00–00:18 | Homepage first view | Search, brand hero and floating food composition are present. The page starts with a strong hero, but several later image treatments repeat across sections. | Kept the search-first hierarchy and hero composition; diversified imagery across featured foods, journal, producer partnership and Explore India sections. Changed the language metric to “12 language options” rather than implying full-site translation is complete. |
+| 00:19–00:43 | Homepage scroll: map preview and featured food section | The map preview is an atlas motif that links to the dedicated map page; the actual map is not embedded on the homepage. Featured cards are category/editorial links rather than live product cards. | Kept the homepage preview separate from the dedicated map. Made the editorial image choices less repetitive. Live product cards remain dependent on approved catalogue records. |
+| 00:44–01:08 | Homepage scroll: food story, producer, Better Choices, Explore India and footer | The producer section displayed a customer-facing notice explaining that the picture was not a real producer/product photograph. This interrupts the brand experience. | Removed that notice and other image-creation disclaimers from public UI. The section remains a general editorial introduction; it does not name or imply an actual producer. |
+| 01:09–01:27 | For Producers page | Public producer-partnership page and its staged process are visible. The application journey requires an authenticated, configured workspace. | Preserved the public page and fixed protected-route handling when the local Supabase configuration is absent. |
+| 01:28–01:49 | Return to homepage / navigation | Homepage navigation works in the recording. | No route changes needed for this sequence. |
+| 01:50–02:06 | Food Stories page | The hero and editorial introduction load, but the three editorial pillar cards show mostly blank colour blocks rather than meaningful image-led content. | Replaced the empty colour-only cards with three distinct image-led editorial panels and added restrained image hover movement. |
+| 02:07–02:31 | India Map page; state selection (Andhra Pradesh) | The map canvas remains blank/loading and the selected State does not produce a usable district map in the recording. There is no clear recovery route when boundary data does not arrive. | Added an early map error listener, a 16-second load timeout, explicit loading/error states and a retry action. A failed map no longer leaves an empty map-sized canvas. Bihar’s district names can be selected from the fallback panel. Other States/UTs still rely on the licensed boundary dataset for district-level navigation. |
+| 02:32–02:55 | Explore India page | The dedicated page is separate and the regional directory is reachable. Search and directory are visible, but regional food/product content is limited by the unconfigured content service. | Kept Explore India separate; replaced developer-oriented setup language with clean editorial empty states. |
+| 02:56–03:08 | Bihar region page | The page reports no approved district guides and the visible district list is empty, even though Bihar is the initial navigation focus. | Added the 38-name Bihar district navigation baseline to the public regional page. The names are navigation only; this does not publish an unverified food-origin claim. |
+| 03:09–03:16 | Shop / “A considered collection” | Shop opens but contains no products in this local run; the visible message refers to environment configuration. | Replaced technical setup wording with a customer-facing catalogue preparation message. No prices, availability or products were fabricated. |
+| 03:17–03:35 | Food Stories / For Producers navigation | Editorial and producer routes are reachable. | Improved Food Stories imagery and removed the misleading producer-image notice. |
+| 03:36–03:45 | Producer application action | Clicking the protected application path reaches the generic error boundary in the recording. The recording does not show the URL clearly, but the route’s server code called the Supabase role lookup without guarding missing local credentials. | `getCurrentUserRoles()` now treats missing Supabase configuration as no assigned roles. Protected workspaces redirect to the Account page rather than throwing a route error. The error boundary also provides Home and Explore India recovery links. |
+| 03:46–04:11 | Return to Explore India, language selector and footer | Regional navigation returns, and changing the language visibly translates some shared interface strings. The recording does not demonstrate full translation of every route, product, story or checkout field. | Kept all 12 selector options. This update does not claim full-site professional translation; remaining untranslated content is listed as an open item below. |
+
+## Code changes made
+
+1. **Map lifecycle and recovery:** the tile error handler is attached immediately; a load timeout prevents indefinite blank states; the map shows an explicit loading panel; failures switch to a retryable fallback panel; and the map container remains mounted for correct cleanup. Bihar district names are offered as selectable fallback navigation when the map source is unavailable.
+2. **Bihar district navigation:** the public Bihar region page now lists the 38 district names from the project’s existing navigation baseline even when Supabase is not configured. The district detail route resolves those known Bihar slugs and renders a clear editorial collection state instead of a false 404.
+3. **Authentication error prevention:** missing local Supabase credentials no longer throw from the role lookup. Protected producer/business workspaces redirect safely to Account.
+4. **Error recovery:** the error boundary now has retry, Home and Explore India actions.
+5. **Food Stories:** the three pillar panels now use distinct image assets instead of empty colour-only blocks; hover treatment is added with reduced-motion support.
+6. **Image and copy consistency:** public image choices are more varied across homepage sections. The visible producer-image disclaimer and all customer-facing AI-creation / image-origin labels were removed. Image alt text now describes the visible subject without mentioning how the image was made.
+7. **Public empty states:** Shop, product detail, regional search and Account no longer expose local environment/setup wording to visitors.
+8. **Motion:** the India → State/District → Food stage transitions receive a restrained entrance transition, while respecting reduced-motion preferences.
+
+## Requirements still open (not silently presented as complete)
+
+- **Map availability:** the vector boundary archives and glyph service are remote. The map now fails gracefully and can be retried, but actual polygon rendering still needs a browser test on the user’s network and a production-hosted boundary source decision.
+- **All-district offline index:** Bihar has a static district navigation baseline. Other States/UTs currently depend on the district vector layer; their full district names are not duplicated into a separate offline directory by this update.
+- **Food-to-district content:** only approved vegetarian/vegan product associations and their own approved product media may appear as named district foods. The local recording does not show an active connected catalogue or published district associations, so no food names, origins or product images were fabricated.
+- **Shop and ordering:** the recording contains no published product cards. Actual pack sizes, prices, availability, shared cart, checkout, payment and order confirmation still require approved catalogue/inventory records and the configured order/payment services.
+- **12-language coverage:** all 12 selector options exist, and some shared labels change. Complete professional translation of every route, food/story record, product, cart and checkout is not verified or complete.
+- **Producer and retailer workspaces:** the public partnership pages work; authenticated application and account functions still require Supabase configuration, migrations and assigned roles.
+- **Browser verification:** this remediation has static source checks and syntax parsing only. It has not been run through the user’s browser, live Supabase, real map network requests, responsive device testing or payment sandbox.
+
+## Source-of-truth protection
+
+This work is an incremental repair of the current Rasvani codebase. It does not replace the original 29-page governing PDF, Master Specification v3.0, warehouse fulfilment model, batch traceability, FEFO/FIFO, quality review or other phase requirements. No producer names, district food associations, prices, stock, licences, delivery promises or payment details were invented.

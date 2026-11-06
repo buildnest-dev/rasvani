@@ -1,0 +1,23 @@
+{
+  "suite": "phase10_open_stock_count_cancellation",
+  "passed": 16,
+  "total": 16,
+  "checks": {
+    "status_constraint_allows_cancelled_terminal_state": true,
+    "cancellation_requires_reason": true,
+    "cancellation_locks_count_row": true,
+    "only_counting_status_can_be_cancelled": true,
+    "creator_or_admin_only": true,
+    "audit_records_reason_and_preserved_lines": true,
+    "inventory_is_not_adjusted": true,
+    "snapshot_and_count_lines_not_deleted": true,
+    "authenticated_execute_only": true,
+    "protected_count_history_exposes_cancel_metadata": true,
+    "ui_displays_cancel_actor_timestamp_and_reason": true,
+    "server_action_uses_protected_rpc": true,
+    "ui_limits_cancel_form_to_creator_or_admin": true,
+    "ui_requires_a_reason_and_explains_retention": true,
+    "responsive_cancel_form_styles": true,
+    "documentation_describes_terminal_cancel_and_scope": true
+  }
+}

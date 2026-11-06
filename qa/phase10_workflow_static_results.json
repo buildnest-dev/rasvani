@@ -1,0 +1,17 @@
+{
+  "suite": "phase10_inventory_workflow_static",
+  "checks": {
+    "36 regions seeded": true,
+    "FEFO ordering present": true,
+    "row locks used": true,
+    "allocation rollback on shortfall": true,
+    "expiry blocked at allocation": true,
+    "inspection role gate": true,
+    "recall workflow present": true,
+    "audit records written": true,
+    "direct writes revoked": true
+  },
+  "passed": 9,
+  "total": 9,
+  "execution": "static source inspection only; no database execution"
+}

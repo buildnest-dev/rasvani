@@ -1,0 +1,98 @@
+{
+  "desktop": {
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "document_width": 1440,
+    "no_horizontal_overflow": true,
+    "assets_loaded_200": 10,
+    "checks": {
+      "search_panel": true,
+      "bag_panel": true,
+      "producer_panel": true,
+      "admin_panel": true,
+      "region_selector": true,
+      "search_result": true,
+      "product_detail": true,
+      "bag_quantity_and_clear": true,
+      "escape_and_focus_restore": true,
+      "retailer_journey": true
+    },
+    "console_errors": []
+  },
+  "tablet": {
+    "viewport": {
+      "width": 820,
+      "height": 1000
+    },
+    "document_width": 820,
+    "no_horizontal_overflow": true,
+    "assets_loaded_200": 10,
+    "checks": {
+      "search_panel": true,
+      "bag_panel": true,
+      "producer_panel": true,
+      "admin_panel": true,
+      "region_selector": true,
+      "search_result": true,
+      "product_detail": true,
+      "bag_quantity_and_clear": true,
+      "escape_and_focus_restore": true,
+      "mobile_menu": true,
+      "mobile_account": true,
+      "retailer_journey": true
+    },
+    "console_errors": []
+  },
+  "mobile": {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "document_width": 390,
+    "no_horizontal_overflow": true,
+    "assets_loaded_200": 10,
+    "checks": {
+      "search_panel": true,
+      "bag_panel": true,
+      "producer_panel": true,
+      "admin_panel": true,
+      "region_selector": true,
+      "search_result": true,
+      "product_detail": true,
+      "bag_quantity_and_clear": true,
+      "escape_and_focus_restore": true,
+      "mobile_menu": true,
+      "mobile_account": true,
+      "retailer_journey": true
+    },
+    "console_errors": []
+  },
+  "overflow_320": {
+    "viewport_width": 320,
+    "document_width": 320,
+    "passed": true
+  },
+  "overflow_360": {
+    "viewport_width": 360,
+    "document_width": 360,
+    "passed": true
+  },
+  "overflow_375": {
+    "viewport_width": 375,
+    "document_width": 375,
+    "passed": true
+  },
+  "overflow_768": {
+    "viewport_width": 768,
+    "document_width": 768,
+    "passed": true
+  },
+  "overflow_1024": {
+    "viewport_width": 1024,
+    "document_width": 1024,
+    "passed": true
+  },
+  "overall_pass": true
+}

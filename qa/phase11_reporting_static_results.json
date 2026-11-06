@@ -1,0 +1,21 @@
+{
+  "checks": {
+    "admin_summary_exists": true,
+    "admin_summary_requires_admin_role": true,
+    "admin_summary_contains_core_review_queues": true,
+    "admin_summary_contains_warehouse_and_commerce_queues": true,
+    "summary_excludes_personal_details": true,
+    "warehouse_summary_role_gated": true,
+    "warehouse_summary_separates_stock_risks": true,
+    "locale_coverage_has_all_12_locales": true,
+    "locale_coverage_requires_editorial_or_quality_role": true,
+    "all_rpcs_revoke_public_anon": true,
+    "all_rpcs_grant_authenticated": true,
+    "no_mutation_endpoints": true,
+    "queue_indexes_added": true
+  },
+  "passed": 13,
+  "total": 13,
+  "status": "PASS",
+  "scope": "Static source checks only; no PostgreSQL/Supabase execution."
+}

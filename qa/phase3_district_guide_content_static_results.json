@@ -1,0 +1,24 @@
+{
+  "suite": "phase3_district_guide_content",
+  "passed": 17,
+  "total": 17,
+  "checks": {
+    "migration_adds_optional_district_introduction": true,
+    "migration_adds_optional_heritage_note": true,
+    "migration_bounds_copy_lengths": true,
+    "legacy_district_rpc_signature_removed": true,
+    "new_rpc_keeps_editor_role_gate": true,
+    "new_rpc_audits_guide_content_presence": true,
+    "action_validates_guide_copy_lengths": true,
+    "action_sends_both_guide_fields_to_rpc": true,
+    "workspace_collects_introduction": true,
+    "workspace_collects_heritage_context": true,
+    "workspace_explains_evidence_review": true,
+    "review_queue_displays_proposed_copy": true,
+    "public_page_selects_approved_district_copy": true,
+    "public_page_renders_optional_intro": true,
+    "public_page_renders_optional_heritage_note": true,
+    "public_copy_not_seeded": true,
+    "responsive_guide_styles_exist": true
+  }
+}

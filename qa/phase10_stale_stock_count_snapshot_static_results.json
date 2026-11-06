@@ -1,0 +1,23 @@
+{
+  "suite": "Visible stale stock-count snapshot read model and UI",
+  "passed": 16,
+  "total": 16,
+  "checks": {
+    "replaces_protected_stock_count_register": true,
+    "retains_warehouse_and_quality_role_gate": true,
+    "retains_admin_role_gate": true,
+    "exposes_stale_line_count": true,
+    "exposes_boolean_stale_flag": true,
+    "detects_stock_version_change": true,
+    "detects_quantity_change": true,
+    "detects_disposed_batches": true,
+    "handles_missing_batch_reference_safely": true,
+    "zero_line_count_is_not_null_stale_flag": true,
+    "remains_read_only": true,
+    "retains_authenticated_grant": true,
+    "ui_declares_new_read_model_fields": true,
+    "ui_shows_stale_status_in_register": true,
+    "ui_warns_on_selected_stale_count": true,
+    "existing_approval_guard_remains_in_prior_migration": true
+  }
+}

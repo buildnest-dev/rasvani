@@ -1,0 +1,25 @@
+{
+  "suite": "Phase 10 receiving checklist template editing",
+  "passed": 16,
+  "total": 16,
+  "status": "PASS",
+  "checks": {
+    "database edit RPC exists": true,
+    "edit RPC is admin-only": true,
+    "edit RPC rejects invalid key and title": true,
+    "edit RPC requires category or storage scope": true,
+    "edit RPC validates active category": true,
+    "built-in checks are immutable": true,
+    "template row is locked before update": true,
+    "before and after values are audited": true,
+    "RPC privileges are revoked from public and anon": true,
+    "server action rechecks admin role and validates values": true,
+    "server action invokes protected RPC": true,
+    "warehouse page exposes edit controls only for custom active templates": true,
+    "edit form supports title category storage and requiredness": true,
+    "success state and actionable error are surfaced": true,
+    "responsive edit form styles exist": true,
+    "documentation explains historical evidence and migration": true
+  },
+  "scope": "Static source checks only; no live Supabase migration execution or authenticated browser test is implied."
+}

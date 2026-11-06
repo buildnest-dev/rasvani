@@ -1,0 +1,19 @@
+{
+  "suite": "Database unique-index enforcement for active stock counts",
+  "passed": 12,
+  "total": 12,
+  "checks": {
+    "preflight_checks_existing_active_duplicates": true,
+    "preflight_fails_with_actionable_conflict_message": true,
+    "does_not_silently_cancel_or_delete_historical_counts": true,
+    "creates_partial_unique_index": true,
+    "unique_key_is_warehouse": true,
+    "only_counting_and_submitted_rows_are_indexed": true,
+    "finalised_and_cancelled_history_remains_outside_index": true,
+    "index_has_explanatory_comment": true,
+    "does_not_change_count_snapshots": true,
+    "does_not_change_inventory_quantities": true,
+    "does_not_change_review_logic": true,
+    "does_not_change_cancellation_logic": true
+  }
+}

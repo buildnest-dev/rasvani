@@ -1,0 +1,80 @@
+{
+  "suite": "Stock-count line search and exception filters",
+  "passed": 24,
+  "total": 24,
+  "status": "PASS",
+  "checks": {
+    "client_component_is_explicit": {
+      "passed": true
+    },
+    "search_input_is_accessibly_labelled": {
+      "passed": true
+    },
+    "search_matches_product_name": {
+      "passed": true
+    },
+    "search_matches_sku": {
+      "passed": true
+    },
+    "search_matches_batch_code": {
+      "passed": true
+    },
+    "search_matches_bin_code": {
+      "passed": true
+    },
+    "all_lines_filter_available": {
+      "passed": true
+    },
+    "uncounted_filter_available": {
+      "passed": true
+    },
+    "variance_filter_available": {
+      "passed": true
+    },
+    "stale_filter_available": {
+      "passed": true
+    },
+    "matched_filter_excludes_stale_lines": {
+      "passed": true
+    },
+    "filter_buttons_expose_pressed_state": {
+      "passed": true
+    },
+    "filter_group_has_accessible_name": {
+      "passed": true
+    },
+    "result_count_is_announced": {
+      "passed": true
+    },
+    "empty_result_state_is_explained": {
+      "passed": true
+    },
+    "filter_counts_are_derived_from_loaded_lines": {
+      "passed": true
+    },
+    "count_entry_still_uses_server_action": {
+      "passed": true
+    },
+    "variance_investigation_still_uses_server_action": {
+      "passed": true
+    },
+    "stock_count_id_is_bound_to_each_action": {
+      "passed": true
+    },
+    "stale_reasons_remain_visible": {
+      "passed": true
+    },
+    "server_page_uses_filtered_line_component": {
+      "passed": true
+    },
+    "inventory_approval_flow_remains_in_server_page": {
+      "passed": true
+    },
+    "responsive_filter_styles_exist": {
+      "passed": true
+    },
+    "keyboard_focus_style_exists": {
+      "passed": true
+    }
+  }
+}

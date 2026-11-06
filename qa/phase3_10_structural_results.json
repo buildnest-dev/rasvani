@@ -1,0 +1,39 @@
+{
+  "suite": "Phase 3-10 structural checks",
+  "checks": [
+    {
+      "check": "region search component",
+      "passed": true
+    },
+    {
+      "check": "region detail route",
+      "passed": true
+    },
+    {
+      "check": "domain migration",
+      "passed": true
+    },
+    {
+      "check": "phase register",
+      "passed": true
+    },
+    {
+      "check": "FEFO index",
+      "passed": true
+    },
+    {
+      "check": "RLS enabled on domain tables",
+      "passed": true
+    },
+    {
+      "check": "no direct client policy for sensitive tables",
+      "passed": true
+    },
+    {
+      "check": "12 locale constraint",
+      "passed": true
+    }
+  ],
+  "passed": 8,
+  "failed": 0
+}

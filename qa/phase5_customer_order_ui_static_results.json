@@ -1,0 +1,19 @@
+{
+  "suite": "phase5_customer_order_ui",
+  "passed": 12,
+  "total": 12,
+  "checks": {
+    "customer order page exists": true,
+    "requires authenticated user": true,
+    "uses private own-orders RPC": true,
+    "displays line item and order totals": true,
+    "payment status is not overstated": true,
+    "cancellation action uses existing server RPC": true,
+    "cancellation reason is validated": true,
+    "page is linked from account": true,
+    "RPC scopes query to authenticated user": true,
+    "RPC limits returned order history": true,
+    "RPC grants authenticated only": true,
+    "order lines are aggregated for own order": true
+  }
+}

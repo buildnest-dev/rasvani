@@ -1,0 +1,74 @@
+{
+  "suite": "Private product image upload and quality review",
+  "passed": 22,
+  "total": 22,
+  "status": "PASS",
+  "checks": {
+    "migration 020 exists": {
+      "passed": true
+    },
+    "storage bucket is private": {
+      "passed": true
+    },
+    "storage bucket restricts MIME types and 5 MB": {
+      "passed": true
+    },
+    "upload policy requires authenticated approved producer": {
+      "passed": true
+    },
+    "storage path begins with authenticated user id": {
+      "passed": true
+    },
+    "storage policy uses safe helper for pending object cleanup": {
+      "passed": true
+    },
+    "media table has RLS and no direct client grants": {
+      "passed": true
+    },
+    "registration checks producer owns product": {
+      "passed": true
+    },
+    "registration checks image object exists": {
+      "passed": true
+    },
+    "product image submission count is bounded": {
+      "passed": true
+    },
+    "registration restricts product image format and size": {
+      "passed": true
+    },
+    "producer media status RPC is owner scoped": {
+      "passed": true
+    },
+    "review queue requires quality role": {
+      "passed": true
+    },
+    "media review function requires reason": {
+      "passed": true
+    },
+    "publication blocked by pending media review": {
+      "passed": true
+    },
+    "producer media route requires producer role": {
+      "passed": true
+    },
+    "producer upload uses private bucket": {
+      "passed": true
+    },
+    "browser validates allowed MIME and size": {
+      "passed": true
+    },
+    "server action finalizes through narrow RPC": {
+      "passed": true
+    },
+    "review workspace renders private signed image previews": {
+      "passed": true
+    },
+    "review workspace supports approve/reject image actions": {
+      "passed": true
+    },
+    "producer product list links to image management": {
+      "passed": true
+    }
+  }
+}

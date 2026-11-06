@@ -1,0 +1,29 @@
+{
+  "suite": "phase3_district_discovery",
+  "passed": 22,
+  "total": 22,
+  "checks": {
+    "state_page_reads_approved_districts": true,
+    "state_page_scopes_districts_to_region": true,
+    "state_page_limits_district_results": true,
+    "state_page_has_database_unconfigured_state": true,
+    "state_page_has_database_error_state": true,
+    "state_page_has_empty_state": true,
+    "state_page_renders_district_navigation": true,
+    "district_page_validates_region": true,
+    "district_page_requires_approved_district": true,
+    "district_page_scopes_district_slug": true,
+    "district_page_requires_approved_associations": true,
+    "district_page_limits_associations": true,
+    "district_page_uses_relationship_labels": true,
+    "district_page_avoids_exclusivity_claim": true,
+    "district_page_links_published_product_detail": true,
+    "district_page_handles_no_associations": true,
+    "district_page_has_connection_error_state": true,
+    "migration_enforces_region_district_match": true,
+    "migration_requires_evidence_reference": true,
+    "migration_public_associations_require_published_products": true,
+    "district_list_has_responsive_grid": true,
+    "district_food_cards_have_responsive_grid": true
+  }
+}

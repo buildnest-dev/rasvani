@@ -1,0 +1,21 @@
+{
+  "suite": "phase8_9_11_editorial_privacy_static",
+  "passed": 12,
+  "total": 12,
+  "checks": {
+    "editorial draft save is role gated": true,
+    "draft submission requires author or admin": true,
+    "review requires pending state": true,
+    "publication requires approved and unpublished": true,
+    "archive requires admin and reason": true,
+    "translation locales constrained to 12": true,
+    "translation approval requires reviewer role": true,
+    "translation public read requires published source": true,
+    "consent is append-only via RPC": true,
+    "consent revocation can be recorded": true,
+    "all workflow RPCs revoke public execute": true,
+    "audit events recorded": true
+  },
+  "failed": [],
+  "database_execution": "NOT RUN"
+}

@@ -1,0 +1,19 @@
+{
+  "checks": {
+    "common_receiving_checklist_seeded": true,
+    "receiving_requires_warehouse_role": true,
+    "received_batches_start_quarantined": true,
+    "mandatory_checklist_enforced": true,
+    "receiving_records_inspection_evidence": true,
+    "returns_start_quarantined": true,
+    "return_inspection_separate_from_stock_reinstatement": true,
+    "expiry_monitoring_view_present": true,
+    "expired_stock_block_function_present": true,
+    "sensitive_functions_revoke_public": true,
+    "no_direct_return_table_writes": true
+  },
+  "passed": 11,
+  "total": 11,
+  "status": "PASS",
+  "scope": "Static source checks only; no PostgreSQL execution."
+}

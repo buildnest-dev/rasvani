@@ -1,0 +1,98 @@
+{
+  "suite": "district_food_trails",
+  "passed": 18,
+  "failed": 0,
+  "total": 18,
+  "checks": [
+    {
+      "name": "38 Bihar district rows are in the source list",
+      "passed": true,
+      "detail": "38 parsed district calls"
+    },
+    {
+      "name": "Each district entry has an image resolver",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Every snack artwork mapping resolves to an existing public asset",
+      "passed": true,
+      "detail": "Checked all declared /images mappings"
+    },
+    {
+      "name": "Buxar Batisa and Papdi use different food photos",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "District Flavour Trails renders each food item as its own card",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Every district food card includes an image",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Every district food card includes Food Stories & Vlogs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "District page mounts the item-focused food trail",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Traditional Foods section navigation resolves to the food grid",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "District food trail includes a 3D animated showcase",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "3D showcase keeps drag, pointer and keyboard controls",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "3D showcase supports per-district accessible labels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "3D showcase respects reduced-motion preference",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Siwan keeps its original foods and adds the PDF dry-snack items",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Siwan stage contains original and PDF food records",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Original Rasvani navigation tabs are retained",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Home remains item-first rather than district-card-first",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "No stock or sale claim is made for illustrative snack images",
+      "passed": true,
+      "detail": ""
+    }
+  ]
+}

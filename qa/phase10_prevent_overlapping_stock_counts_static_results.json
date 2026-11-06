@@ -1,0 +1,21 @@
+{
+  "suite": "Prevent overlapping full-warehouse stock counts",
+  "passed": 14,
+  "total": 14,
+  "checks": {
+    "replaces_protected_creation_rpc": true,
+    "requires_warehouse_operator_or_admin": true,
+    "validates_active_warehouse": true,
+    "serializes_per_warehouse_creation": true,
+    "blocks_existing_open_or_submitted_count": true,
+    "uses_clear_conflict_message": true,
+    "retains_full_warehouse_snapshot": true,
+    "retains_non_disposed_scope": true,
+    "retains_batch_snapshot_quantity": true,
+    "rejects_empty_snapshot": true,
+    "audits_full_warehouse_scope": true,
+    "does_not_mutate_inventory": true,
+    "revokes_public_execution": true,
+    "grants_authenticated_execution": true
+  }
+}

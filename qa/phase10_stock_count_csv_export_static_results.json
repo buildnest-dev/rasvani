@@ -1,0 +1,19 @@
+{
+  "checks": {
+    "export is an explicit user action": true,
+    "export is limited to currently visible filtered lines": true,
+    "CSV has UTF-8 BOM and CRLF records": true,
+    "CSV values are quoted and embedded quotes escaped": true,
+    "spreadsheet formula injection prefixes are neutralised": true,
+    "report includes snapshot and physical quantities": true,
+    "report includes variance and stale diagnostics": true,
+    "report includes inspection and escalation evidence": true,
+    "report includes count and investigation notes": true,
+    "empty exports are disabled": true,
+    "download filename identifies count and filter": true,
+    "export control has responsive layout": true
+  },
+  "passed": 12,
+  "total": 12,
+  "scope": "Static source checks only; no browser download, live database, framework build or deployment test is implied."
+}

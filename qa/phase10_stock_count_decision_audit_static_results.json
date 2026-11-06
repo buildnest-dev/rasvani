@@ -1,0 +1,26 @@
+{
+  "suite": "Stock-count decision audit read model",
+  "passed": 19,
+  "total": 19,
+  "checks": {
+    "replaces_protected_count_register": true,
+    "returns_submitter_identity": true,
+    "returns_final_reviewer_identity": true,
+    "returns_final_review_reason": true,
+    "returns_count_creation_notes": true,
+    "preserves_cancel_actor_and_reason": true,
+    "preserves_variance_and_escalation_totals": true,
+    "retains_warehouse_quality_role_gate": true,
+    "read_model_is_stable_security_definer": true,
+    "revoke_public_anon_and_grant_authenticated": true,
+    "page_type_accepts_decision_audit_fields": true,
+    "register_displays_submission_actor_and_time": true,
+    "register_displays_review_actor_and_time": true,
+    "detail_displays_original_count_notes": true,
+    "approved_decision_displays_reviewer_and_reason": true,
+    "rejected_decision_explains_no_inventory_change": true,
+    "register_displays_review_decision_reason": true,
+    "register_displays_cancellation_reason": true,
+    "does_not_change_adjustment_rpc_or_inventory": true
+  }
+}

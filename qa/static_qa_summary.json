@@ -1,0 +1,393 @@
+{
+  "status": "PASS",
+  "passed": 1016,
+  "total": 1016,
+  "suites": [
+    {
+      "suite": "Phase 1 navigation 3D motion",
+      "passed": 23,
+      "total": 23,
+      "status": "PASS",
+      "file": "phase1_navigation_motion_static_results.json"
+    },
+    {
+      "suite": "Phase 1 complete visual redesign",
+      "passed": 48,
+      "total": 48,
+      "status": "PASS",
+      "file": "phase1_visual_redesign_static_results.json"
+    },
+    {
+      "suite": "Phase 1 premium editorial and item imagery",
+      "passed": 16,
+      "total": 16,
+      "status": "PASS",
+      "file": "phase1_premium_editorial_images_static_results.json"
+    },
+    {
+      "suite": "Phase 3 regional directory",
+      "passed": 12,
+      "total": 12,
+      "status": "PASS",
+      "file": "phase3_regional_directory_static_results.json"
+    },
+    {
+      "suite": "Phase 3 regional food search",
+      "passed": 31,
+      "total": 31,
+      "status": "PASS",
+      "file": "phase3_regional_search_static_results.json"
+    },
+    {
+      "suite": "Phase 3 protected regional review workspace",
+      "passed": 39,
+      "total": 39,
+      "status": "PASS",
+      "file": "phase3_regional_review_static_results.json"
+    },
+    {
+      "suite": "Phase 3 district discovery",
+      "passed": 22,
+      "total": 22,
+      "status": "PASS",
+      "file": "phase3_district_discovery_static_results.json"
+    },
+    {
+      "suite": "Phase 3 district guide content",
+      "passed": 17,
+      "total": 17,
+      "status": "PASS",
+      "file": "phase3_district_guide_content_static_results.json"
+    },
+    {
+      "suite": "Phase 3 state and UT overview content",
+      "passed": 30,
+      "total": 30,
+      "status": "PASS",
+      "file": "phase3_region_overview_static_results.json"
+    },
+    {
+      "suite": "Phase 3 state category discovery",
+      "passed": 16,
+      "total": 16,
+      "status": "PASS",
+      "file": "phase3_region_category_discovery_static_results.json"
+    },
+    {
+      "suite": "Catalogue review workspace",
+      "passed": 15,
+      "total": 15,
+      "status": "PASS",
+      "file": "phase4_catalogue_review_static_results.json"
+    },
+    {
+      "suite": "Public catalogue and product detail UI",
+      "passed": 13,
+      "total": 13,
+      "status": "PASS",
+      "file": "phase4_public_catalogue_static_results.json"
+    },
+    {
+      "suite": "Public approved product media delivery",
+      "passed": 22,
+      "total": 22,
+      "status": "PASS",
+      "file": "phase4_public_media_static_results.json"
+    },
+    {
+      "suite": "Phase 4 regional catalogue filters",
+      "passed": 16,
+      "total": 16,
+      "status": "PASS",
+      "file": "phase4_regional_catalogue_filters_static_results.json"
+    },
+    {
+      "suite": "Phase 4 product detail regional story",
+      "passed": 20,
+      "total": 20,
+      "status": "PASS",
+      "file": "phase4_product_detail_regional_story_static_results.json"
+    },
+    {
+      "suite": "Phase 2 identity/access",
+      "passed": 15,
+      "total": 15,
+      "status": "PASS",
+      "file": "phase2_static_results.json"
+    },
+    {
+      "suite": "Inventory allocation/recall",
+      "passed": 9,
+      "total": 9,
+      "status": "PASS",
+      "file": "phase10_workflow_static_results.json"
+    },
+    {
+      "suite": "Receiving/returns/expiry",
+      "passed": 11,
+      "total": 11,
+      "status": "PASS",
+      "file": "phase10_receiving_returns_static_results.json"
+    },
+    {
+      "suite": "Reservation/dispatch",
+      "passed": 11,
+      "total": 11,
+      "status": "PASS",
+      "file": "phase5_10_reservation_static_results.json"
+    },
+    {
+      "suite": "Producer/catalogue governance",
+      "passed": 14,
+      "total": 14,
+      "status": "PASS",
+      "file": "phase6_4_governance_static_results.json"
+    },
+    {
+      "suite": "Customer commerce/B2B",
+      "passed": 17,
+      "total": 17,
+      "status": "PASS",
+      "file": "phase5_7_commerce_b2b_static_results.json"
+    },
+    {
+      "suite": "Editorial/translations/consent",
+      "passed": 12,
+      "total": 12,
+      "status": "PASS",
+      "file": "phase8_9_11_editorial_privacy_static_results.json"
+    },
+    {
+      "suite": "Admin reporting",
+      "passed": 13,
+      "total": 13,
+      "status": "PASS",
+      "file": "phase11_reporting_static_results.json"
+    },
+    {
+      "suite": "Protected admin dashboard UI",
+      "passed": 11,
+      "total": 11,
+      "status": "PASS",
+      "file": "phase11_admin_ui_static_results.json"
+    },
+    {
+      "suite": "Protected editorial workspace UI",
+      "passed": 13,
+      "total": 13,
+      "status": "PASS",
+      "file": "phase8_editorial_ui_static_results.json"
+    },
+    {
+      "suite": "Translation workspace UI",
+      "passed": 10,
+      "total": 10,
+      "status": "PASS",
+      "file": "phase9_translation_ui_static_results.json"
+    },
+    {
+      "suite": "Protected producer self-service portal",
+      "passed": 18,
+      "total": 18,
+      "status": "PASS",
+      "file": "phase6_producer_portal_static_results.json"
+    },
+    {
+      "suite": "Protected warehouse workspace UI",
+      "passed": 30,
+      "total": 30,
+      "status": "PASS",
+      "file": "phase10_warehouse_workspace_static_results.json"
+    },
+    {
+      "suite": "Customer order history and cancellation UI",
+      "passed": 12,
+      "total": 12,
+      "status": "PASS",
+      "file": "phase5_customer_order_ui_static_results.json"
+    },
+    {
+      "suite": "Business buyer self-service portal",
+      "passed": 15,
+      "total": 15,
+      "status": "PASS",
+      "file": "phase7_business_portal_static_results.json"
+    },
+    {
+      "suite": "Admin business verification queue",
+      "passed": 10,
+      "total": 10,
+      "status": "PASS",
+      "file": "phase7_business_review_ui_static_results.json"
+    },
+    {
+      "suite": "Producer facility self-service and staff review",
+      "passed": 20,
+      "total": 20,
+      "status": "PASS",
+      "file": "phase6_facility_workspace_static_results.json"
+    },
+    {
+      "suite": "Private product image upload and quality review",
+      "passed": 22,
+      "total": 22,
+      "status": "PASS",
+      "file": "phase6_product_media_static_results.json"
+    },
+    {
+      "suite": "Private warehouse receiving evidence review",
+      "passed": 13,
+      "total": 13,
+      "status": "PASS",
+      "file": "phase10_private_receiving_evidence_static_results.json"
+    },
+    {
+      "suite": "Quality-controlled product recall workspace",
+      "passed": 12,
+      "total": 12,
+      "status": "PASS",
+      "file": "phase10_recall_workspace_static_results.json"
+    },
+    {
+      "suite": "Read-only inventory movement ledger",
+      "passed": 13,
+      "total": 13,
+      "status": "PASS",
+      "file": "phase10_inventory_movement_ledger_static_results.json"
+    },
+    {
+      "suite": "Physical stock-count reconciliation workspace",
+      "passed": 20,
+      "total": 20,
+      "status": "PASS",
+      "file": "phase10_stock_count_workspace_static_results.json"
+    },
+    {
+      "suite": "Receiving checklist template editing",
+      "passed": 16,
+      "total": 16,
+      "status": "PASS",
+      "file": "phase10_checklist_template_editing_static_results.json"
+    },
+    {
+      "suite": "Independent stock-count variance investigation",
+      "passed": 15,
+      "total": 15,
+      "status": "PASS",
+      "file": "phase10_stock_count_variance_investigation_static_results.json"
+    },
+    {
+      "suite": "Immutable stock-count investigation evidence",
+      "passed": 10,
+      "total": 10,
+      "status": "PASS",
+      "file": "phase10_immutable_stock_count_investigation_static_results.json"
+    },
+    {
+      "suite": "Open stock-count cancellation",
+      "passed": 16,
+      "total": 16,
+      "status": "PASS",
+      "file": "phase10_open_stock_count_cancellation_static_results.json"
+    },
+    {
+      "suite": "Physical stock-count line audit",
+      "passed": 16,
+      "total": 16,
+      "status": "PASS",
+      "file": "phase10_stock_count_line_audit_static_results.json"
+    },
+    {
+      "suite": "Stock-count decision audit read model and register",
+      "passed": 19,
+      "total": 19,
+      "status": "PASS",
+      "file": "phase10_stock_count_decision_audit_static_results.json"
+    },
+    {
+      "suite": "Prevent overlapping full-warehouse stock counts",
+      "passed": 14,
+      "total": 14,
+      "status": "PASS",
+      "file": "phase10_prevent_overlapping_stock_counts_static_results.json"
+    },
+    {
+      "suite": "Database unique-index enforcement for active stock counts",
+      "passed": 12,
+      "total": 12,
+      "status": "PASS",
+      "file": "phase10_stock_count_unique_index_static_results.json"
+    },
+    {
+      "suite": "Visible stale stock-count snapshot read model and UI",
+      "passed": 16,
+      "total": 16,
+      "status": "PASS",
+      "file": "phase10_stale_stock_count_snapshot_static_results.json"
+    },
+    {
+      "suite": "Line-level stale stock-count explanations",
+      "passed": 18,
+      "total": 18,
+      "status": "PASS",
+      "file": "phase10_stale_stock_count_line_explanations_static_results.json"
+    },
+    {
+      "suite": "Stock-count line search and exception filters",
+      "passed": 24,
+      "total": 24,
+      "status": "PASS",
+      "file": "phase10_stock_count_line_search_filters_static_results.json"
+    },
+    {
+      "suite": "Physical stock-count filtered CSV export",
+      "passed": 12,
+      "total": 12,
+      "status": "PASS",
+      "file": "phase10_stock_count_csv_export_static_results.json"
+    },
+    {
+      "suite": "Video review regression remediation",
+      "passed": 29,
+      "total": 29,
+      "status": "PASS",
+      "file": "video_review_regressions_static_results.json"
+    },
+    {
+      "suite": "Homepage map separation and dedicated discovery routes",
+      "passed": 28,
+      "total": 28,
+      "status": "PASS",
+      "file": "phase1_homepage_live_map_static_results.json"
+    },
+    {
+      "suite": "Homepage Bihar exact dry-snack atlas and full map",
+      "passed": 43,
+      "total": 43,
+      "status": "PASS",
+      "file": "homepage_bihar_exact_dry_snacks_and_full_map_static_results.json"
+    },
+    {
+      "suite": "Siwan food imagery, interactive 3D carousel, and India map",
+      "passed": 22,
+      "total": 22,
+      "status": "PASS",
+      "file": "siwan_reel_3d_category_static_results.json"
+    },
+    {
+      "suite": "District Flavour Trails photos and per-item 3D",
+      "passed": 18,
+      "total": 18,
+      "status": "PASS",
+      "file": "district_food_trails_static_results.json"
+    },
+    {
+      "suite": "Sitewide locale, image quality and cinematic homepage motion",
+      "passed": 27,
+      "total": 27,
+      "status": "PASS",
+      "file": "sitewide_locale_motion_image_quality_static_results.json"
+    }
+  ],
+  "scope": "Static source checks only. No live PostgreSQL/Supabase, framework build, end-to-end, security penetration, accessibility audit or performance test is implied."
+}

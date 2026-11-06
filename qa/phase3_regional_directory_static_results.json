@@ -1,0 +1,19 @@
+{
+  "suite": "Phase 3 regional directory",
+  "passed": 12,
+  "total": 12,
+  "checks": {
+    "uses canonical 36-region taxonomy": true,
+    "offers all states and union territories filters": true,
+    "searches region names without a map dependency": true,
+    "filter controls expose accessible pressed state": true,
+    "search results announce changes": true,
+    "zero-result state is explained": true,
+    "region links resolve to region detail route": true,
+    "Bihar is identified as first launch focus without invented food claims": true,
+    "availability and delivery are not implied": true,
+    "directory page retains map-independent browsing": true,
+    "taxonomy includes 36 region records": true,
+    "responsive styling is present": true
+  }
+}
