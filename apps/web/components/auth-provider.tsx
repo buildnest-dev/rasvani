@@ -26,7 +26,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setRoleError('');
       try {
         const token = await next.getIdToken();
-        setRole(await syncRoleAction(token));
+        const result = await syncRoleAction(token);
+        setRole(result.role);
+        if (result.error) setRoleError(result.error);
       } catch (caught) {
         setRole('customer');
         setRoleError(caught instanceof Error ? caught.message : 'Server check failed.');

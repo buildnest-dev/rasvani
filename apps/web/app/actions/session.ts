@@ -12,8 +12,13 @@ const message = (error: unknown, fallback: string) => (error instanceof Error &&
 
 const FINAL = new Set<string>(FINAL_STATUSES);
 
-export async function syncRoleAction(idToken: string): Promise<Role> {
-  try { return (await verifySession(idToken)).role; } catch { return 'customer'; }
+export async function syncRoleAction(idToken: string): Promise<{ role: Role; error?: string }> {
+  try { return { role: (await verifySession(idToken)).role }; } catch (caught) {
+    // Safe diagnostic for the signed-in user: error text only, never env values.
+    const err = caught as { code?: string | number; message?: string };
+    const text = `${err.code ?? ''} ${err.message ?? 'unknown error'}`.replace(/-----BEGIN[\s\S]*?END[^-]*-----/g, '[key]').slice(0, 220);
+    return { role: 'customer', error: text.trim() };
+  }
 }
 
 /* ------------------------------ Customer ------------------------------ */
