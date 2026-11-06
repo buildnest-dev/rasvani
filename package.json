@@ -12,7 +12,7 @@
     "typecheck": "npm run typecheck --workspace @rasvani/web"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": "22.x"
   },
   "overrides": {
     "postcss": "^8.5.32"
