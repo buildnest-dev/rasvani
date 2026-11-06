@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AddToCart } from '@/components/add-to-cart';
+import { ProductArt } from '@/components/product-art';
 import { loadVisibleProducts } from '@/lib/firebase/catalogue';
 import { formatPaise } from '@/lib/money';
 
@@ -21,7 +22,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       : failed ? <p className="status" role="status">We are refreshing the catalogue. Please revisit this collection shortly.</p> : <>
         <form className="shop-filters" action="/shop" method="get"><label>Search products<input type="search" name="q" defaultValue={term} maxLength={80} placeholder="Search by food name or baker" /></label><button className="btn" type="submit">Search</button>{term && <Link className="text-link" href="/shop">Clear</Link>}</form>
         {products.length === 0 ? <div className="shop-empty"><h2>The collection is taking shape.</h2><p>{term ? 'No products match your search.' : 'New Bihar foods will appear here very soon.'}</p></div> : <div className="shop-grid">{products.map((product) => <article className="shop-card" key={product.id}>
-          <div className="shop-card-art" aria-hidden="true"><span>Rasvani · Bihar</span></div>
+          <ProductArt product={product} sizes="(max-width: 700px) 90vw, (max-width: 1100px) 45vw, 30vw" />
           <div className="shop-card-body"><div className="eyebrow">{product.makerName ? `${product.makerName}${product.makerDistrict ? ` · ${product.makerDistrict}` : ''}` : 'Home-made in Bihar'}</div><h2><Link href={`/shop/${encodeURIComponent(product.slug)}`}>{product.name}</Link></h2><p>{product.description?.trim() || 'Home-made vegetarian regional food.'}</p>
             <div className="shop-card-price"><strong>{formatPaise(product.pricePaise)}</strong><AddToCart productId={product.id} slug={product.slug} name={product.name} unitPaise={product.pricePaise} /></div>
             <div className="shop-card-foot"><span>{storageLabels[product.storage] ?? ''}</span><Link className="text-link" href={`/shop/${encodeURIComponent(product.slug)}`}>View details →</Link></div></div>

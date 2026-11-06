@@ -6,14 +6,15 @@ import { useAuth } from '@/components/auth-provider';
 import { UpiQr } from '@/components/upi-qr';
 import {
   deleteBakerProfileAction, inviteBakerAction, publishProductAction, removeBakerAction, saveBakerProfileAction,
-  savePaymentSettingsAction, setOrderHandlingAction, setOrderStatusAction, setProductPriceAction, setProductVisibilityAction,
+  savePaymentSettingsAction, setOrderHandlingAction, setOrderStatusAction, setProductImageAction, setProductPriceAction, setProductVisibilityAction,
 } from '@/app/actions/session';
+import { foodImages, productImage } from '@/lib/food-images';
 import { biharDistricts } from '@/lib/bihar-districts';
 import { firestore } from '@/lib/firebase/client';
 import { formatPaise } from '@/lib/money';
 import { FINAL_STATUSES, ORDER_STATUSES, payablePaise, statusLabel, upiLink, type BakerProfile, type OrderDoc, type PaymentSettings } from '@/lib/orders';
 
-type ProductRow = { id: string; name: string; sku: string; makerName: string | null; makerDistrict?: string | null; pricePaise: number; visible: boolean };
+type ProductRow = { id: string; name: string; sku: string; makerName: string | null; makerDistrict?: string | null; image?: string | null; pricePaise: number; visible: boolean };
 type BakerLogin = { id: string; email: string; name?: string };
 type Tab = 'orders' | 'products' | 'bakers' | 'payment';
 type Filter = 'new' | 'progress' | 'done' | 'all';
@@ -163,11 +164,14 @@ export function AdminDashboard() {
       <form className="form-shell checkout-form wide" onSubmit={(event) => { event.preventDefault(); const form = event.currentTarget; const d = new FormData(form); void act((token) => publishProductAction(token, {
         name: String(d.get('name')), sku: String(d.get('sku')), description: String(d.get('description')), makerName: '', makerId: String(d.get('makerId') ?? '') || undefined,
         priceRupees: Number(d.get('price')), storage: String(d.get('storage')), vegetarianEvidence: String(d.get('evidence')),
+        image: String(d.get('image') ?? '') || undefined,
       }), 'Food added and visible in the shop.').then((ok) => { if (ok) form.reset(); }); }}>
         <h2>Add a food item</h2>
         {profiles.length === 0 && <p className="notice">Add the baker or restaurant first (Bakers tab), then pick it here.</p>}
         <label htmlFor="p-maker">Made by (baker / restaurant)</label><select id="p-maker" name="makerId" required defaultValue=""><option value="" disabled>Choose baker or restaurant</option>{profiles.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.district}</option>)}</select>
         <label htmlFor="p-name">Food name</label><input id="p-name" name="name" required maxLength={180} />
+        <label htmlFor="p-image">Picture (optional; if the name matches a Bihar food, its picture is used automatically)</label>
+        <select id="p-image" name="image" defaultValue=""><option value="">Automatic</option>{foodImages.map((img) => <option key={img.path} value={img.path}>{img.label}</option>)}</select>
         <label htmlFor="p-sku">Code (unique, e.g. RV-THEKUA-250)</label><input id="p-sku" name="sku" required maxLength={80} />
         <label htmlFor="p-price">Price in rupees</label><input id="p-price" name="price" type="number" step="0.01" min="1" max="100000" required />
         <label htmlFor="p-desc">Description (pack size / weight)</label><textarea id="p-desc" name="description" rows={3} maxLength={2000} />
@@ -177,9 +181,10 @@ export function AdminDashboard() {
       </form>
       <h2 className="admin-h2">All foods</h2>
       {products.length === 0 ? <p className="notice">No foods yet.</p> : <div className="customer-order-list">{products.map((product) => <article className="customer-order-card" key={product.id}>
-        <div className="customer-order-head"><div><span className="eyebrow">{product.sku}{product.makerName ? ` · ${product.makerName}` : ''}{product.makerDistrict ? `, ${product.makerDistrict}` : ''}</span><h2>{product.name}</h2></div><div className="customer-order-status"><strong>{formatPaise(product.pricePaise)}</strong><span className={`pill ${product.visible ? 'st-delivered' : 'st-cancelled'}`}>{product.visible ? 'Visible in shop' : 'Hidden'}</span></div></div>
+        <div className="customer-order-head">{productImage(product) && <span className="admin-thumb">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={productImage(product) ?? ''} alt="" width={72} height={72} /></span>}<div><span className="eyebrow">{product.sku}{product.makerName ? ` · ${product.makerName}` : ''}{product.makerDistrict ? `, ${product.makerDistrict}` : ''}</span><h2>{product.name}</h2></div><div className="customer-order-status"><strong>{formatPaise(product.pricePaise)}</strong><span className={`pill ${product.visible ? 'st-delivered' : 'st-cancelled'}`}>{product.visible ? 'Visible in shop' : 'Hidden'}</span></div></div>
         <div className="admin-order-form">
           <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductPriceAction(token, product.id, Number(d.get('price'))), 'Price changed.'); }}><label>New price (₹)<input name="price" type="number" step="0.01" min="1" max="100000" required /></label><button className="btn secondary" type="submit" disabled={busy}>Change price</button></form>
+          <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductImageAction(token, product.id, String(d.get('image') ?? '')), 'Picture changed.'); }}><label>Picture<select name="image" defaultValue={product.image ?? ''}><option value="">Automatic</option>{foodImages.map((img) => <option key={img.path} value={img.path}>{img.label}</option>)}</select></label><button className="btn secondary" type="submit" disabled={busy}>Set picture</button></form>
           <button className="btn secondary" type="button" disabled={busy} onClick={() => void act((token) => setProductVisibilityAction(token, product.id, !product.visible), 'Updated.')}>{product.visible ? 'Hide from shop' : 'Show in shop'}</button>
         </div>
       </article>)}</div>}

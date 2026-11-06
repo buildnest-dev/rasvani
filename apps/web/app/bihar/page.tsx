@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AddToCart } from '@/components/add-to-cart';
+import { ProductArt } from '@/components/product-art';
 import { BiharFoodsGrid, type BiharFoodCard } from '@/components/bihar-foods-grid';
 import { biharHomeFoodItems } from '@/lib/bihar-home-food-items';
 import { loadVisibleProducts } from '@/lib/firebase/catalogue';
@@ -38,7 +39,7 @@ export default async function BiharPage() {
       {!configured || failed ? <p className="status" role="status">We are refreshing the menu. Please check back shortly.</p>
         : products.length === 0 ? <div className="shop-empty"><h3>New foods are being added.</h3><p>Our first home bakers are joining. Order will open here very soon.</p></div>
         : <div className="shop-grid">{products.map((product) => <article className="shop-card" key={product.id}>
-          <div className="shop-card-art" aria-hidden="true"><span>Rasvani · Bihar</span></div>
+          <ProductArt product={product} sizes="(max-width: 700px) 90vw, (max-width: 1100px) 45vw, 30vw" />
           <div className="shop-card-body"><div className="eyebrow">{product.makerName ? `${product.makerName}${product.makerDistrict ? ` · ${product.makerDistrict}` : ''}` : 'Home-made in Bihar'}</div>
             <h3><Link href={`/shop/${encodeURIComponent(product.slug)}`}>{product.name}</Link></h3><p>{product.description?.trim() || 'Home-made vegetarian regional food.'}</p>
             <div className="shop-card-price"><strong>{formatPaise(product.pricePaise)}</strong><AddToCart productId={product.id} slug={product.slug} name={product.name} unitPaise={product.pricePaise} /></div></div>

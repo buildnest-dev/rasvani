@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb, requireRole, verifySession, type Role } from '@/lib/firebase/admin';
 import { verifyCaptcha } from '@/lib/captcha';
+import { isAllowedFoodImage } from '@/lib/food-images';
 import { biharDistricts } from '@/lib/bihar-districts';
 import { FINAL_STATUSES, ORDER_STATUSES, PAYMENTS } from '@/lib/orders';
 
@@ -146,6 +147,7 @@ export async function assignBakerAction(idToken: string, orderId: string, bakerU
 const productSchema = z.object({
   name: z.string().trim().min(2).max(180), sku: z.string().trim().min(2).max(80),
   description: z.string().trim().max(2000), makerName: z.string().trim().max(120), makerId: z.string().trim().max(60).optional(),
+  image: z.string().trim().max(120).optional(),
   priceRupees: z.number().min(1).max(100000), storage: z.enum(['ambient', 'chilled', 'frozen', 'other']),
   vegetarianEvidence: z.string().trim().min(3, 'Write how you confirmed it is 100% vegetarian.').max(300),
 });
@@ -156,6 +158,7 @@ export async function publishProductAction(idToken: string, input: unknown): Pro
     const parsed = productSchema.safeParse(input);
     if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'Check the product fields.');
     const d = parsed.data;
+    if (d.image && !isAllowedFoodImage(d.image)) return fail('Choose a picture from the list.');
     let makerName = d.makerName; let makerDistrict: string | null = null; let makerId: string | null = null;
     if (d.makerId) {
       const profile = await adminDb().collection('bakerProfiles').doc(d.makerId).get();
@@ -166,7 +169,7 @@ export async function publishProductAction(idToken: string, input: unknown): Pro
     const slugBase = d.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80) || 'product';
     await ref.set({
       name: d.name, sku: d.sku.toUpperCase(), slug: `${slugBase}-${ref.id.slice(0, 5).toLowerCase()}`, description: d.description || null,
-      makerName: makerName || null, makerId, makerDistrict, pricePaise: Math.round(d.priceRupees * 100), storage: d.storage,
+      image: d.image || null, makerName: makerName || null, makerId, makerDistrict, pricePaise: Math.round(d.priceRupees * 100), storage: d.storage,
       vegetarianEvidence: d.vegetarianEvidence, visible: true, createdAt: new Date().toISOString(),
     });
     return { ok: true, id: ref.id };
@@ -180,6 +183,15 @@ export async function setProductPriceAction(idToken: string, productId: string, 
     await adminDb().collection('products').doc(productId).update({ pricePaise: Math.round(priceRupees * 100), updatedAt: new Date().toISOString() });
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not change the price.')); }
+}
+
+export async function setProductImageAction(idToken: string, productId: string, image: string): Promise<Result> {
+  try {
+    await requireRole(idToken, ['admin']);
+    if (image && !isAllowedFoodImage(image)) return fail('Choose a picture from the list.');
+    await adminDb().collection('products').doc(productId).update({ image: image || null, updatedAt: new Date().toISOString() });
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not change the picture.')); }
 }
 
 export async function setProductVisibilityAction(idToken: string, productId: string, visible: boolean): Promise<Result> {
