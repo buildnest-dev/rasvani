@@ -51,7 +51,17 @@ export function AdminDashboard() {
     const db = firestore();
     const stops = [
       onSnapshot(collection(db, 'orders'), (snap) => {
-        const rows = snap.docs.map((d) => ({ ...(d.data() as Omit<OrderDoc, 'id'>), id: d.id }));
+        // Tolerate hand-made or older documents with missing fields so one bad order never hides the rest.
+        const rows = snap.docs.map((d) => {
+          const raw = d.data() as Partial<OrderDoc>;
+          return {
+            ...raw, id: d.id, orderNumber: raw.orderNumber ?? d.id.slice(0, 8).toUpperCase(), customerEmail: raw.customerEmail ?? '',
+            status: raw.status ?? 'placed', paymentStatus: raw.paymentStatus ?? 'pending', lines: Array.isArray(raw.lines) ? raw.lines : [],
+            totalPaise: Number(raw.totalPaise ?? 0), createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : new Date(0).toISOString(),
+            bakerId: raw.bakerId ?? null, bakerName: raw.bakerName ?? null, notes: raw.notes ?? null,
+            address: { fulfilment: 'delivery', name: 'Customer', phone: '', district: '', pincode: null, address: null, landmark: null, location: null, paymentPreference: '', ...(raw.address ?? {}) },
+          } as OrderDoc;
+        });
         rows.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
         setOrders(rows);
         if (firstLoad.current) { firstLoad.current = false; return; }
