@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test": "node --test \"tests/*.test.ts\"",
     "predev": "node scripts/copy-maplibre-workers.mjs",
     "prebuild": "node scripts/copy-maplibre-workers.mjs",
     "prestart": "node scripts/copy-maplibre-workers.mjs"

@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
+import { CaptchaField, captchaConfigured, type CaptchaHandle } from '@/components/captcha-field';
 import { useCart } from '@/components/cart-provider';
 import { placeOrderAction } from '@/app/actions/session';
 import { biharDistricts } from '@/lib/bihar-districts';
@@ -15,6 +16,8 @@ export function CheckoutForm() {
   const router = useRouter();
   const [state, setState] = useState<{ error?: string }>({});
   const [pending, setPending] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<CaptchaHandle>(null);
 
   async function submit(form: HTMLFormElement) {
     const data = new FormData(form);
@@ -25,10 +28,11 @@ export function CheckoutForm() {
         method: text('method'), name: text('name'), phone: text('phone'), district: text('district'), pincode: text('pincode'),
         address: text('address'), landmark: text('landmark'), notes: text('notes'), payment: text('payment'),
         lat: coords ? Number(coords.lat) : null, lng: coords ? Number(coords.lng) : null,
+        website: text('website'),
         lines: lines.map((line) => ({ productId: line.productId, qty: line.qty })),
-      });
-      if (result.ok) router.push('/account/orders?placed=1'); else setState({ error: result.error });
-    } catch { setState({ error: 'Something went wrong. Please try again.' }); }
+      }, captchaToken ?? undefined);
+      if (result.ok) router.push('/account/orders?placed=1'); else { setState({ error: result.error }); captchaRef.current?.reset(); }
+    } catch { setState({ error: 'Something went wrong. Please try again.' }); captchaRef.current?.reset(); }
     setPending(false);
   }
   const [method, setMethod] = useState<'delivery' | 'pickup'>('delivery');
@@ -76,8 +80,10 @@ export function CheckoutForm() {
         <label className="method-card"><input type="radio" name="payment" value="cod" defaultChecked /><strong>Cash on delivery / pay at collection</strong><span>Pay when the food reaches you or when you collect it</span></label>
         <label className="method-card"><input type="radio" name="payment" value="upi" /><strong>Pay by UPI QR</strong><span>After you order, a QR with your exact amount appears in My orders</span></label>
       </fieldset>
+      <div className="hp-field" aria-hidden="true"><label htmlFor="co-website">Leave this empty</label><input id="co-website" name="website" tabIndex={-1} autoComplete="off" /></div>
+      <CaptchaField ref={captchaRef} onToken={setCaptchaToken} />
       {state.error && <p className="status" role="alert">{state.error}</p>}
-      <button className="btn" type="submit" disabled={pending}>{pending ? 'Placing your order…' : 'Place order'}</button>
+      <button className="btn" type="submit" disabled={pending || (captchaConfigured && !captchaToken)}>{pending ? 'Placing your order…' : 'Place order'}</button>
       <p className="notice">No payment is taken on this page. Rasvani calls you to confirm the order, any delivery charge, and delivery or pickup. Delivery charge, if any, is added by Rasvani before you pay.</p>
     </form>
     <aside className="cart-summary"><h2>Your order</h2>

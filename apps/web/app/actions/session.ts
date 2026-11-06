@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb, requireRole, verifySession, type Role } from '@/lib/firebase/admin';
+import { verifyCaptcha } from '@/lib/captcha';
 import { biharDistricts } from '@/lib/bihar-districts';
 import { FINAL_STATUSES, ORDER_STATUSES, PAYMENTS } from '@/lib/orders';
 
@@ -14,10 +15,10 @@ const FINAL = new Set<string>(FINAL_STATUSES);
 
 export async function syncRoleAction(idToken: string): Promise<{ role: Role; error?: string }> {
   try { return { role: (await verifySession(idToken)).role }; } catch (caught) {
-    // Safe diagnostic for the signed-in user: error text only, never env values.
+    // Details go to the server log only (Vercel Logs). The browser gets a generic message so no internals leak.
     const err = caught as { code?: string | number; message?: string };
-    const text = `${err.code ?? ''} ${err.message ?? 'unknown error'}`.replace(/-----BEGIN[\s\S]*?END[^-]*-----/g, '[key]').slice(0, 220);
-    return { role: 'customer', error: text.trim() };
+    console.error('syncRoleAction failed:', err.code ?? '', String(err.message ?? '').replace(/-----BEGIN[\s\S]*?END[^-]*-----/g, '[key]').slice(0, 300));
+    return { role: 'customer', error: 'Could not check your account on the server. Please sign out and sign in again.' };
   }
 }
 
@@ -35,9 +36,19 @@ const orderSchema = z.object({
 });
 const paymentLabels = { cod: 'Cash on delivery / pay at collection', upi: 'Pay by UPI QR to Rasvani' } as const;
 
-export async function placeOrderAction(idToken: string, input: unknown): Promise<Result<{ orderNumber: string }>> {
+/** Verifies the "I am not a robot" token on the server. Used by the sign-in screen before it calls Firebase. */
+export async function verifyCaptchaAction(token: string): Promise<{ ok: boolean; error?: string }> {
+  const result = await verifyCaptcha(token);
+  return result.ok ? { ok: true } : { ok: false, error: result.message };
+}
+
+export async function placeOrderAction(idToken: string, input: unknown, captchaToken?: string): Promise<Result<{ orderNumber: string }>> {
   let session;
   try { session = await verifySession(idToken); } catch { return fail('Please sign in to place your order.'); }
+  // Bot checks first: hidden honeypot field (humans never fill it), then the server-verified CAPTCHA token.
+  if (input && typeof input === 'object' && String((input as { website?: unknown }).website ?? '').length > 0) return fail('Please try again.');
+  const human = await verifyCaptcha(captchaToken);
+  if (!human.ok) return fail(human.message);
   if (!session.emailVerified) return fail('Please verify your email first. Check your inbox for the verification link.');
   const parsed = orderSchema.safeParse(input);
   if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'Please check the form.');
@@ -50,6 +61,12 @@ export async function placeOrderAction(idToken: string, input: unknown): Promise
 
   try {
     const db = adminDb();
+    // Abuse guard: at most 8 orders per hour and 5 still-open orders per customer.
+    const mine = await db.collection('orders').where('userId', '==', session.uid).limit(200).get();
+    const hourAgo = new Date(Date.now() - 3600_000).toISOString();
+    const recent = mine.docs.filter((d) => String(d.data().createdAt ?? '') >= hourAgo).length;
+    const open = mine.docs.filter((d) => !FINAL.has(d.data().status)).length;
+    if (recent >= 8 || open >= 5) return fail('You have several orders in progress. Please wait for Rasvani to confirm them, or write to rasvanifoods@gmail.com.');
     const snaps = await Promise.all(data.lines.map((line) => db.collection('products').doc(line.productId).get()));
     const lines: { productId: string; name: string; qty: number; unitPaise: number; linePaise: number; makerName: string | null }[] = [];
     for (const [index, snap] of snaps.entries()) {

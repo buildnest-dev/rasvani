@@ -10,12 +10,12 @@ const MAP_GLYPHS = 'https://fonts.openmaptiles.org';
 const csp = [
   "default-src 'self'",
   // Next.js injects inline bootstrap scripts; a nonce-based policy is the next hardening step.
-  `script-src 'self' 'unsafe-inline' https://apis.google.com${isDev ? " 'unsafe-eval'" : ''}`,
+  `script-src 'self' 'unsafe-inline' https://apis.google.com https://challenges.cloudflare.com${isDev ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https://*.googleusercontent.com",
   `connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebaseapp.com https://www.googleapis.com ${MAP_TILES} ${MAP_GLYPHS}${isDev ? ' ws:' : ''}`,
-  "frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://appleid.apple.com",
+  "frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://appleid.apple.com https://challenges.cloudflare.com",
   "worker-src 'self' blob:",
   "child-src 'self' blob:",
   "object-src 'none'",
