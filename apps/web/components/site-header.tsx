@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import { supportedLocales, useLocale } from '@/components/locale-provider';
 import { LocalizedCopy } from '@/components/localized-copy';
+import { useCart } from '@/components/cart-provider';
 
 type MenuItemTarget = HTMLElement;
 function applyMenuTilt(event: ReactPointerEvent<MenuItemTarget>) {
@@ -32,6 +33,7 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const { locale, setLocale, t, translate } = useLocale();
+  const { count: cartCount } = useCart();
   // Brand-led navigation names: readable across India's regional food audience.
   const links = [
     [translate('Home of Flavours'), '/'],
@@ -53,12 +55,16 @@ export function SiteHeader() {
       </nav>
       <div className="actions header-actions">
         <label className="language-control"><span className="sr-only">Choose language</span><span aria-hidden="true">文</span><select aria-label="Choose language" value={locale} onChange={(event) => setLocale(event.target.value as typeof locale)}>{supportedLocales.map((item) => <option key={item.code} value={item.code}>{item.native}</option>)}</select></label>
+        <Link className="header-account account-link menu-item-3d cart-link" href="/cart" aria-label={`Cart, ${cartCount} items`} style={menuItemStyle(links.length)} {...motionHandlers}>Cart{cartCount > 0 && <span className="cart-badge">{cartCount}</span>}</Link>
+        <Link className="header-account account-link menu-item-3d orders-link" href="/account/orders" style={menuItemStyle(links.length)} {...motionHandlers}>My orders</Link>
         <Link className="header-account account-link menu-item-3d" href="/account" style={menuItemStyle(links.length)} {...motionHandlers}>{t('account')}</Link>
         <button className="iconbtn menu-button menu-item-3d" type="button" aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'} aria-expanded={menuOpen} style={menuItemStyle(links.length + 1)} {...motionHandlers} onClick={() => setMenuOpen((value) => !value)}>☰</button>
       </div>
     </div>
     {menuOpen && <nav className="wrap mobile-nav-links" aria-label="Mobile navigation">
       {links.map(([label, href], index) => <Link key={href} href={href} aria-current={isCurrent(href) ? 'page' : undefined} className={`menu-item-3d ${isCurrent(href) ? 'is-current' : ''}`} style={menuItemStyle(index)} onClick={() => setMenuOpen(false)} {...motionHandlers}><span>{label}</span>{isCurrent(href) && <span className="nav-current-note">YOU ARE HERE</span>}</Link>)}
+      <Link href="/cart" onClick={() => setMenuOpen(false)}>Cart{cartCount > 0 ? ` (${cartCount})` : ''}</Link>
+      <Link href="/account/orders" onClick={() => setMenuOpen(false)}>My orders</Link>
       <Link href="/account" onClick={() => setMenuOpen(false)}>{t('account')}</Link>
     </nav>}
   </header></LocalizedCopy>;

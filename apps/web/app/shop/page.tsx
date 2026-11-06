@@ -3,6 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { regions } from '@/lib/regions';
+import { AddToCart } from '@/components/add-to-cart';
+import { formatPaise } from '@/lib/money';
 
 export const metadata: Metadata = { title: 'Shop regional foods', description: 'Explore approved and published regional food stories and catalogue entries from Rasvani.' };
 type Product = { id: string; slug: string; name: string; description: string | null; storage_condition: string; category_id: string | null; created_at: string };
@@ -25,6 +27,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   let categories: Category[] = [];
   let districts: DistrictOption[] = [];
   const productImages = new Map<string, string>();
+  const prices = new Map<string, number>();
   let configured = true;
   let loadError = false;
   try {
@@ -105,6 +108,8 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       }
     }
     if (!productResult.error && products.length > 0) {
+      const priceResult = await supabase.rpc('get_public_product_prices', { p_product_ids: products.map((product) => product.id) });
+      if (!priceResult.error) ((priceResult.data ?? []) as { product_id: string; amount_paise: number | string }[]).forEach((row) => prices.set(row.product_id, Number(row.amount_paise)));
       const mediaResult = await supabase.rpc('get_public_catalogue_product_media', {
         p_product_ids: products.map((product) => product.id), p_limit_per_product: 1,
       });
@@ -120,7 +125,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   } catch { configured = false; }
   const categoryNames = new Map(categories.map((item) => [item.id, item.name]));
   return <section className="wrap shop-page">
-    <div className="page-hero"><div className="eyebrow">Shop regional foods</div><h1>A considered collection.</h1><p className="section-intro">Discover catalogue entries that have passed Rasvani&apos;s producer and product approval process. Availability and ordering are shown only when fulfilment is configured.</p></div>
+    <div className="page-hero"><div className="eyebrow">Shop regional foods</div><h1>A considered collection.</h1><p className="section-intro">Home-made vegetarian regional foods from Bihar. Add to cart, then choose home delivery (selected areas of Bihar) or order online and collect from a Rasvani partner shop.</p></div>
     {!configured ? <div className="shop-empty-editorial" role="status"><div className="shop-empty-editorial-image"><Image src="/images/rasvani-feast-hero.webp" alt="A richly arranged vegetarian table with regional dishes" fill sizes="(max-width: 760px) 100vw, 45vw"/></div><div className="shop-empty-editorial-copy"><div className="eyebrow">THE RASVANI COLLECTION</div><h2>A thoughtful collection is taking shape.</h2><p>Our first regional collections are being prepared with care. Published foods will appear here with their approved details and availability.</p><div className="cta-row"><Link href="/explore-india" className="btn">Explore India ↗</Link><Link href="/india-map" className="text-link">Start with the map →</Link></div></div></div> : loadError ? <p className="status" role="status">We are refreshing the catalogue. Please revisit this collection shortly.</p> : <>
       <form className="shop-filters" action="/shop" method="get">
         <label>Search products<input type="search" name="q" defaultValue={term} maxLength={80} placeholder="Search product names and reviewed regional spellings"/></label>
@@ -132,9 +137,9 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       </form>
       {products.length === 0 ? <div className="shop-empty"><h2>The collection is taking shape.</h2><p>{term || category || region || district ? 'No published products match those filters.' : 'No products are currently published. New entries appear here only after the required reviews are complete.'}</p></div> : <div className="shop-grid">{products.map((product) => <article className="shop-card" key={product.id}>
         {productImages.has(product.id) ? <div className="shop-card-photo"><Image src={productImages.get(product.id)!} alt={`${product.name} product photo`} width={640} height={420} unoptimized/></div> : <div className="shop-card-art" aria-hidden="true"><span>Rasvani · Regional catalogue</span></div>}
-        <div className="shop-card-body"><div className="eyebrow">{product.category_id ? categoryNames.get(product.category_id) ?? 'Regional food' : 'Regional food'}</div><h2><Link href={`/shop/${encodeURIComponent(product.slug)}`}>{product.name}</Link></h2><p>{product.description?.trim() || 'Product description is being prepared for publication.'}</p><div className="shop-card-foot"><span>{storageLabels[product.storage_condition] ?? 'Storage details to confirm'}</span><Link className="text-link" href={`/shop/${encodeURIComponent(product.slug)}`}>View details →</Link></div></div>
+        <div className="shop-card-body"><div className="eyebrow">{product.category_id ? categoryNames.get(product.category_id) ?? 'Regional food' : 'Regional food'}</div><h2><Link href={`/shop/${encodeURIComponent(product.slug)}`}>{product.name}</Link></h2><p>{product.description?.trim() || 'Product description is being prepared for publication.'}</p>{prices.has(product.id) ? <div className="shop-card-price"><strong>{formatPaise(prices.get(product.id)!)}</strong><AddToCart productId={product.id} slug={product.slug} name={product.name} unitPaise={prices.get(product.id)!} /></div> : <p className="notice">Price will be shown soon.</p>}<div className="shop-card-foot"><span>{storageLabels[product.storage_condition] ?? 'Storage details to confirm'}</span><Link className="text-link" href={`/shop/${encodeURIComponent(product.slug)}`}>View details →</Link></div></div>
       </article>)}</div>}
-      <p className="notice shop-disclaimer">Prices, stock quantities, delivery promises and checkout are not displayed here because those commercial and fulfilment details are not yet enabled for public use. Only quality-approved photographs attached to published products are displayed. Search includes evidence-reviewed regional names and transliterations in supported languages.</p>
+      <p className="notice shop-disclaimer">Ordering is open for Bihar only. Rasvani calls you to confirm every order, the final amount, and delivery or pickup. Only quality-approved photographs attached to published products are displayed.</p>
     </>}
   </section>;
 }

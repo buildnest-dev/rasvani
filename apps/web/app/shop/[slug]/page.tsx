@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { regions } from '@/lib/regions';
 import { createClient } from '@/lib/supabase/server';
+import { AddToCart } from '@/components/add-to-cart';
+import { formatPaise } from '@/lib/money';
 
 type Product = {
   id: string;
@@ -53,6 +55,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   let productImages: { media_id: string; url: string }[] = [];
   let regionalRelationships: PublicRegionalRelationship[] = [];
   let regionalContentUnavailable = false;
+  let pricePaise: number | null = null;
 
   try {
     const supabase = await createClient();
@@ -61,6 +64,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       .eq('slug', slug).eq('approval_status', 'approved').not('published_at', 'is', null).maybeSingle();
     if (result.error) throw result.error;
     product = result.data as Product | null;
+    if (product) {
+      const priceResult = await supabase.rpc('get_public_product_prices', { p_product_ids: [product.id] });
+      const row = (priceResult.data ?? [])[0] as { amount_paise: number | string } | undefined;
+      if (!priceResult.error && row) pricePaise = Number(row.amount_paise);
+    }
 
     if (product?.category_id) {
       const categoryResult = await supabase.from('categories').select('name').eq('id', product.category_id).eq('active', true).maybeSingle();
@@ -141,7 +149,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <dt>Ingredients</dt><dd>{product.ingredients?.length ? product.ingredients.join(', ') : 'Not provided'}</dd>
           <dt>Allergen statement</dt><dd>{product.allergen_statement || 'Not provided'}</dd>
         </dl>
-        <p className="status">Ordering is not open for this catalogue entry yet. Price, pack options, availability and delivery details will appear when the order service is ready.</p>
+        {pricePaise !== null ? <div className="product-buy"><p className="product-price">{formatPaise(pricePaise)}</p><AddToCart productId={product.id} slug={product.slug} name={product.name} unitPaise={pricePaise} showQuantity /><p className="notice">Home delivery in selected areas of Bihar, or collect from a Rasvani partner shop. Rasvani confirms every order by phone.</p></div> : <p className="status">Price will be shown soon.</p>}
       </div>
     </div>
 

@@ -18,6 +18,12 @@ function readCredentials(formData: FormData) {
   });
 }
 
+// Only these in-app destinations may follow sign-in (prevents open redirects).
+function safeNext(formData: FormData): string {
+  const value = String(formData.get('next') ?? '');
+  return value === '/checkout' || value === '/cart' ? value : '/account';
+}
+
 export async function signInAction(_previous: AuthActionState, formData: FormData): Promise<AuthActionState> {
   const parsed = readCredentials(formData);
   if (!parsed.success) return { error: 'Enter a valid email and a password of at least 10 characters.' };
@@ -28,7 +34,7 @@ export async function signInAction(_previous: AuthActionState, formData: FormDat
 
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) return { error: 'We could not sign you in with those details. Check them and try again.' };
-  redirect('/account');
+  redirect(safeNext(formData));
 }
 
 export async function signUpAction(_previous: AuthActionState, formData: FormData): Promise<AuthActionState> {
@@ -44,7 +50,7 @@ export async function signUpAction(_previous: AuthActionState, formData: FormDat
     password: parsed.data.password,
   });
   if (error) return { error: 'We could not create the account. Please check your details or try again later.' };
-  if (data.session) redirect('/account');
+  if (data.session) redirect(safeNext(formData));
   return { success: 'If registration is enabled, check your email for the verification message before signing in.' };
 }
 
