@@ -36,6 +36,18 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Private baker / restaurant directory (phone, address). Admin only.
+    match /bakerProfiles/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Payment settings (UPI ID shown to customers who choose UPI). Public read, server-only write.
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /bakerInvites/{email} {
       allow read: if isAdmin();
       allow write: if false;

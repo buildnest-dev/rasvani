@@ -25,7 +25,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       <div className="shop-card-art shop-detail-art" aria-hidden="true"><span>Rasvani · Bihar</span></div>
       <div className="product-detail-copy">
         <h2>Product information</h2>
-        <dl><dt>Storage</dt><dd>{storageLabels[product.storage] ?? 'On pack'}</dd><dt>Diet</dt><dd>100% vegetarian</dd><dt>Made by</dt><dd>{product.makerName ?? 'A Bihar home baker'}</dd></dl>
+        <dl><dt>Storage</dt><dd>{storageLabels[product.storage] ?? 'On pack'}</dd><dt>Diet</dt><dd>100% vegetarian</dd><dt>Made by</dt><dd>{product.makerName ?? 'A Bihar home baker'}{product.makerDistrict ? `, ${product.makerDistrict}` : ''}</dd></dl>
         <div className="product-buy"><p className="product-price">{formatPaise(product.pricePaise)}</p><AddToCart productId={product.id} slug={product.slug} name={product.name} unitPaise={product.pricePaise} showQuantity /><p className="notice">Home delivery in selected areas of Bihar, or collect from a Rasvani partner shop. Rasvani confirms every order by phone.</p></div>
       </div>
     </div>

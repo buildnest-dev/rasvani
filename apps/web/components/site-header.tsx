@@ -37,6 +37,7 @@ export function SiteHeader() {
   // Brand-led navigation names: readable across India's regional food audience.
   const links = [
     [translate('Home of Flavours'), '/'],
+    ['Bihar', '/bihar'],
     [translate('India, Unfolded'), '/india-map'],
     [translate('Flavour Trails'), '/explore-india'],
     [translate('The Pantry'), '/shop'],

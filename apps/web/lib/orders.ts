@@ -2,23 +2,45 @@ export const ORDER_STATUSES = ['placed', 'confirmed', 'accepted', 'preparing', '
 export const FINAL_STATUSES = ['delivered', 'cancelled'] as const;
 export const PAYMENTS = ['pending', 'paid', 'failed', 'refunded'] as const;
 
-export type OrderLine = { productId: string; name: string; qty: number; unitPaise: number; linePaise: number };
+export type OrderLine = { productId: string; name: string; qty: number; unitPaise: number; linePaise: number; makerName?: string | null };
 export type OrderDoc = {
   id: string; orderNumber: string; userId: string; customerEmail: string; status: string; paymentStatus: string;
   lines: OrderLine[]; totalPaise: number; bakerId: string | null; bakerName: string | null; notes: string | null; createdAt: string;
+  paymentMethod?: 'cod' | 'upi'; paymentRef?: string | null; deliveryFeePaise?: number | null;
+  customerNote?: string | null; bakerProfileId?: string | null;
   address: {
     fulfilment: 'delivery' | 'pickup'; name: string; phone: string; district: string; pincode: string | null;
     address: string | null; landmark: string | null; location: { lat: number; lng: number } | null; paymentPreference: string;
   };
 };
+export type BakerProfile = {
+  id: string; name: string; phone: string; address: string; district: string; mapsLink: string | null; notes: string | null; active: boolean;
+};
+export type PaymentSettings = { upiId: string; payeeName: string };
+
+export const payablePaise = (order: Pick<OrderDoc, 'totalPaise' | 'deliveryFeePaise'>) => order.totalPaise + (order.deliveryFeePaise ?? 0);
 export const statusLabel = (value: string) => value.replaceAll('_', ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
 export const statusNote: Record<string, string> = {
   placed: 'We have your order. Rasvani will call you to confirm.',
   confirmed: 'Confirmed by Rasvani.',
-  accepted: 'The baker has accepted your order.',
+  accepted: 'Your order is confirmed with the kitchen.',
   preparing: 'Being prepared fresh.',
   ready: 'Ready for pickup or dispatch.',
   dispatched: 'On the way.',
   delivered: 'Delivered. Thank you!',
   cancelled: 'This order was cancelled.',
 };
+
+/** Customer-facing progress steps. Pickup orders skip the "on the way" step. */
+export function progressSteps(fulfilment: 'delivery' | 'pickup'): { key: string; label: string; statuses: string[] }[] {
+  return [
+    { key: 'placed', label: 'Order placed', statuses: ['placed'] },
+    { key: 'confirmed', label: 'Confirmed', statuses: ['confirmed', 'accepted'] },
+    { key: 'preparing', label: 'Preparing', statuses: ['preparing'] },
+    { key: 'ready', label: fulfilment === 'pickup' ? 'Ready to collect' : 'Ready', statuses: ['ready'] },
+    ...(fulfilment === 'delivery' ? [{ key: 'dispatched', label: 'On the way', statuses: ['dispatched'] }] : []),
+    { key: 'delivered', label: fulfilment === 'pickup' ? 'Collected' : 'Delivered', statuses: ['delivered'] },
+  ];
+}
+export const upiLink = (settings: PaymentSettings, amountPaise: number, orderNumber: string) =>
+  `upi://pay?pa=${encodeURIComponent(settings.upiId)}&pn=${encodeURIComponent(settings.payeeName)}&am=${(amountPaise / 100).toFixed(2)}&cu=INR&tn=${encodeURIComponent(orderNumber)}`;

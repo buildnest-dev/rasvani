@@ -29,11 +29,11 @@ const orderSchema = z.object({
   phone: z.string().trim().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number.'),
   district: z.enum(biharDistricts, { message: 'Choose your district in Bihar.' }),
   pincode: clean(6), address: clean(300), landmark: clean(120), notes: clean(400),
-  payment: z.enum(['pay_on_receipt', 'pay_upi_after_call']),
+  payment: z.enum(['cod', 'upi']),
   lat: z.number().min(6).max(38).nullable(), lng: z.number().min(68).max(98).nullable(),
   lines: z.array(z.object({ productId: z.string().min(1).max(60), qty: z.number().int().min(1).max(20) })).min(1).max(50),
 });
-const paymentLabels = { pay_on_receipt: 'Pay when I receive / collect', pay_upi_after_call: 'Pay by UPI after Rasvani confirms' } as const;
+const paymentLabels = { cod: 'Cash on delivery / pay at collection', upi: 'Pay by UPI QR to Rasvani' } as const;
 
 export async function placeOrderAction(idToken: string, input: unknown): Promise<Result<{ orderNumber: string }>> {
   let session;
@@ -51,18 +51,23 @@ export async function placeOrderAction(idToken: string, input: unknown): Promise
   try {
     const db = adminDb();
     const snaps = await Promise.all(data.lines.map((line) => db.collection('products').doc(line.productId).get()));
-    const lines: { productId: string; name: string; qty: number; unitPaise: number; linePaise: number }[] = [];
+    const lines: { productId: string; name: string; qty: number; unitPaise: number; linePaise: number; makerName: string | null }[] = [];
     for (const [index, snap] of snaps.entries()) {
       const product = snap.data();
       if (!snap.exists || !product || product.visible !== true || !Number.isInteger(product.pricePaise)) return fail('An item in your cart is no longer available. Please remove it and try again.');
       const qty = data.lines[index].qty;
-      lines.push({ productId: snap.id, name: String(product.name), qty, unitPaise: product.pricePaise, linePaise: product.pricePaise * qty });
+      lines.push({ productId: snap.id, name: String(product.name), qty, unitPaise: product.pricePaise, linePaise: product.pricePaise * qty, makerName: product.makerName ?? null });
     }
     const totalPaise = lines.reduce((sum, line) => sum + line.linePaise, 0);
+    if (data.payment === 'upi') {
+      const pay = await db.collection('settings').doc('payment').get();
+      if (!pay.exists || !pay.data()?.upiId) return fail('UPI payment is not switched on yet. Please choose cash on delivery / pay at collection.');
+    }
     const orderNumber = `RV-${Math.random().toString(36).slice(2, 8).toUpperCase()}${Date.now().toString(36).slice(-4).toUpperCase()}`;
     await db.collection('orders').add({
       orderNumber, userId: session.uid, customerEmail: session.email, status: 'placed', paymentStatus: 'pending',
-      lines, totalPaise, bakerId: null, bakerName: null, notes: data.notes || null, createdAt: new Date().toISOString(),
+      lines, totalPaise, bakerId: null, bakerName: null, bakerProfileId: null, deliveryFeePaise: null, customerNote: null,
+      paymentMethod: data.payment, paymentRef: null, notes: data.notes || null, createdAt: new Date().toISOString(),
       address: {
         fulfilment: data.method, name: data.name, phone: data.phone, state: 'Bihar', district: data.district,
         pincode: data.pincode || null, address: data.address || null, landmark: data.landmark || null,
@@ -123,7 +128,7 @@ export async function assignBakerAction(idToken: string, orderId: string, bakerU
 
 const productSchema = z.object({
   name: z.string().trim().min(2).max(180), sku: z.string().trim().min(2).max(80),
-  description: z.string().trim().max(2000), makerName: z.string().trim().max(120),
+  description: z.string().trim().max(2000), makerName: z.string().trim().max(120), makerId: z.string().trim().max(60).optional(),
   priceRupees: z.number().min(1).max(100000), storage: z.enum(['ambient', 'chilled', 'frozen', 'other']),
   vegetarianEvidence: z.string().trim().min(3, 'Write how you confirmed it is 100% vegetarian.').max(300),
 });
@@ -134,11 +139,17 @@ export async function publishProductAction(idToken: string, input: unknown): Pro
     const parsed = productSchema.safeParse(input);
     if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'Check the product fields.');
     const d = parsed.data;
+    let makerName = d.makerName; let makerDistrict: string | null = null; let makerId: string | null = null;
+    if (d.makerId) {
+      const profile = await adminDb().collection('bakerProfiles').doc(d.makerId).get();
+      if (!profile.exists) return fail('That baker or restaurant was not found. Add it under Bakers first.');
+      makerId = profile.id; makerName = String(profile.data()?.name ?? makerName); makerDistrict = profile.data()?.district ?? null;
+    }
     const ref = adminDb().collection('products').doc();
     const slugBase = d.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80) || 'product';
     await ref.set({
       name: d.name, sku: d.sku.toUpperCase(), slug: `${slugBase}-${ref.id.slice(0, 5).toLowerCase()}`, description: d.description || null,
-      makerName: d.makerName || null, pricePaise: Math.round(d.priceRupees * 100), storage: d.storage,
+      makerName: makerName || null, makerId, makerDistrict, pricePaise: Math.round(d.priceRupees * 100), storage: d.storage,
       vegetarianEvidence: d.vegetarianEvidence, visible: true, createdAt: new Date().toISOString(),
     });
     return { ok: true, id: ref.id };
@@ -184,6 +195,100 @@ export async function removeBakerAction(idToken: string, email: string): Promise
     if (!existing.empty) await existing.docs[0].ref.update({ role: 'customer', updatedAt: FieldValue.serverTimestamp() });
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not remove the baker.')); }
+}
+
+/* ---------------- Admin: baker directory, payment settings, order handling ---------------- */
+const profileSchema = z.object({
+  id: z.string().trim().max(60).optional(),
+  name: z.string().trim().min(2, 'Enter the baker or restaurant name.').max(120),
+  phone: z.string().trim().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number.'),
+  address: z.string().trim().min(5, 'Enter the address or area.').max(300),
+  district: z.enum(biharDistricts, { message: 'Choose the district in Bihar.' }),
+  mapsLink: z.string().trim().max(500).refine((value) => !value || /^https:\/\/(www\.)?(google\.com\/maps|maps\.google\.com|maps\.app\.goo\.gl|goo\.gl\/maps)/.test(value), 'Use a Google Maps link, or leave it empty.'),
+  notes: z.string().trim().max(500),
+});
+
+export async function saveBakerProfileAction(idToken: string, input: unknown): Promise<Result<{ id: string }>> {
+  try {
+    await requireRole(idToken, ['admin']);
+    const parsed = profileSchema.safeParse(input);
+    if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'Check the baker details.');
+    const { id, mapsLink, notes, ...rest } = parsed.data;
+    const col = adminDb().collection('bakerProfiles');
+    const ref = id ? col.doc(id) : col.doc();
+    if (id && !(await ref.get()).exists) return fail('Baker not found.');
+    await ref.set({ ...rest, mapsLink: mapsLink || null, notes: notes || null, active: true, ...(id ? { updatedAt: new Date().toISOString() } : { createdAt: new Date().toISOString() }) }, { merge: true });
+    return { ok: true, id: ref.id };
+  } catch (error) { return fail(message(error, 'Could not save the baker.')); }
+}
+
+export async function deleteBakerProfileAction(idToken: string, id: string): Promise<Result> {
+  try {
+    await requireRole(idToken, ['admin']);
+    const used = await adminDb().collection('products').where('makerId', '==', id).limit(1).get();
+    if (!used.empty) return fail('Some products use this baker. Hide or change those products first.');
+    await adminDb().collection('bakerProfiles').doc(id).delete();
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not remove the baker.')); }
+}
+
+const paymentSettingsSchema = z.object({
+  upiId: z.string().trim().regex(/^[a-zA-Z0-9._-]{2,64}@[a-zA-Z0-9]{2,32}$/, 'Enter a valid UPI ID, like name@bank.'),
+  payeeName: z.string().trim().min(2, 'Enter the name shown on the UPI account.').max(60),
+});
+export async function savePaymentSettingsAction(idToken: string, input: unknown): Promise<Result> {
+  try {
+    await requireRole(idToken, ['admin']);
+    const parsed = paymentSettingsSchema.safeParse(input);
+    if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'Check the UPI details.');
+    await adminDb().collection('settings').doc('payment').set({ ...parsed.data, updatedAt: new Date().toISOString() });
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not save the payment details.')); }
+}
+
+const handlingSchema = z.object({
+  bakerProfileId: z.string().trim().max(60),
+  deliveryFeeRupees: z.number().min(0).max(5000),
+  customerNote: z.string().trim().max(300),
+});
+export async function setOrderHandlingAction(idToken: string, orderId: string, input: unknown): Promise<Result> {
+  try {
+    await requireRole(idToken, ['admin']);
+    const parsed = handlingSchema.safeParse(input);
+    if (!parsed.success) return fail('Check the delivery charge and note.');
+    const db = adminDb();
+    const ref = db.collection('orders').doc(orderId);
+    const order = await ref.get();
+    if (!order.exists || FINAL.has(order.data()?.status)) return fail('Order cannot be changed.');
+    let bakerName: string | null = null;
+    if (parsed.data.bakerProfileId) {
+      const profile = await db.collection('bakerProfiles').doc(parsed.data.bakerProfileId).get();
+      if (!profile.exists) return fail('That baker was not found.');
+      bakerName = String(profile.data()?.name ?? 'Baker');
+    }
+    await ref.update({
+      bakerProfileId: parsed.data.bakerProfileId || null, bakerName,
+      deliveryFeePaise: Math.round(parsed.data.deliveryFeeRupees * 100) || null,
+      customerNote: parsed.data.customerNote || null, updatedAt: new Date().toISOString(),
+    });
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not save the order details.')); }
+}
+
+/* Customer tells Rasvani they paid by UPI (admin still verifies and marks it received). */
+export async function submitPaymentRefAction(idToken: string, orderId: string, reference: string): Promise<Result> {
+  try {
+    const session = await verifySession(idToken);
+    const ref = adminDb().collection('orders').doc(orderId);
+    const order = (await ref.get()).data();
+    if (!order || order.userId !== session.uid) return fail('Order not found.');
+    if (order.paymentMethod !== 'upi' || order.paymentStatus === 'paid') return fail('Payment is not pending for this order.');
+    if (order.status === 'cancelled') return fail('This order was cancelled.');
+    const cleaned = reference.trim();
+    if (!/^[A-Za-z0-9]{6,30}$/.test(cleaned)) return fail('Enter the UPI transaction ID (6 to 30 letters or digits).');
+    await ref.update({ paymentRef: cleaned, paymentRefAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not save your payment reference.')); }
 }
 
 /* -------------------------------- Baker -------------------------------- */

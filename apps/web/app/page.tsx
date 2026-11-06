@@ -1,4 +1,4 @@
 import type { Metadata } from 'next';
-import { HomeExperience } from '@/components/home-experience';
-export const metadata: Metadata = { title: 'India, Served by Region', description: 'Discover India’s regional vegetarian food stories, makers and carefully reviewed collections.' };
-export default function HomePage() { return <HomeExperience />; }
+import { HomeLanding } from '@/components/home-landing';
+export const metadata: Metadata = { title: 'Taste India From Home', description: 'Authentic regional vegetarian foods from home bakers. For all of India, live in Bihar today.' };
+export default function HomePage() { return <HomeLanding />; }

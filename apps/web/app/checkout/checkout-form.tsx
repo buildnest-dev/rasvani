@@ -73,12 +73,12 @@ export function CheckoutForm() {
       <label htmlFor="co-notes">Note for Rasvani (optional)</label>
       <textarea id="co-notes" name="notes" rows={2} maxLength={400} />
       <fieldset className="checkout-methods"><legend>Payment</legend>
-        <label className="method-card"><input type="radio" name="payment" value="pay_on_receipt" defaultChecked /><strong>Pay when I receive / collect</strong><span>Cash or UPI at handover</span></label>
-        <label className="method-card"><input type="radio" name="payment" value="pay_upi_after_call" /><strong>Pay by UPI after confirmation</strong><span>We share payment details on the call</span></label>
+        <label className="method-card"><input type="radio" name="payment" value="cod" defaultChecked /><strong>Cash on delivery / pay at collection</strong><span>Pay when the food reaches you or when you collect it</span></label>
+        <label className="method-card"><input type="radio" name="payment" value="upi" /><strong>Pay by UPI QR</strong><span>After you order, a QR with your exact amount appears in My orders</span></label>
       </fieldset>
       {state.error && <p className="status" role="alert">{state.error}</p>}
       <button className="btn" type="submit" disabled={pending}>{pending ? 'Placing your order…' : 'Place order'}</button>
-      <p className="notice">No online payment is taken on this page. Rasvani confirms your order, the final amount, and delivery or pickup by phone.</p>
+      <p className="notice">No payment is taken on this page. Rasvani calls you to confirm the order, any delivery charge, and delivery or pickup. Delivery charge, if any, is added by Rasvani before you pay.</p>
     </form>
     <aside className="cart-summary"><h2>Your order</h2>
       <ul className="cart-summary-lines">{lines.map((line) => <li key={line.productId}><span>{line.name} × {line.qty}</span><strong>{formatPaise(line.unitPaise * line.qty)}</strong></li>)}</ul>

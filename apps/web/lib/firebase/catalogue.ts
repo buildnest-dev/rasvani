@@ -2,7 +2,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { firebaseConfigured, firestore } from '@/lib/firebase/client';
 
 export type Product = {
-  id: string; name: string; slug: string; sku: string; description: string | null; makerName: string | null;
+  id: string; name: string; slug: string; sku: string; description: string | null; makerName: string | null; makerDistrict?: string | null;
   pricePaise: number; storage: string;
 };
 
