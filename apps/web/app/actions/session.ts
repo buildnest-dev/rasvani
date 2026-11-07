@@ -205,7 +205,7 @@ const productSchema = z.object({
   name: z.string().trim().min(2).max(180), sku: z.string().trim().min(2).max(80),
   description: z.string().trim().max(2000), makerName: z.string().trim().max(120), makerId: z.string().trim().max(60).optional(),
   image: z.string().trim().max(120).optional(),
-  priceRupees: z.number().min(1).max(100000), storage: z.enum(['ambient', 'chilled', 'frozen', 'other']),
+  priceRupees: z.number().min(1).max(100000), mrpRupees: z.number().min(0).max(100000).optional(), storage: z.enum(['ambient', 'chilled', 'frozen', 'other']),
   vegetarianEvidence: z.string().trim().min(3, 'Write how you confirmed it is 100% vegetarian.').max(300),
 });
 
@@ -226,18 +226,21 @@ export async function publishProductAction(idToken: string, input: unknown): Pro
     const slugBase = d.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80) || 'product';
     await ref.set({
       name: d.name, sku: d.sku.toUpperCase(), slug: `${slugBase}-${ref.id.slice(0, 5).toLowerCase()}`, description: d.description || null,
-      image: d.image || null, makerName: makerName || null, makerId, makerDistrict, pricePaise: Math.round(d.priceRupees * 100), storage: d.storage,
+      image: d.image || null, makerName: makerName || null, makerId, makerDistrict, pricePaise: Math.round(d.priceRupees * 100), mrpPaise: mrpPaiseFor(d.priceRupees, d.mrpRupees), storage: d.storage,
       vegetarianEvidence: d.vegetarianEvidence, visible: true, createdAt: new Date().toISOString(),
     });
     return { ok: true, id: ref.id };
   } catch (error) { return fail(message(error, 'Could not publish the product.')); }
 }
 
-export async function setProductPriceAction(idToken: string, productId: string, priceRupees: number): Promise<Result> {
+/** The crossed-out MRP is only kept when it is higher than the selling price. */
+const mrpPaiseFor = (priceRupees: number, mrpRupees?: number): number | null => mrpRupees && mrpRupees > priceRupees ? Math.round(mrpRupees * 100) : null;
+
+export async function setProductPriceAction(idToken: string, productId: string, priceRupees: number, mrpRupees?: number): Promise<Result> {
   try {
     await requireRole(idToken, ['admin']);
     if (!Number.isFinite(priceRupees) || priceRupees < 1 || priceRupees > 100000) return fail('Price must be between ₹1 and ₹1,00,000.');
-    await adminDb().collection('products').doc(safeId(productId)).update({ pricePaise: Math.round(priceRupees * 100), updatedAt: new Date().toISOString() });
+    await adminDb().collection('products').doc(safeId(productId)).update({ pricePaise: Math.round(priceRupees * 100), mrpPaise: mrpPaiseFor(priceRupees, mrpRupees), updatedAt: new Date().toISOString() });
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not change the price.')); }
 }

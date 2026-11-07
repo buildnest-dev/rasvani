@@ -109,3 +109,18 @@
 .hs-search .lp-search{max-width:640px;margin:0 auto}
 @media(max-width:700px){.hs-arrow{display:none}.hs-shade{background:linear-gradient(0deg,rgba(35,12,8,.85),rgba(35,12,8,.3))}.hs-copy{justify-content:flex-end;padding-bottom:56px}}
 @media(prefers-reduced-motion:reduce){.hs-slide{transition:none}}
+
+/* Photos uploaded by the admin are shown whole (never cropped) on a soft background */
+.shop-card-art.has-img.is-upload{background:#f5ecde}
+.shop-card-art.has-img.is-upload img{object-fit:contain}
+.shop-card:hover .shop-card-art.has-img.is-upload img{transform:none}
+
+/* Product card: rounded square photo shown whole, uppercase name, price with MRP and % off */
+.shop-card{border-radius:18px;border:1px solid #e4d6c3;background:#fffdf8;padding:12px;overflow:hidden}
+.shop-card-art.has-img{aspect-ratio:1/1;border-radius:14px}
+.shop-card-body h2,.shop-card-body h3{text-transform:uppercase;letter-spacing:.02em;font-size:15px;line-height:1.35}
+.price-tag{display:inline-flex;align-items:baseline;flex-wrap:wrap;gap:8px}
+.price-tag strong{font-size:20px;color:#2b1a14}
+.price-tag s{color:#8a7d70;font-size:14px}
+.price-tag em{font-style:normal;font-weight:700;font-size:13px;color:#b3261e}
+.pd-price .price-tag strong{font-size:30px}

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { AddToCart } from '@/components/add-to-cart';
 import { ProductArt } from '@/components/product-art';
+import { PriceTag } from '@/components/price-tag';
 import { loadVisibleProducts } from '@/lib/firebase/catalogue';
 import { formatPaise } from '@/lib/money';
 
@@ -30,7 +31,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       <div className="pd-info">
         <span className="eyebrow">{maker}</span>
         <h1>{product.name}</h1>
-        <p className="pd-price">{formatPaise(product.pricePaise)}</p>
+        <p className="pd-price"><PriceTag pricePaise={product.pricePaise} mrpPaise={product.mrpPaise} /></p>
         <div className="pd-from"><span aria-hidden="true">✳</span><div><small>Made by</small><strong>{maker}</strong><em>{where}</em></div></div>
         <ul className="pd-facts">
           <li><b>100%</b> vegetarian</li>

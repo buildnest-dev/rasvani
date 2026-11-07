@@ -3,7 +3,7 @@ import { firebaseConfigured, firestore } from '@/lib/firebase/client';
 
 export type Product = {
   id: string; name: string; slug: string; sku: string; description: string | null; makerName: string | null; makerDistrict?: string | null; image?: string | null;
-  pricePaise: number; storage: string;
+  pricePaise: number; mrpPaise?: number | null; storage: string;
 };
 
 // Public read of visible products only (Firestore rules allow exactly this query).

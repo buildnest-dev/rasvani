@@ -6,5 +6,5 @@ export function ProductArt({ product, sizes = '(max-width: 700px) 90vw, 30vw', p
   const src = productImage(product);
   const uploaded = Boolean(src && uploadedImageId(src));
   if (!src) return <div className={`shop-card-art ${className}`} aria-hidden="true"><span>Rasvani · Bihar</span></div>;
-  return <div className={`shop-card-art has-img ${className}`}><Image src={src} alt={uploaded ? product.name : `${product.name} (illustrative picture)`} fill sizes={sizes} priority={priority} unoptimized={uploaded} /></div>;
+  return <div className={`shop-card-art has-img ${uploaded ? 'is-upload' : ''} ${className}`}><Image src={src} alt={uploaded ? product.name : `${product.name} (illustrative picture)`} fill sizes={sizes} priority={priority} unoptimized={uploaded} /></div>;
 }
