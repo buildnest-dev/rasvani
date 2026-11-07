@@ -21,7 +21,7 @@ function safeId(id: unknown): string {
   return id;
 }
 function safeEmailKey(email: unknown): string {
-  if (typeof email !== 'string' || email.length > 254 || /[/s]/.test(email)) throw new Error('Not permitted: invalid email');
+  if (typeof email !== 'string' || email.length === 0 || email.length > 254 || email.includes('/') || /\s/.test(email)) throw new Error('Not permitted: invalid email');
   return email;
 }
 
