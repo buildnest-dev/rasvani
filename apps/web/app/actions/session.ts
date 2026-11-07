@@ -1,5 +1,6 @@
 'use server';
 
+import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb, requireRole, verifySession, type Role } from '@/lib/firebase/admin';
@@ -13,6 +14,19 @@ const fail = (error: string): { ok: false; error: string } => ({ ok: false, erro
 const message = (error: unknown, fallback: string) => (error instanceof Error && /Not permitted|sign in/i.test(error.message) ? error.message : fallback);
 
 const FINAL = new Set<string>(FINAL_STATUSES);
+
+/** Accepts only https links whose host is exactly a Google Maps host (blocks look-alikes such as maps.app.goo.gl.evil.com). */
+function isMapsLink(value: string) {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:' || url.username || url.password) return false;
+    const host = url.hostname.toLowerCase();
+    if (host === 'maps.app.goo.gl' || host === 'maps.google.com') return true;
+    if (host === 'goo.gl') return url.pathname.startsWith('/maps');
+    return (host === 'google.com' || host === 'www.google.com') && url.pathname.startsWith('/maps');
+  } catch { return false; }
+}
 
 export async function syncRoleAction(idToken: string): Promise<{ role: Role; error?: string }> {
   try { return { role: (await verifySession(idToken)).role }; } catch (caught) {
@@ -81,7 +95,7 @@ export async function placeOrderAction(idToken: string, input: unknown, captchaT
       const pay = await db.collection('settings').doc('payment').get();
       if (!pay.exists || !pay.data()?.upiId) return fail('UPI payment is not switched on yet. Please choose cash on delivery / pay at collection.');
     }
-    const orderNumber = `RV-${Math.random().toString(36).slice(2, 8).toUpperCase()}${Date.now().toString(36).slice(-4).toUpperCase()}`;
+    const orderNumber = `RV-${randomBytes(4).toString('hex').toUpperCase()}${Date.now().toString(36).slice(-3).toUpperCase()}`;
     await db.collection('orders').add({
       orderNumber, userId: session.uid, customerEmail: session.email, status: 'placed', paymentStatus: 'pending',
       lines, totalPaise, bakerId: null, bakerName: null, bakerProfileId: null, deliveryFeePaise: null, customerNote: null,
@@ -233,7 +247,7 @@ const profileSchema = z.object({
   phone: z.string().trim().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number.'),
   address: z.string().trim().min(5, 'Enter the address or area.').max(300),
   district: z.enum(biharDistricts, { message: 'Choose the district in Bihar.' }),
-  mapsLink: z.string().trim().max(500).refine((value) => !value || /^https:\/\/(www\.)?(google\.com\/maps|maps\.google\.com|maps\.app\.goo\.gl|goo\.gl\/maps)/.test(value), 'Use a Google Maps link, or leave it empty.'),
+  mapsLink: z.string().trim().max(500).refine(isMapsLink, 'Use a Google Maps link, or leave it empty.'),
   notes: z.string().trim().max(500),
 });
 

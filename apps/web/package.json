@@ -14,8 +14,6 @@
     "prestart": "node scripts/copy-maplibre-workers.mjs"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.7.0",
-    "@supabase/supabase-js": "^2.57.4",
     "firebase": "^13.2.0",
     "firebase-admin": "^14.5.0",
     "maplibre-gl": "^6.16.0",

@@ -72,3 +72,11 @@
 @keyframes au-shimmer{to{background-position:-200% 0}}
 @media(max-width:900px){.au-shell{grid-template-columns:1fr;border-radius:6px 24px 6px 6px}.au-side{min-height:300px}.au-main{padding:28px 20px}}
 @media(prefers-reduced-motion:reduce){.au-skel{animation:none}.au-social,.au-submit{transition:none}}
+/* Partner pages */
+.fp-hero{position:relative;min-height:420px;display:grid;align-items:end;color:#fff;overflow:hidden}
+.fp-img{object-fit:cover}.fp-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(40,16,12,.88),rgba(40,16,12,.4) 70%,rgba(40,16,12,.12))}
+.fp-copy{position:relative;padding-top:90px;padding-bottom:48px}
+.fp-copy .rg-badge{margin-left:0}
+.fp-copy h1{font:500 clamp(46px,6vw,80px)/1.02 var(--serif);margin:6px 0 12px}
+.fp-copy p{font:18px/1.6 var(--serif);max-width:560px;color:#f7e6d0;margin:0}
+.fp-h2{font:500 clamp(28px,3.4vw,40px) var(--serif);color:var(--maroon);margin:6px 0 4px}

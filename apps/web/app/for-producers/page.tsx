@@ -1,6 +1,38 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-export const metadata: Metadata={title:'For Producers', description:'Learn about Rasvani’s curated producer partnership and review process.'};
-export default function ProducersPage(){return <div className="producer-public-page"><section className="producer-public-hero"><div className="wrap producer-public-grid"><div><div className="eyebrow">PARTNERSHIPS / BUILT ON TRUST</div><h1>Bring your food story to a wider table.</h1><p>Rasvani is building a curated network of traditional and regional food producers. Every application, facility and product passes through a separate review process.</p><div className="hero-actions"><Link className="btn" href="/producer-portal">Start a producer application ↗</Link><Link className="text-link" href="/explore-india">Explore the regional atlas</Link></div></div><div className="producer-public-art"><Image src="/images/rasvani-editorial-spice-pantry.webp" alt="Indian grains, spices and fresh ingredients arranged for traditional food preparation" fill sizes="(max-width: 800px) 100vw, 48vw"/><div className="producer-public-stamp">CURATED<br/><strong>PARTNERSHIPS</strong></div></div></div></section>
-  <section className="wrap partnership-process"><div className="section-heading-premium"><div><div className="eyebrow">HOW PARTNERSHIP WORKS</div><h2>A thoughtful path to publication.</h2></div><p>Submitting an application does not guarantee approval or listing.</p></div><div className="process-steps"><article><span>01</span><h3>Business application</h3><p>Submit initial business and contact details.</p></article><article><span>02</span><h3>Facility review</h3><p>Production location, hygiene practices and relevant documents are reviewed separately.</p></article><article><span>03</span><h3>Product assessment</h3><p>Ingredients, labels, packaging, claims and evidence are assessed.</p></article><article><span>04</span><h3>Catalogue decision</h3><p>Only separately approved products can be published in the catalogue.</p></article></div><div className="partnership-policy-note">Primary fulfilment design: Producer → Rasvani warehouse / collection centre → Customer. Warehouse site, inbound logistics and commercial terms remain subject to the agreed business decisions.</div></section></div>}
+
+export const metadata: Metadata = {
+  title: 'Cook with Rasvani',
+  description: 'Home bakers and restaurants in Bihar: get your home-made vegetarian food in front of customers with Rasvani.',
+};
+
+const steps = [
+  ['Tell us about your kitchen', 'Write to us with your name, district, phone and what you make.'],
+  ['We add you to Rasvani', 'We save your details and location and list your foods with real pictures.'],
+  ['Orders reach you', 'When a customer orders, Rasvani talks to you, confirms the delivery or takeaway, and you prepare the food.'],
+];
+
+export default function ProducersPage() {
+  return <div className="fp-page">
+    <section className="fp-hero">
+      <Image src="/images/rasvani-editorial-sweets-brass.webp" alt="" fill priority sizes="100vw" className="fp-img" />
+      <div className="fp-shade" aria-hidden="true" />
+      <div className="wrap fp-copy">
+        <span className="rg-badge is-live">Bihar home bakers and restaurants</span>
+        <h1>Your kitchen, on Rasvani.</h1>
+        <p>If you make traditional vegetarian food in Bihar, Rasvani can bring it to customers who miss the taste of home.</p>
+        <div className="cta-row">
+          <a className="btn" href="mailto:rasvanifoods@gmail.com?subject=Cook%20with%20Rasvani">Write to Rasvani</a>
+          <Link className="btn secondary rg-light" href="/bihar">See what is live</Link>
+        </div>
+      </div>
+    </section>
+    <section className="wrap rg-main">
+      <div className="eyebrow">HOW IT WORKS</div>
+      <h2 className="fp-h2">Three simple steps.</h2>
+      <div className="rg-steps">{steps.map(([title, text], index) => <article key={title}><b>{index + 1}</b><h3>{title}</h3><p>{text}</p></article>)}</div>
+      <p className="notice">Rasvani lists only 100% vegetarian food. We confirm every listing with you before it goes live. Joining does not guarantee a listing.</p>
+    </section>
+  </div>;
+}
