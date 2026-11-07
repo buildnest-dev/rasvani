@@ -67,6 +67,7 @@ export default function MyOrdersPage() {
           <p className="notice">{statusNote[order.status] ?? ''}</p>
           {order.customerNote && <p className="order-message"><strong>Message from Rasvani:</strong> {order.customerNote}</p>}
           <ul className="customer-order-lines">{order.lines.map((line) => <li key={line.productId}><span>{line.name} <small>· {line.qty} × {formatPaise(line.unitPaise)}</small></span><strong>{formatPaise(line.linePaise)}</strong></li>)}</ul>
+          {order.deliveryTime ? <div className="customer-order-total"><span>Delivery time</span><strong>{order.deliveryTime}</strong></div> : null}
           {order.deliveryFeePaise ? <div className="customer-order-total"><span>Delivery charge</span><strong>{formatPaise(order.deliveryFeePaise)}</strong></div> : null}
           <div className="customer-order-total"><span>{order.paymentStatus === 'paid' ? 'Paid' : 'To pay'}</span><strong>{formatPaise(payable)}</strong></div>
           {showQr && payment && <div className="upi-box">

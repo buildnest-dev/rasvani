@@ -157,13 +157,15 @@ export function AdminDashboard() {
                 : <p className="notice">{makers.length ? `Foods by: ${makers.join(', ')}. ` : ''}Not connected yet. Choose below.</p>}</div>
             </div>
             <ul className="customer-order-lines">{order.lines.map((line) => <li key={line.productId}><span>{line.name} <small>· {line.qty} × {formatPaise(line.unitPaise)}{line.makerName ? ` · ${line.makerName}` : ''}</small></span><strong>{formatPaise(line.linePaise)}</strong></li>)}</ul>
+            {order.deliveryTime ? <div className="customer-order-total"><span>Delivery time</span><strong>{order.deliveryTime}</strong></div> : null}
             {order.deliveryFeePaise ? <div className="customer-order-total"><span>Delivery charge</span><strong>{formatPaise(order.deliveryFeePaise)}</strong></div> : null}
             <div className="customer-order-total"><span>To collect</span><strong>{formatPaise(payablePaise(order))}</strong></div>
             {order.paymentMethod === 'upi' && order.paymentStatus !== 'paid' && <p className="notice">{order.paymentRef ? <>Customer says paid. UPI transaction ID: <strong>{order.paymentRef}</strong>. Check your UPI app, then mark Received.</> : 'Waiting for the customer to pay by UPI.'}</p>}
             {!final && <>
-              <form className="admin-order-form" key={`${order.id}-${order.bakerProfileId}-${order.deliveryFeePaise}`} onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setOrderHandlingAction(token, order.id, { bakerProfileId: String(d.get('baker') ?? ''), deliveryFeeRupees: Number(d.get('fee') || 0), customerNote: String(d.get('note') ?? '') }), 'Order details saved.'); }}>
+              <form className="admin-order-form" key={`${order.id}-${order.bakerProfileId}-${order.deliveryFeePaise}-${order.deliveryTime ?? ''}`} onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setOrderHandlingAction(token, order.id, { bakerProfileId: String(d.get('baker') ?? ''), deliveryFeeRupees: Number(d.get('fee') || 0), customerNote: String(d.get('note') ?? ''), deliveryTime: String(d.get('time') ?? '') }), 'Order details saved.'); }}>
                 <label>Connect baker<select name="baker" defaultValue={order.bakerProfileId ?? ''}><option value="">Not connected</option>{profiles.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.district}</option>)}</select></label>
                 <label>Delivery charge (₹)<input name="fee" type="number" min="0" max="5000" step="1" defaultValue={order.deliveryFeePaise ? order.deliveryFeePaise / 100 : ''} placeholder="0" /></label>
+                <label className="grow">Delivery time<input name="time" maxLength={80} defaultValue={order.deliveryTime ?? ''} placeholder="e.g. Today 6–8 PM  /  2–3 days" /></label>
                 <label className="grow">Message for customer<input name="note" maxLength={300} defaultValue={order.customerNote ?? ''} placeholder="e.g. Pickup from shop after 5 PM" /></label>
                 <button className="btn secondary" type="submit" disabled={busy}>Save</button>
               </form>

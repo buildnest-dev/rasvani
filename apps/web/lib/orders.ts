@@ -7,7 +7,7 @@ export type OrderDoc = {
   id: string; orderNumber: string; userId: string; customerEmail: string; status: string; paymentStatus: string;
   lines: OrderLine[]; totalPaise: number; bakerId: string | null; bakerName: string | null; notes: string | null; createdAt: string;
   paymentMethod?: 'cod' | 'upi'; paymentRef?: string | null; deliveryFeePaise?: number | null;
-  customerNote?: string | null; bakerProfileId?: string | null;
+  customerNote?: string | null; deliveryTime?: string | null; bakerProfileId?: string | null;
   address: {
     fulfilment: 'delivery' | 'pickup'; name: string; phone: string; district: string; pincode: string | null;
     address: string | null; landmark: string | null; location: { lat: number; lng: number } | null; paymentPreference: string;

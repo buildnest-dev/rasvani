@@ -333,6 +333,7 @@ const handlingSchema = z.object({
   bakerProfileId: z.string().trim().max(60),
   deliveryFeeRupees: z.number().min(0).max(5000),
   customerNote: z.string().trim().max(300),
+  deliveryTime: z.string().trim().max(80).optional(),
 });
 export async function setOrderHandlingAction(idToken: string, orderId: string, input: unknown): Promise<Result> {
   try {
@@ -352,7 +353,7 @@ export async function setOrderHandlingAction(idToken: string, orderId: string, i
     await ref.update({
       bakerProfileId: parsed.data.bakerProfileId || null, bakerName,
       deliveryFeePaise: Math.round(parsed.data.deliveryFeeRupees * 100) || null,
-      customerNote: parsed.data.customerNote || null, updatedAt: new Date().toISOString(),
+      customerNote: parsed.data.customerNote || null, deliveryTime: parsed.data.deliveryTime || null, updatedAt: new Date().toISOString(),
     });
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not save the order details.')); }
