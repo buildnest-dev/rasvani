@@ -12,7 +12,7 @@ export function DistrictMotion() {
     const nodes = Array.from(document.querySelectorAll<HTMLElement>('.rv-reveal'));
     if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { nodes.forEach((node) => node.classList.add('is-in')); return; }
     // Content stays visible unless this script runs: only then do blocks start hidden and fade in.
-    document.body.classList.add('rv-ready');
+
     const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('is-in'); observer.unobserve(entry.target); } }), { threshold: 0.05 });
     nodes.forEach((node) => observer.observe(node));
     return () => { observer.disconnect(); document.body.classList.remove('rv-ready'); };

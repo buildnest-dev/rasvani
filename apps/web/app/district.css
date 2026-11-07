@@ -1,6 +1,6 @@
 /* District pages: spotlight, floating foods, gallery, scroll reveal */
-.rv-ready .rv-reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
-.rv-ready .rv-reveal.is-in{opacity:1;transform:none}
+/* Sections are always visible (a scroll-reveal fade used to leave them blank when it did not fire). */
+.rv-reveal{opacity:1;transform:none}
 .ds-spotlight{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:center;background:linear-gradient(135deg,#5a1f24,#7a3320 60%,#8a4a1f);color:#fff6ea;border-radius:6px 36px 6px 6px;padding:36px;margin:26px 0;overflow:hidden;position:relative}
 .ds-spot-copy h2{font:500 clamp(30px,4vw,46px)/1.1 var(--serif);margin:8px 0 10px;color:#fff6ea!important}
 .ds-spot-copy .eyebrow{color:#ffd9a8}
