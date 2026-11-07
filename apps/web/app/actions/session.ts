@@ -15,6 +15,16 @@ const message = (error: unknown, fallback: string) => (error instanceof Error &&
 
 const FINAL = new Set<string>(FINAL_STATUSES);
 
+/** Firestore ids come from the browser: allow only plain ids so a value like 'a/b/c' can never address another path. */
+function safeId(id: unknown): string {
+  if (typeof id !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(id)) throw new Error('Not permitted: invalid id');
+  return id;
+}
+function safeEmailKey(email: unknown): string {
+  if (typeof email !== 'string' || email.length > 254 || /[/s]/.test(email)) throw new Error('Not permitted: invalid email');
+  return email;
+}
+
 /** Accepts only https links whose host is exactly a Google Maps host (blocks look-alikes such as maps.app.goo.gl.evil.com). */
 function isMapsLink(value: string) {
   if (!value) return true;
@@ -82,7 +92,7 @@ export async function placeOrderAction(idToken: string, input: unknown, captchaT
     const recent = mine.docs.filter((d) => String(d.data().createdAt ?? '') >= hourAgo).length;
     const open = mine.docs.filter((d) => !FINAL.has(d.data().status)).length;
     if (recent >= 8 || open >= 5) return fail('You have several orders in progress. Please wait for Rasvani to confirm them, or write to rasvanifoods@gmail.com.');
-    const snaps = await Promise.all(data.lines.map((line) => db.collection('products').doc(line.productId).get()));
+    const snaps = await Promise.all(data.lines.map((line) => db.collection('products').doc(safeId(line.productId)).get()));
     const lines: { productId: string; name: string; qty: number; unitPaise: number; linePaise: number; makerName: string | null }[] = [];
     for (const [index, snap] of snaps.entries()) {
       const product = snap.data();
@@ -114,7 +124,7 @@ export async function placeOrderAction(idToken: string, input: unknown, captchaT
 export async function cancelMyOrderAction(idToken: string, orderId: string, reason: string): Promise<Result> {
   try {
     const session = await verifySession(idToken);
-    const ref = adminDb().collection('orders').doc(orderId);
+    const ref = adminDb().collection('orders').doc(safeId(orderId));
     const snap = await ref.get();
     const order = snap.data();
     if (!order || order.userId !== session.uid) return fail('Order not found.');
@@ -130,7 +140,7 @@ export async function setOrderStatusAction(idToken: string, orderId: string, sta
   try {
     await requireRole(idToken, ['admin']);
     if (!(ORDER_STATUSES as readonly string[]).includes(status) || (payment && !(PAYMENTS as readonly string[]).includes(payment))) return fail('Invalid status.');
-    const ref = adminDb().collection('orders').doc(orderId);
+    const ref = adminDb().collection('orders').doc(safeId(orderId));
     const snap = await ref.get();
     if (!snap.exists) return fail('Order not found.');
     if (FINAL.has(snap.data()?.status)) return fail('This order is already final.');
@@ -143,11 +153,11 @@ export async function assignBakerAction(idToken: string, orderId: string, bakerU
   try {
     await requireRole(idToken, ['admin']);
     const db = adminDb();
-    const orderRef = db.collection('orders').doc(orderId);
+    const orderRef = db.collection('orders').doc(safeId(orderId));
     const order = await orderRef.get();
     if (!order.exists || FINAL.has(order.data()?.status)) return fail('Order cannot be changed.');
     if (!bakerUid) { await orderRef.update({ bakerId: null, bakerName: null, updatedAt: new Date().toISOString() }); return { ok: true }; }
-    const baker = await db.collection('roles').doc(bakerUid).get();
+    const baker = await db.collection('roles').doc(safeId(bakerUid)).get();
     if (!baker.exists || baker.data()?.role !== 'baker') return fail('That baker is not active.');
     await orderRef.update({
       bakerId: bakerUid, bakerName: baker.data()?.name ?? baker.data()?.email ?? 'Baker',
@@ -175,7 +185,7 @@ export async function publishProductAction(idToken: string, input: unknown): Pro
     if (d.image && !isAllowedFoodImage(d.image)) return fail('Choose a picture from the list.');
     let makerName = d.makerName; let makerDistrict: string | null = null; let makerId: string | null = null;
     if (d.makerId) {
-      const profile = await adminDb().collection('bakerProfiles').doc(d.makerId).get();
+      const profile = await adminDb().collection('bakerProfiles').doc(safeId(d.makerId)).get();
       if (!profile.exists) return fail('That baker or restaurant was not found. Add it under Bakers first.');
       makerId = profile.id; makerName = String(profile.data()?.name ?? makerName); makerDistrict = profile.data()?.district ?? null;
     }
@@ -194,7 +204,7 @@ export async function setProductPriceAction(idToken: string, productId: string, 
   try {
     await requireRole(idToken, ['admin']);
     if (!Number.isFinite(priceRupees) || priceRupees < 1 || priceRupees > 100000) return fail('Price must be between ₹1 and ₹1,00,000.');
-    await adminDb().collection('products').doc(productId).update({ pricePaise: Math.round(priceRupees * 100), updatedAt: new Date().toISOString() });
+    await adminDb().collection('products').doc(safeId(productId)).update({ pricePaise: Math.round(priceRupees * 100), updatedAt: new Date().toISOString() });
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not change the price.')); }
 }
@@ -203,7 +213,7 @@ export async function setProductImageAction(idToken: string, productId: string, 
   try {
     await requireRole(idToken, ['admin']);
     if (image && !isAllowedFoodImage(image)) return fail('Choose a picture from the list.');
-    await adminDb().collection('products').doc(productId).update({ image: image || null, updatedAt: new Date().toISOString() });
+    await adminDb().collection('products').doc(safeId(productId)).update({ image: image || null, updatedAt: new Date().toISOString() });
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not change the picture.')); }
 }
@@ -211,7 +221,7 @@ export async function setProductImageAction(idToken: string, productId: string, 
 export async function setProductVisibilityAction(idToken: string, productId: string, visible: boolean): Promise<Result> {
   try {
     await requireRole(idToken, ['admin']);
-    await adminDb().collection('products').doc(productId).update({ visible, updatedAt: new Date().toISOString() });
+    await adminDb().collection('products').doc(safeId(productId)).update({ visible, updatedAt: new Date().toISOString() });
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not update the product.')); }
 }
@@ -222,7 +232,7 @@ export async function inviteBakerAction(idToken: string, input: unknown): Promis
     await requireRole(idToken, ['admin']);
     const parsed = inviteSchema.safeParse(input);
     if (!parsed.success) return fail('Enter a valid email address.');
-    await adminDb().collection('bakerInvites').doc(parsed.data.email).set({ name: parsed.data.name || null, active: true, createdAt: new Date().toISOString() }, { merge: true });
+    await adminDb().collection('bakerInvites').doc(safeEmailKey(parsed.data.email)).set({ name: parsed.data.name || null, active: true, createdAt: new Date().toISOString() }, { merge: true });
     const existing = await adminDb().collection('roles').where('email', '==', parsed.data.email).limit(1).get();
     if (!existing.empty) await existing.docs[0].ref.update({ role: 'baker', name: parsed.data.name || null });
     return { ok: true };
@@ -233,7 +243,7 @@ export async function removeBakerAction(idToken: string, email: string): Promise
   try {
     await requireRole(idToken, ['admin']);
     const key = email.trim().toLowerCase();
-    await adminDb().collection('bakerInvites').doc(key).set({ active: false, updatedAt: new Date().toISOString() }, { merge: true });
+    await adminDb().collection('bakerInvites').doc(safeEmailKey(key)).set({ active: false, updatedAt: new Date().toISOString() }, { merge: true });
     const existing = await adminDb().collection('roles').where('email', '==', key).limit(1).get();
     if (!existing.empty) await existing.docs[0].ref.update({ role: 'customer', updatedAt: FieldValue.serverTimestamp() });
     return { ok: true };
@@ -258,7 +268,7 @@ export async function saveBakerProfileAction(idToken: string, input: unknown): P
     if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'Check the baker details.');
     const { id, mapsLink, notes, ...rest } = parsed.data;
     const col = adminDb().collection('bakerProfiles');
-    const ref = id ? col.doc(id) : col.doc();
+    const ref = id ? col.doc(safeId(id)) : col.doc();
     if (id && !(await ref.get()).exists) return fail('Baker not found.');
     await ref.set({ ...rest, mapsLink: mapsLink || null, notes: notes || null, active: true, ...(id ? { updatedAt: new Date().toISOString() } : { createdAt: new Date().toISOString() }) }, { merge: true });
     return { ok: true, id: ref.id };
@@ -270,7 +280,7 @@ export async function deleteBakerProfileAction(idToken: string, id: string): Pro
     await requireRole(idToken, ['admin']);
     const used = await adminDb().collection('products').where('makerId', '==', id).limit(1).get();
     if (!used.empty) return fail('Some products use this baker. Hide or change those products first.');
-    await adminDb().collection('bakerProfiles').doc(id).delete();
+    await adminDb().collection('bakerProfiles').doc(safeId(id)).delete();
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not remove the baker.')); }
 }
@@ -300,12 +310,12 @@ export async function setOrderHandlingAction(idToken: string, orderId: string, i
     const parsed = handlingSchema.safeParse(input);
     if (!parsed.success) return fail('Check the delivery charge and note.');
     const db = adminDb();
-    const ref = db.collection('orders').doc(orderId);
+    const ref = db.collection('orders').doc(safeId(orderId));
     const order = await ref.get();
     if (!order.exists || FINAL.has(order.data()?.status)) return fail('Order cannot be changed.');
     let bakerName: string | null = null;
     if (parsed.data.bakerProfileId) {
-      const profile = await db.collection('bakerProfiles').doc(parsed.data.bakerProfileId).get();
+      const profile = await db.collection('bakerProfiles').doc(safeId(parsed.data.bakerProfileId)).get();
       if (!profile.exists) return fail('That baker was not found.');
       bakerName = String(profile.data()?.name ?? 'Baker');
     }
@@ -322,7 +332,7 @@ export async function setOrderHandlingAction(idToken: string, orderId: string, i
 export async function submitPaymentRefAction(idToken: string, orderId: string, reference: string): Promise<Result> {
   try {
     const session = await verifySession(idToken);
-    const ref = adminDb().collection('orders').doc(orderId);
+    const ref = adminDb().collection('orders').doc(safeId(orderId));
     const order = (await ref.get()).data();
     if (!order || order.userId !== session.uid) return fail('Order not found.');
     if (order.paymentMethod !== 'upi' || order.paymentStatus === 'paid') return fail('Payment is not pending for this order.');
@@ -338,7 +348,7 @@ export async function submitPaymentRefAction(idToken: string, orderId: string, r
 export async function bakerUpdateOrderAction(idToken: string, orderId: string, next: 'accepted' | 'preparing' | 'ready' | 'declined'): Promise<Result> {
   try {
     const session = await requireRole(idToken, ['baker']);
-    const ref = adminDb().collection('orders').doc(orderId);
+    const ref = adminDb().collection('orders').doc(safeId(orderId));
     const snap = await ref.get();
     const order = snap.data();
     if (!order || order.bakerId !== session.uid) return fail('This order is not assigned to you.');

@@ -23,7 +23,7 @@ export async function verifySession(idToken: string): Promise<Session> {
   const emailVerified = decoded.email_verified === true;
   let role: Role = 'customer';
   let bakerName: string | null = null;
-  if (emailVerified && email) {
+  if (emailVerified && email && !/[/s]/.test(email)) {
     if (adminEmails().includes(email)) role = 'admin';
     else {
       const invite = await adminDb().collection('bakerInvites').doc(email).get();

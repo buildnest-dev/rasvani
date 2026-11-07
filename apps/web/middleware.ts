@@ -7,7 +7,10 @@ const RETIRED_ROUTES = ['/producer-portal', '/warehouse', '/catalogue-review', '
 
 export function middleware(request: NextRequest) {
   const host = (request.headers.get('host') ?? '').toLowerCase().split(':')[0];
-  const { pathname } = request.nextUrl;
+  // Decode and lower-case before matching so /%61dmin, /ADMIN or /admin/ cannot slip past the checks below.
+  let pathname = request.nextUrl.pathname;
+  try { pathname = decodeURIComponent(pathname); } catch { return new NextResponse('Bad request', { status: 400 }); }
+  pathname = pathname.split('/').filter((part, index) => index === 0 || part !== '').join('/').toLowerCase() || '/';
 
   if (RETIRED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))) return new NextResponse('Not found', { status: 404 });
 
