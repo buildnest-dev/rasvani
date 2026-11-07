@@ -198,7 +198,7 @@ export function AdminDashboard() {
         <label htmlFor="p-desc">Description (pack size / weight)</label><textarea id="p-desc" name="description" rows={3} maxLength={2000} />
         <label htmlFor="p-storage">Storage</label><select id="p-storage" name="storage" defaultValue="ambient"><option value="ambient">Room temperature</option><option value="chilled">Chilled</option><option value="frozen">Frozen</option><option value="other">Other</option></select>
         <label htmlFor="p-ev">How you confirmed it is 100% vegetarian</label><input id="p-ev" name="evidence" required maxLength={300} />
-        <button className="btn" type="submit" disabled={busy || profiles.length === 0}>Publish food</button>
+        <button className="btn" type="submit" disabled={busy || picBusy}>Publish food</button>
       </form>
       <h2 className="admin-h2">All foods</h2>
       {products.length === 0 ? <p className="notice">No foods yet.</p> : <div className="customer-order-list">{products.map((product) => <article className="customer-order-card" key={product.id}>
