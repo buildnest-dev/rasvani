@@ -184,8 +184,8 @@ export function AdminDashboard() {
         image: newPic || String(d.get('image') ?? '') || undefined,
       }), 'Food added and visible in the shop.').then((ok) => { if (ok) { form.reset(); setNewPic(''); } }); }}>
         <h2>Add a food item</h2>
-        {profiles.length === 0 && <p className="notice">Add the baker or restaurant first (Bakers tab), then pick it here.</p>}
-        <label htmlFor="p-maker">Made by (baker / restaurant)</label><select id="p-maker" name="makerId" required defaultValue=""><option value="" disabled>Choose baker or restaurant</option>{profiles.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.district}</option>)}</select>
+        {profiles.length === 0 && <p className="notice">Baker is optional. To link one, add it in the Bakers tab first.</p>}
+        <label htmlFor="p-maker">Made by (baker / restaurant) — optional</label><select id="p-maker" name="makerId" defaultValue=""><option value="">No baker (optional)</option>{profiles.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.district}</option>)}</select>
         <label htmlFor="p-name">Food name</label><input id="p-name" name="name" required maxLength={180} />
         <label htmlFor="p-upload">Upload your own food photo (JPG, PNG or WebP)</label>
         <input id="p-upload" type="file" accept="image/jpeg,image/png,image/webp" disabled={picBusy || busy} onChange={(event) => { const input = event.currentTarget; void uploadPicture(input.files?.[0]).then((path) => { if (path) setNewPic(path); else input.value = ''; }); }} />
