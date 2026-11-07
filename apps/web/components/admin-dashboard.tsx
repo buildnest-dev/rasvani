@@ -5,7 +5,7 @@ import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { useAuth } from '@/components/auth-provider';
 import { UpiQr } from '@/components/upi-qr';
 import {
-  deleteBakerProfileAction, inviteBakerAction, publishProductAction, removeBakerAction, saveBakerProfileAction,
+  deleteBakerProfileAction, inviteBakerAction, deleteProductAction, publishProductAction, removeBakerAction, saveBakerProfileAction,
   savePaymentSettingsAction, setOrderHandlingAction, setOrderStatusAction, setProductImageAction, setProductPriceAction, setProductVisibilityAction,
   uploadFoodImageAction,
 } from '@/app/actions/session';
@@ -207,6 +207,7 @@ export function AdminDashboard() {
           <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductPriceAction(token, product.id, Number(d.get('price'))), 'Price changed.'); }}><label>New price (₹)<input name="price" type="number" step="0.01" min="1" max="100000" required /></label><button className="btn secondary" type="submit" disabled={busy}>Change price</button></form>
           <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductImageAction(token, product.id, String(d.get('image') ?? '')), 'Picture changed.'); }}><label>Picture<select name="image" defaultValue={product.image ?? ''}><option value="">Automatic</option>{foodImages.map((img) => <option key={img.path} value={img.path}>{img.label}</option>)}</select></label><button className="btn secondary" type="submit" disabled={busy}>Set picture</button><label>Or upload a photo<input type="file" accept="image/jpeg,image/png,image/webp" disabled={picBusy || busy} onChange={(event) => { const input = event.currentTarget; void uploadPicture(input.files?.[0]).then((path) => { if (path) void act((token) => setProductImageAction(token, product.id, path), 'Photo uploaded and set.'); input.value = ''; }); }} /></label></form>
           <button className="btn secondary" type="button" disabled={busy} onClick={() => void act((token) => setProductVisibilityAction(token, product.id, !product.visible), 'Updated.')}>{product.visible ? 'Hide from shop' : 'Show in shop'}</button>
+          <button className="btn secondary" type="button" disabled={busy} onClick={() => { if (window.confirm(`Remove "${product.name}" permanently? This cannot be undone. (Use Hide if you only want to pause it.)`)) void act((token) => deleteProductAction(token, product.id), 'Food removed.'); }}>Remove food</button>
         </div>
       </article>)}</div>}
     </>}

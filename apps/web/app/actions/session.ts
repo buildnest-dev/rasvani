@@ -389,3 +389,21 @@ export async function bakerUpdateOrderAction(idToken: string, orderId: string, n
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not update the order.')); }
 }
+
+/** Permanently removes a food. Past orders keep their own copy of the name and price, so they are not affected. */
+export async function deleteProductAction(idToken: string, productId: string): Promise<Result> {
+  try {
+    await requireRole(idToken, ['admin']);
+    const ref = adminDb().collection('products').doc(safeId(productId));
+    const snap = await ref.get();
+    if (!snap.exists) return fail('This food was already removed.');
+    const image = String(snap.data()?.image ?? '');
+    await ref.delete();
+    const pic = uploadedImageId(image);
+    if (pic) {
+      const stillUsed = await adminDb().collection('products').where('image', '==', image).limit(1).get();
+      if (stillUsed.empty) await adminDb().collection('foodImages').doc(safeId(pic)).delete().catch(() => undefined);
+    }
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not remove the food.')); }
+}
