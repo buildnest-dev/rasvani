@@ -81,29 +81,40 @@ export function AuthPanel({ audience = 'customer' }: { audience?: 'customer' | '
     setMessage('If that email has an account, a reset link is on its way.');
   });
 
-  return <div className="auth-panel form-shell">
-    <h2>{audience === 'admin' ? 'Rasvani admin sign-in' : audience === 'baker' ? 'Baker and restaurant sign-in' : mode === 'signup' ? 'Create your account' : 'Sign in to order'}</h2>
-    {audience !== 'customer' && <p className="notice">Only registered {audience === 'admin' ? 'admin' : 'baker'} accounts can use this area.</p>}
-    <CaptchaField ref={captchaRef} onToken={onToken} />
-    {captchaConfigured && checking && <p className="notice" role="status">Checking…</p>}
-    <button type="button" className="btn secondary social-btn" disabled={!allowed} onClick={() => social('google')}>Continue with Google</button>
-    {appleEnabled && <button type="button" className="btn secondary social-btn" disabled={!allowed} onClick={() => social('apple')}>Continue with Apple (iPhone / iCloud)</button>}
-    <p className="notice auth-or">or use your email</p>
-    <form onSubmit={(event) => { event.preventDefault(); void submit(); }}>
+  const [showPass, setShowPass] = useState(false);
+  const title = audience === 'admin' ? 'Admin sign-in' : audience === 'baker' ? 'Baker & restaurant sign-in' : mode === 'signup' ? 'Create your account' : 'Welcome back';
+  const strength = Math.min(4, (password.length >= 8 ? 1 : 0) + (/[A-Z]/.test(password) && /[a-z]/.test(password) ? 1 : 0) + (/\d/.test(password) ? 1 : 0) + (/[^A-Za-z0-9]/.test(password) ? 1 : 0));
+
+  return <div className="au-card">
+    <div className="au-head">
+      <h2>{title}</h2>
+      <p>{audience !== 'customer' ? `Only registered ${audience === 'admin' ? 'admin' : 'baker'} accounts can use this area.` : mode === 'signup' ? 'Order Bihar’s home-made foods and track every order.' : 'Sign in to order and track your food.'}</p>
+    </div>
+    {canSignUp && <div className="au-tabs" role="tablist" aria-label="Sign in or create account">
+      <button type="button" role="tab" aria-selected={mode === 'signin'} className={mode === 'signin' ? 'is-on' : ''} onClick={() => { setMode('signin'); setError(''); setMessage(''); }}>Sign in</button>
+      <button type="button" role="tab" aria-selected={mode === 'signup'} className={mode === 'signup' ? 'is-on' : ''} onClick={() => { setMode('signup'); setError(''); setMessage(''); }}>Create account</button>
+    </div>}
+    <button type="button" className="au-social" disabled={!allowed} onClick={() => social('google')}>
+      <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z" /><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z" /><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z" /><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z" /></svg>
+      Continue with Google
+    </button>
+    {appleEnabled && <button type="button" className="au-social" disabled={!allowed} onClick={() => social('apple')}>Continue with Apple</button>}
+    <div className="au-or"><span>or use your email</span></div>
+    <form onSubmit={(event) => { event.preventDefault(); void submit(); }} className="au-form">
       <div className="hp-field" aria-hidden="true"><label htmlFor="au-company">Leave this empty</label><input id="au-company" ref={honeypot} tabIndex={-1} autoComplete="off" /></div>
-      {mode === 'signup' && <><label htmlFor="au-name">Your name</label><input id="au-name" value={name} onChange={(event) => setName(event.target.value)} maxLength={80} autoComplete="name" /></>}
-      <label htmlFor="au-email">Email address</label>
-      <input id="au-email" type="email" required value={email} onChange={(event) => setEmail(event.target.value)} maxLength={254} autoComplete="email" />
-      <label htmlFor="au-pass">Password</label>
-      <input id="au-pass" type="password" required minLength={8} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} />
-      <button className="btn" type="submit" disabled={!allowed}>{busy ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}</button>
+      {mode === 'signup' && <div className="au-field"><label htmlFor="au-name">Your name</label><input id="au-name" value={name} onChange={(event) => setName(event.target.value)} maxLength={80} autoComplete="name" placeholder="Full name" /></div>}
+      <div className="au-field"><label htmlFor="au-email">Email address</label><input id="au-email" type="email" required value={email} onChange={(event) => setEmail(event.target.value)} maxLength={254} autoComplete="email" placeholder="you@example.com" /></div>
+      <div className="au-field"><label htmlFor="au-pass">Password</label>
+        <div className="au-pass"><input id="au-pass" type={showPass ? 'text' : 'password'} required minLength={8} maxLength={128} value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} placeholder="At least 8 characters" />
+          <button type="button" className="au-eye" onClick={() => setShowPass((v) => !v)} aria-label={showPass ? 'Hide password' : 'Show password'}>{showPass ? 'Hide' : 'Show'}</button></div>
+        {mode === 'signup' && password.length > 0 && <div className="au-meter" aria-hidden="true"><i className={strength >= 1 ? 'on' : ''} /><i className={strength >= 2 ? 'on' : ''} /><i className={strength >= 3 ? 'on' : ''} /><i className={strength >= 4 ? 'on' : ''} /></div>}
+      </div>
+      <CaptchaField ref={captchaRef} onToken={onToken} />
+      {captchaConfigured && checking && <p className="au-note" role="status">Checking…</p>}
+      <button className="au-submit" type="submit" disabled={!allowed}>{busy ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}</button>
     </form>
-    {error && <p className="status" role="alert">{error}</p>}
-    {message && <p className="status" role="status">{message}</p>}
-    <p className="notice">
-      {canSignUp && <button type="button" className="text-link" onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}>{mode === 'signin' ? 'New here? Create an account' : 'Already have an account? Sign in'}</button>}
-      {' '}<button type="button" className="text-link" disabled={!allowed} onClick={reset}>Forgot password?</button>
-    </p>
-    <p className="notice">Mobile-number verification will be added soon.</p>
+    {error && <p className="au-msg au-err" role="alert">{error}</p>}
+    {message && <p className="au-msg au-ok" role="status">{message}</p>}
+    <p className="au-foot"><button type="button" className="au-link" disabled={!allowed} onClick={reset}>Forgot password?</button></p>
   </div>;
 }

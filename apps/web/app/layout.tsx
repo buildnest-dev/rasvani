@@ -5,6 +5,7 @@ import './globals.css';
 import './flow.css';
 import './landing.css';
 import './district.css';
+import './region.css';
 import { SiteHeader } from '@/components/site-header';
 import { LocaleProvider } from '@/components/locale-provider';
 import { LaunchStrip } from '@/components/launch-strip';
