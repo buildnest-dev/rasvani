@@ -6,7 +6,7 @@ import { useAuth } from '@/components/auth-provider';
 import { UpiQr } from '@/components/upi-qr';
 import {
   deleteBakerProfileAction, inviteBakerAction, deleteProductAction, publishProductAction, removeBakerAction, saveBakerProfileAction,
-  savePaymentSettingsAction, setOrderHandlingAction, setOrderStatusAction, setProductImageAction, setProductPriceAction, setProductVisibilityAction,
+  savePaymentSettingsAction, resolveOrderTicketAction, setOrderHandlingAction, setOrderStatusAction, setProductImageAction, setProductPriceAction, setProductVisibilityAction,
   uploadFoodImageAction,
 } from '@/app/actions/session';
 import { shrinkImage } from '@/lib/resize-image';
@@ -19,7 +19,7 @@ import { FINAL_STATUSES, ORDER_STATUSES, payablePaise, statusLabel, upiLink, typ
 type ProductRow = { id: string; name: string; sku: string; makerName: string | null; makerDistrict?: string | null; image?: string | null; pricePaise: number; visible: boolean };
 type BakerLogin = { id: string; email: string; name?: string };
 type Tab = 'orders' | 'products' | 'bakers' | 'payment';
-type Filter = 'new' | 'progress' | 'done' | 'all';
+type Filter = 'new' | 'requests' | 'progress' | 'done' | 'all';
 const isFinal = (status: string) => (FINAL_STATUSES as readonly string[]).includes(status);
 
 /** One broken order must never hide the others: shows its basics instead of crashing the whole list. */
@@ -130,8 +130,8 @@ export function AdminDashboard() {
     setAlertsOn(result === 'granted'); beep();
   }
 
-  const shown = orders.filter((order) => filter === 'all' ? true : filter === 'new' ? order.status === 'placed' : filter === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed');
-  const count = (f: Filter) => orders.filter((order) => f === 'all' ? true : f === 'new' ? order.status === 'placed' : f === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed').length;
+  const shown = orders.filter((order) => filter === 'all' ? true : filter === 'requests' ? order.ticket?.status === 'open' : filter === 'new' ? order.status === 'placed' : filter === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed');
+  const count = (f: Filter) => orders.filter((order) => f === 'all' ? true : f === 'requests' ? order.ticket?.status === 'open' : f === 'new' ? order.status === 'placed' : f === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed').length;
   const profileById = (id: string | null | undefined) => profiles.find((p) => p.id === id);
   const todayRevenue = orders.filter((o) => o.paymentStatus === 'paid').reduce((sum, o) => sum + payablePaise(o), 0);
 
@@ -143,7 +143,7 @@ export function AdminDashboard() {
       <div><span>Payment received</span><strong>{formatPaise(todayRevenue)}</strong></div>
     </div>
     <div className="admin-tabs" role="tablist">
-      {([['orders', `Orders${newCount ? ` · ${newCount} new` : ''}`], ['products', 'Foods & prices'], ['bakers', 'Bakers & restaurants'], ['payment', 'Payment QR']] as [Tab, string][]).map(([item, label]) =>
+      {([['orders', `Orders${newCount ? ` · ${newCount} new` : ''}${count('requests') ? ` · ${count('requests')} requests` : ''}`], ['products', 'Foods & prices'], ['bakers', 'Bakers & restaurants'], ['payment', 'Payment QR']] as [Tab, string][]).map(([item, label]) =>
         <button key={item} role="tab" aria-selected={tab === item} className={`btn ${tab === item ? '' : 'secondary'}`} onClick={() => setTab(item)}>{label}</button>)}
     </div>
     {alertText && <div className="admin-alert" role="alert"><strong>{alertText}</strong><button className="btn secondary" type="button" onClick={() => { setAlertText(''); setTab('orders'); setFilter('new'); }}>View</button></div>}
@@ -151,7 +151,7 @@ export function AdminDashboard() {
     {message && <p className="status" role="status">{message}</p>}
 
     {tab === 'orders' && <>
-      <div className="admin-filters">{([['new', 'New'], ['progress', 'In progress'], ['done', 'Done'], ['all', 'All']] as [Filter, string][]).map(([f, label]) =>
+      <div className="admin-filters">{([['new', 'New'], ['requests', 'Requests'], ['progress', 'In progress'], ['done', 'Done'], ['all', 'All']] as [Filter, string][]).map(([f, label]) =>
         <button key={f} type="button" aria-pressed={filter === f} className={`chip ${filter === f ? 'is-on' : ''}`} onClick={() => setFilter(f)}>{label} <b>{count(f)}</b></button>)}</div>
       {shown.length === 0 ? <div className="form-shell"><h2>Nothing here</h2><p>New orders appear here the moment a customer places them.</p></div> : <div className="customer-order-list">
         {shown.map((order) => {
@@ -174,6 +174,15 @@ export function AdminDashboard() {
             {order.deliveryFeePaise ? <div className="customer-order-total"><span>Delivery charge</span><strong>{formatPaise(order.deliveryFeePaise)}</strong></div> : null}
             <div className="customer-order-total"><span>To collect</span><strong>{formatPaise(payablePaise(order))}</strong></div>
             {order.paymentMethod === 'upi' && order.paymentStatus !== 'paid' && <p className="notice">{order.paymentRef ? <>Customer says paid. UPI transaction ID: <strong>{order.paymentRef}</strong>. Check your UPI app, then mark Received.</> : 'Waiting for the customer to pay by UPI.'}</p>}
+            {order.ticket && <div className={`notice ticket-box ticket-${order.ticket.status}`}>
+              <strong>{order.ticket.type === 'cancel' ? 'CANCELLATION REQUEST' : 'REFUND REQUEST'} · {order.ticket.status === 'open' ? 'OPEN' : order.ticket.status === 'approved' ? 'Approved' : 'Rejected'}</strong>
+              <br />Reason: {order.ticket.reason}{order.ticket.details ? ` — ${order.ticket.details}` : ''}
+              {order.ticket.adminNote && <><br />Your reply: {order.ticket.adminNote}</>}
+              {order.ticket.status === 'open' && <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); const decision = (event.nativeEvent as SubmitEvent).submitter?.getAttribute('value') === 'approve' ? 'approve' : 'reject'; if (!window.confirm(decision === 'approve' ? (order.ticket?.type === 'cancel' ? 'Approve and CANCEL this order?' : 'Approve this refund request?') : 'Reject this request?')) return; void act((token) => resolveOrderTicketAction(token, order.id, decision, String(d.get('note') ?? '')), decision === 'approve' ? 'Request approved.' : 'Request rejected.'); }}>
+                <label className="grow">Reply to customer (required if you reject)<input name="note" maxLength={300} placeholder="e.g. Order already left the kitchen" /></label>
+                <button className="btn" type="submit" name="decision" value="approve" disabled={busy}>Approve &amp; resolve</button>
+                <button className="btn secondary" type="submit" name="decision" value="reject" disabled={busy}>Reject</button>
+              </form>}</div>}
             {!final && <>
               <form className="admin-order-form" key={`${order.id}-${order.bakerProfileId}-${order.deliveryFeePaise}-${order.deliveryTime ?? ''}`} onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setOrderHandlingAction(token, order.id, { bakerProfileId: String(d.get('baker') ?? ''), deliveryFeeRupees: Number(d.get('fee') || 0), customerNote: String(d.get('note') ?? ''), deliveryTime: String(d.get('time') ?? '') }), 'Order details saved.'); }}>
                 <label>Connect baker<select name="baker" defaultValue={order.bakerProfileId ?? ''}><option value="">Not connected</option>{profiles.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.district}</option>)}</select></label>

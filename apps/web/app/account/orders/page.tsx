@@ -6,10 +6,10 @@ import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { useAuth } from '@/components/auth-provider';
 import { useCart } from '@/components/cart-provider';
 import { UpiQr } from '@/components/upi-qr';
-import { cancelMyOrderAction, submitPaymentRefAction } from '@/app/actions/session';
+import { requestOrderTicketAction, submitPaymentRefAction } from '@/app/actions/session';
 import { firestore } from '@/lib/firebase/client';
 import { formatPaise } from '@/lib/money';
-import { payablePaise, progressSteps, statusLabel, statusNote, upiLink, type OrderDoc, type PaymentSettings } from '@/lib/orders';
+import { CANCEL_REASONS, REFUND_REASONS, ticketTypeFor, payablePaise, progressSteps, statusLabel, statusNote, upiLink, type OrderDoc, type PaymentSettings } from '@/lib/orders';
 
 export default function MyOrdersPage() {
   const { user, loading, configured, getToken } = useAuth();
@@ -36,10 +36,28 @@ export default function MyOrdersPage() {
     return () => { stopOrders(); stopPay(); };
   }, [user]);
 
-  async function cancel(orderId: string, form: HTMLFormElement) {
-    const reason = String(new FormData(form).get('reason') ?? '');
-    const result = await cancelMyOrderAction(await getToken(), orderId, reason);
+  /** Never cancels directly: asks the customer to confirm, then sends a request that Rasvani resolves. */
+  async function sendTicket(order: OrderDoc, form: HTMLFormElement) {
+    const kind = ticketTypeFor(order.status);
+    if (!kind) return;
+    const data = new FormData(form);
+    const reason = String(data.get('reason') ?? '');
+    const sure = window.confirm(kind === 'cancel'
+      ? `Do you really want to ask Rasvani to cancel order ${order.orderNumber}?
+
+Reason: ${reason}
+
+Your order is NOT cancelled yet. Rasvani will review your request and reply here.`
+      : `Do you really want to request a refund for order ${order.orderNumber}?
+
+Reason: ${reason}
+
+Rasvani will review your request and reply here.`);
+    if (!sure) return;
+    const result = await requestOrderTicketAction(await getToken(), order.id, { reason, details: String(data.get('details') ?? '') });
     setError(result.ok ? '' : result.error);
+    setInfo(result.ok ? 'Your request has been sent to Rasvani. We will reply here soon.' : '');
+    if (result.ok) form.reset();
   }
   async function sendRef(orderId: string, form: HTMLFormElement) {
     const result = await submitPaymentRefAction(await getToken(), orderId, String(new FormData(form).get('ref') ?? ''));
@@ -79,8 +97,23 @@ export default function MyOrdersPage() {
                 : <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); void sendRef(order.id, event.currentTarget); }}><label>After paying, enter the UPI transaction ID<input name="ref" required minLength={6} maxLength={30} pattern="[A-Za-z0-9]{6,30}" autoComplete="off" /></label><button className="btn" type="submit">I have paid</button></form>}</div></div>}
           {order.paymentMethod === 'upi' && order.paymentStatus !== 'paid' && order.status !== 'cancelled' && !payment?.upiId && <p className="notice">UPI details are being set up. Rasvani will share them on the call.</p>}
           <p className="notice"><strong>{a.fulfilment === 'pickup' ? 'Takeaway: collect from shop' : 'Home delivery'}</strong>{place ? ` · ${place}` : ''} · Phone {a.phone}</p>
-          {['placed', 'confirmed'].includes(order.status) && <details className="customer-order-cancel"><summary>Cancel this order</summary>
-            <form onSubmit={(event) => { event.preventDefault(); void cancel(order.id, event.currentTarget); }}><label>Reason<textarea name="reason" required minLength={3} maxLength={300} rows={3} /></label><button className="btn secondary" type="submit">Cancel order</button></form></details>}
+          {order.ticket && <div className={`notice ticket-box ticket-${order.ticket.status}`} role="status">
+            <strong>{order.ticket.type === 'cancel' ? 'Cancellation request' : 'Refund request'} · {order.ticket.status === 'open' ? 'Waiting for Rasvani' : order.ticket.status === 'approved' ? 'Approved' : 'Not approved'}</strong>
+            <br />Reason: {order.ticket.reason}{order.ticket.details ? ` — ${order.ticket.details}` : ''}
+            {order.ticket.status === 'approved' && <><br />{order.ticket.type === 'cancel' ? 'Your order has been cancelled.' : 'Your refund is approved. Rasvani will send the money back to you.'}</>}
+            {order.ticket.adminNote && <><br />Message from Rasvani: {order.ticket.adminNote}</>}</div>}
+          {ticketTypeFor(order.status) && order.ticket?.status !== 'open' && (() => {
+            const kind = ticketTypeFor(order.status);
+            const reasons = kind === 'cancel' ? CANCEL_REASONS : REFUND_REASONS;
+            return <details className="customer-order-cancel"><summary>{kind === 'cancel' ? 'Request to cancel this order' : 'Request a refund'}</summary>
+              {kind === 'refund' && <p className="notice">This order has been dispatched, so it cannot be cancelled now. If something is wrong, you can ask for a refund.</p>}
+              <form onSubmit={(event) => { event.preventDefault(); void sendTicket(order, event.currentTarget); }}>
+                <label>Why? <select name="reason" required defaultValue=""><option value="" disabled>Choose a reason</option>{reasons.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+                <label>More details (needed if you choose Other)<textarea name="details" maxLength={300} rows={3} /></label>
+                <button className="btn secondary" type="submit">{kind === 'cancel' ? 'Send cancellation request' : 'Send refund request'}</button>
+                <p className="notice">This only sends a request. Rasvani reviews it and the order is not cancelled until it is approved.</p>
+              </form></details>;
+          })()}
         </article>;
       })}</div>}
   </section>;

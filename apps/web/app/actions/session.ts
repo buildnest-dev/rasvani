@@ -7,7 +7,7 @@ import { adminDb, requireRole, verifySession, type Role } from '@/lib/firebase/a
 import { verifyCaptcha } from '@/lib/captcha';
 import { UPLOAD_PREFIX, isLibraryImage, uploadedImageId } from '@/lib/food-images';
 import { biharDistricts } from '@/lib/bihar-districts';
-import { FINAL_STATUSES, ORDER_STATUSES, PAYMENTS } from '@/lib/orders';
+import { CANCEL_REASONS, FINAL_STATUSES, ORDER_STATUSES, PAYMENTS, REFUND_REASONS, ticketTypeFor } from '@/lib/orders';
 
 type Result<T = object> = ({ ok: true } & T) | { ok: false; error: string };
 const fail = (error: string): { ok: false; error: string } => ({ ok: false, error });
@@ -121,18 +121,51 @@ export async function placeOrderAction(idToken: string, input: unknown, captchaT
   } catch { return fail('We could not place the order. Please try again, or write to rasvanifoods@gmail.com.'); }
 }
 
-export async function cancelMyOrderAction(idToken: string, orderId: string, reason: string): Promise<Result> {
+/** The customer never cancels directly: this files a request (ticket) that the admin resolves. */
+const ticketInput = z.object({ reason: z.string().trim().min(3).max(80), details: z.string().trim().max(300).optional() });
+export async function requestOrderTicketAction(idToken: string, orderId: string, input: unknown): Promise<Result> {
   try {
     const session = await verifySession(idToken);
+    const parsed = ticketInput.safeParse(input);
+    if (!parsed.success) return fail('Please choose a reason.');
+    const type = parsed.data.reason === 'Other' && (parsed.data.details ?? '').length < 3 ? null : 'ok';
+    if (!type) return fail('Please write a few words about the reason.');
     const ref = adminDb().collection('orders').doc(safeId(orderId));
-    const snap = await ref.get();
-    const order = snap.data();
+    const order = (await ref.get()).data();
     if (!order || order.userId !== session.uid) return fail('Order not found.');
-    if (!['placed', 'confirmed'].includes(order.status)) return fail('This order can no longer be cancelled here. Please contact Rasvani.');
-    if (reason.trim().length < 3) return fail('Please tell us why you are cancelling.');
-    await ref.update({ status: 'cancelled', cancelReason: reason.trim().slice(0, 300), updatedAt: new Date().toISOString() });
+    const kind = ticketTypeFor(String(order.status));
+    if (!kind) return fail('This order is already closed, so no request can be made.');
+    const allowed: readonly string[] = kind === 'cancel' ? CANCEL_REASONS : REFUND_REASONS;
+    if (!allowed.includes(parsed.data.reason)) return fail('Please choose a reason from the list.');
+    if (order.ticket?.status === 'open') return fail('You already have an open request for this order. Rasvani will reply soon.');
+    const now = new Date().toISOString();
+    await ref.update({ ticket: { type: kind, reason: parsed.data.reason, details: parsed.data.details || null, status: 'open', requestedAt: now, resolvedAt: null, adminNote: null }, updatedAt: now });
     return { ok: true };
-  } catch (error) { return fail(message(error, 'Could not cancel the order.')); }
+  } catch (error) { return fail(message(error, 'Could not send your request.')); }
+}
+
+/** Admin resolves the ticket. Approving a cancel request cancels the order; approving a refund request marks the payment refunded. */
+export async function resolveOrderTicketAction(idToken: string, orderId: string, decision: 'approve' | 'reject', note: string): Promise<Result> {
+  try {
+    await requireRole(idToken, ['admin']);
+    if (decision !== 'approve' && decision !== 'reject') return fail('Choose approve or reject.');
+    const ref = adminDb().collection('orders').doc(safeId(orderId));
+    const order = (await ref.get()).data();
+    const ticket = order?.ticket;
+    if (!order || !ticket || ticket.status !== 'open') return fail('There is no open request on this order.');
+    const cleanNote = note.trim().slice(0, 300);
+    if (decision === 'reject' && cleanNote.length < 3) return fail('Write a short reason for the customer when you reject.');
+    const now = new Date().toISOString();
+    const update: Record<string, unknown> = { ticket: { ...ticket, status: decision === 'approve' ? 'approved' : 'rejected', resolvedAt: now, adminNote: cleanNote || null }, updatedAt: now };
+    if (decision === 'approve') {
+      if (ticket.type === 'cancel') {
+        if (FINAL.has(String(order.status))) return fail('This order is already final.');
+        update.status = 'cancelled'; update.cancelReason = String(ticket.reason).slice(0, 300);
+      } else update.paymentStatus = 'refunded';
+    }
+    await ref.update(update);
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not resolve the request.')); }
 }
 
 /* -------------------------------- Admin -------------------------------- */

@@ -3,11 +3,20 @@ export const FINAL_STATUSES = ['delivered', 'cancelled'] as const;
 export const PAYMENTS = ['pending', 'paid', 'failed', 'refunded'] as const;
 
 export type OrderLine = { productId: string; name: string; qty: number; unitPaise: number; linePaise: number; makerName?: string | null };
+export type OrderTicket = {
+  type: 'cancel' | 'refund'; reason: string; details?: string | null; status: 'open' | 'approved' | 'rejected';
+  requestedAt: string; resolvedAt?: string | null; adminNote?: string | null;
+};
+export const CANCEL_REASONS = ['I changed my mind', 'I ordered by mistake', 'Wrong item or quantity', 'Delivery is taking too long', 'Wrong address or phone number', 'Payment problem', 'Other'] as const;
+export const REFUND_REASONS = ['Item damaged or spoiled', 'Wrong item received', 'Quality is not as expected', 'Order not received', 'Other'] as const;
+/** Before dispatch an order can be cancelled (by request). From dispatch on, only a refund can be requested. */
+export const ticketTypeFor = (status: string): 'cancel' | 'refund' | null =>
+  ['placed', 'confirmed', 'accepted', 'preparing', 'ready'].includes(status) ? 'cancel' : ['dispatched', 'delivered'].includes(status) ? 'refund' : null;
 export type OrderDoc = {
   id: string; orderNumber: string; userId: string; customerEmail: string; status: string; paymentStatus: string;
   lines: OrderLine[]; totalPaise: number; bakerId: string | null; bakerName: string | null; notes: string | null; createdAt: string;
   paymentMethod?: 'cod' | 'upi'; paymentRef?: string | null; deliveryFeePaise?: number | null;
-  customerNote?: string | null; deliveryTime?: string | null; bakerProfileId?: string | null;
+  customerNote?: string | null; deliveryTime?: string | null; ticket?: OrderTicket | null; bakerProfileId?: string | null;
   address: {
     fulfilment: 'delivery' | 'pickup'; name: string; phone: string; district: string; pincode: string | null;
     address: string | null; landmark: string | null; location: { lat: number; lng: number } | null; paymentPreference: string;
