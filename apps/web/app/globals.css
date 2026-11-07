@@ -989,3 +989,29 @@ html[data-motion-ready="true"] .footer{position:relative;isolation:isolate;}
 .dm-food img{object-fit:cover}
 .dm-food strong{padding:10px 12px;color:#5a1f24;font-size:15px}
 .dm-actions{display:flex;flex-wrap:wrap;gap:12px}
+
+/* Header actions: language pill + icon buttons (cart, orders, account) */
+.header-actions{display:flex;align-items:center;gap:6px}
+.hx-lang{position:relative;display:inline-flex;align-items:center;gap:6px;height:42px;padding:0 10px 0 12px;border:1px solid #e4d6c3;border-radius:999px;background:#fffaf2;color:#5a1f24;transition:border-color .2s,box-shadow .2s}
+.hx-lang:hover,.hx-lang:focus-within{border-color:#8e3f2c;box-shadow:0 2px 10px rgba(90,31,36,.12)}
+.hx-lang select{appearance:none;-webkit-appearance:none;border:0;background:transparent;font:600 13px/1 inherit;font-family:inherit;color:inherit;cursor:pointer;padding:0 14px 0 0;max-width:92px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%235a1f24' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M1 1l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right center}
+.hx-lang select:focus{outline:none}
+.hx-btn{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 12px;border-radius:999px;color:#442329;font:600 13px/1 inherit;font-family:inherit;text-decoration:none;border:1px solid transparent;transition:background .2s,color .2s,border-color .2s}
+.hx-btn:hover,.hx-btn:focus-visible{background:#f3e6d3;border-color:#e4d6c3}
+.hx-ico{position:relative;display:inline-flex}
+.hx-badge{position:absolute;top:-8px;right:-10px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#b3261e;color:#fff;font:700 11px/18px inherit;font-family:inherit;text-align:center;box-shadow:0 0 0 2px #fffaf2}
+.hx-primary{background:linear-gradient(135deg,#5a1f24,#8e3f2c);color:#fffaf1}
+.hx-primary:hover,.hx-primary:focus-visible{background:linear-gradient(135deg,#6d2530,#a24a33);color:#fff;border-color:transparent}
+.header-actions .orders-link{display:inline-flex}
+@media(max-width:1240px){.hx-label{display:none}.hx-btn{padding:0 10px}.hx-primary .hx-label{display:none}}
+@media(max-width:900px){.hx-lang select{max-width:70px}.hx-btn{height:40px}.hx-lang{height:40px}}
+/* Keep the header on one line: labels only on very wide screens, compact nav below that */
+@media(max-width:1700px){.hx-label{display:none}.hx-btn{width:42px;padding:0;justify-content:center}.hx-lang select{max-width:64px}}
+@media(min-width:1241px) and (max-width:1700px){.nav-premium{gap:2px}.nav-premium .menu-item-3d{padding-inline:8px;font-size:12.5px}.nav-current-note{display:none}}
+@media(max-width:700px){
+  .header-actions{gap:2px}
+  .header-actions .orders-link,.header-actions .hx-primary{display:none}
+  .hx-lang{width:40px;padding:0;justify-content:center}
+  .hx-lang select{position:absolute;inset:0;width:100%;max-width:none;opacity:0;padding:0}
+  .hx-btn{width:40px}
+}
