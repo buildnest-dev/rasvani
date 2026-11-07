@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { biharHomeFoodItems } from '@/lib/bihar-home-food-items';
+import { HeroSlider } from '@/components/hero-slider';
 import { regions } from '@/lib/regions';
 
 const featuredNames = ['Silao Khaja', 'Thekua', 'Tilkut', 'Sattu Ladoo'];
@@ -12,30 +13,17 @@ const states = regions.slice(0, 28);
 /** India-first landing page. Bihar is the only live state today; every other state is marked "soon". */
 export function HomeLanding() {
   return <div className="landing">
-    <section className="lp-hero">
-      <div className="wrap lp-hero-grid">
-        <div className="lp-hero-copy">
-          <p className="lp-badge"><span className="launch-dot" aria-hidden="true" /> For all of India · <b>live in Bihar today</b></p>
-          <h1>Taste India<br /><em>From Home</em></h1>
-          <p className="lp-lead">Authentic regional vegetarian foods, made by home bakers and local kitchens. Order online for home delivery or collect from a partner shop.</p>
-          <form action="/explore-india" method="get" role="search" className="lp-search">
-            <label className="sr-only" htmlFor="lp-q">Search regional foods</label>
-            <input id="lp-q" type="search" name="q" minLength={2} maxLength={80} placeholder="What do you want to taste from India?" autoComplete="off" />
-            <button type="submit" aria-label="Search">Search</button>
-          </form>
-          <ul className="lp-trust">
-            <li><b>100%</b> vegetarian</li>
-            <li><b>Home-made</b> by local bakers</li>
-            <li><b>Bihar</b> orders open now</li>
-            <li><b>More states</b> coming soon</li>
-          </ul>
-        </div>
-        <div className="lp-hero-art">
-          <Image src="/images/rasvani-feast-hero.webp" alt="A rich vegetarian Indian food spread on traditional serving dishes" fill priority sizes="(max-width: 900px) 100vw, 50vw" />
-          <span className="lp-hero-note">Different states.<br />Different flavours.<br /><b>One India.</b></span>
-        </div>
-      </div>
-    </section>
+    <HeroSlider />
+    <section className="hs-search"><div className="wrap">
+      <form action="/explore-india" method="get" role="search" className="lp-search">
+        <label className="sr-only" htmlFor="lp-q">Search regional foods</label>
+        <input id="lp-q" type="search" name="q" minLength={2} maxLength={80} placeholder="What do you want to taste from India?" autoComplete="off" />
+        <button type="submit" aria-label="Search">Search</button>
+      </form>
+      <ul className="lp-trust" style={{ justifyContent: 'center' }}>
+        <li><b>100%</b> vegetarian</li><li><b>Home-made</b> by local bakers</li><li><b>Bihar</b> orders open now</li><li><b>More states</b> coming soon</li>
+      </ul>
+    </div></section>
 
     <section className="lp-states wrap" aria-labelledby="lp-states-h">
       <div className="lp-states-panel">
