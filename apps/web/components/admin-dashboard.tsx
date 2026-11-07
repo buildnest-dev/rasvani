@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { useAuth } from '@/components/auth-provider';
 import { UpiQr } from '@/components/upi-qr';
@@ -21,6 +21,19 @@ type BakerLogin = { id: string; email: string; name?: string };
 type Tab = 'orders' | 'products' | 'bakers' | 'payment';
 type Filter = 'new' | 'progress' | 'done' | 'all';
 const isFinal = (status: string) => (FINAL_STATUSES as readonly string[]).includes(status);
+
+/** One broken order must never hide the others: shows its basics instead of crashing the whole list. */
+class OrderBoundary extends Component<{ order: OrderDoc; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    const o = this.props.order;
+    return <article className="customer-order-card admin-order is-new"><div className="customer-order-head"><div><span className="eyebrow">{String(o.orderNumber ?? o.id)}</span><h2>{String(o.address?.name ?? 'Customer')}</h2></div></div>
+      <p className="notice">This order has unusual data and could not be shown fully. Customer: {String(o.address?.name ?? '')} · {String(o.address?.phone ?? '')} · {String(o.customerEmail ?? '')}. Total {formatPaise(Number(o.totalPaise) || 0)}. Please contact the customer directly.</p></article>;
+  }
+}
+const safeDate = (iso: string) => { const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }); };
 
 function beep() {
   try {
@@ -74,7 +87,7 @@ export function AdminDashboard() {
           const raw = d.data() as Partial<OrderDoc>;
           return {
             ...raw, id: d.id, orderNumber: raw.orderNumber ?? d.id.slice(0, 8).toUpperCase(), customerEmail: raw.customerEmail ?? '',
-            status: raw.status ?? 'placed', paymentStatus: raw.paymentStatus ?? 'pending', lines: Array.isArray(raw.lines) ? raw.lines : [],
+            status: raw.status ?? 'placed', paymentStatus: raw.paymentStatus ?? 'pending', lines: (Array.isArray(raw.lines) ? raw.lines : []).filter((l) => l && typeof l === 'object').map((l, i) => ({ ...l, productId: String(l.productId ?? i), name: String(l.name ?? 'Item'), qty: Number(l.qty) || 1, unitPaise: Number(l.unitPaise) || 0, linePaise: Number(l.linePaise) || 0 })),
             totalPaise: Number(raw.totalPaise ?? 0), createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : new Date(0).toISOString(),
             bakerId: raw.bakerId ?? null, bakerName: raw.bakerName ?? null, notes: raw.notes ?? null,
             address: { fulfilment: 'delivery', name: 'Customer', phone: '', district: '', pincode: null, address: null, landmark: null, location: null, paymentPreference: '', ...(raw.address ?? {}) },
@@ -146,8 +159,8 @@ export function AdminDashboard() {
           const place = [a.address, a.landmark, a.district, a.pincode].filter(Boolean).join(', ');
           const baker = profileById(order.bakerProfileId);
           const makers = Array.from(new Set(order.lines.map((l) => l.makerName).filter(Boolean)));
-          return <article className={`customer-order-card admin-order ${order.status === 'placed' ? 'is-new' : ''}`} key={order.id}>
-            <div className="customer-order-head"><div><span className="eyebrow">{order.orderNumber}</span><h2>{new Date(order.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</h2></div>
+          return <OrderBoundary key={order.id} order={order}><article className={`customer-order-card admin-order ${order.status === 'placed' ? 'is-new' : ''}`}>
+            <div className="customer-order-head"><div><span className="eyebrow">{order.orderNumber}</span><h2>{safeDate(order.createdAt)}</h2></div>
               <div className="customer-order-status"><span className={`pill st-${order.status}`}>{statusLabel(order.status)}</span><span className={`pill pay-${order.paymentStatus}`}>{order.paymentMethod === 'upi' ? 'UPI' : 'COD'} · {statusLabel(order.paymentStatus)}</span></div></div>
             <div className="admin-two">
               <div><h3>Customer</h3><p><strong>{a.name}</strong><br /><a className="text-link" href={`tel:${a.phone}`}>{a.phone}</a><br />{order.customerEmail}</p>
@@ -174,7 +187,7 @@ export function AdminDashboard() {
                 <label>Payment<select name="payment" defaultValue=""><option value="">No change</option><option value="paid">Received</option><option value="pending">Pending</option><option value="failed">Failed</option><option value="refunded">Refunded</option></select></label>
                 <button className="btn" type="submit" disabled={busy}>Update</button>
               </form></>}
-          </article>;
+          </article></OrderBoundary>;
         })}
       </div>}
     </>}
