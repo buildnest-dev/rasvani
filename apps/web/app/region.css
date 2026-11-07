@@ -80,3 +80,6 @@
 .fp-copy h1{font:500 clamp(46px,6vw,80px)/1.02 var(--serif);margin:6px 0 12px}
 .fp-copy p{font:18px/1.6 var(--serif);max-width:560px;color:#f7e6d0;margin:0}
 .fp-h2{font:500 clamp(28px,3.4vw,40px) var(--serif);color:var(--maroon);margin:6px 0 4px}
+
+.admin-upload-preview{display:flex;align-items:center;gap:12px;margin-top:8px}
+.admin-upload-preview img{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid #ddd}

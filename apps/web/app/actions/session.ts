@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb, requireRole, verifySession, type Role } from '@/lib/firebase/admin';
 import { verifyCaptcha } from '@/lib/captcha';
-import { isAllowedFoodImage } from '@/lib/food-images';
+import { UPLOAD_PREFIX, isLibraryImage, uploadedImageId } from '@/lib/food-images';
 import { biharDistricts } from '@/lib/bihar-districts';
 import { FINAL_STATUSES, ORDER_STATUSES, PAYMENTS } from '@/lib/orders';
 
@@ -182,7 +182,7 @@ export async function publishProductAction(idToken: string, input: unknown): Pro
     const parsed = productSchema.safeParse(input);
     if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'Check the product fields.');
     const d = parsed.data;
-    if (d.image && !isAllowedFoodImage(d.image)) return fail('Choose a picture from the list.');
+    if (d.image && !(await imageOk(d.image))) return fail('Choose a picture from the list or upload one.');
     let makerName = d.makerName; let makerDistrict: string | null = null; let makerId: string | null = null;
     if (d.makerId) {
       const profile = await adminDb().collection('bakerProfiles').doc(safeId(d.makerId)).get();
@@ -209,10 +209,40 @@ export async function setProductPriceAction(idToken: string, productId: string, 
   } catch (error) { return fail(message(error, 'Could not change the price.')); }
 }
 
+/** A picture is valid if it is in the built-in library, or it is an uploaded picture that really exists. */
+async function imageOk(path: string): Promise<boolean> {
+  if (isLibraryImage(path)) return true;
+  const id = uploadedImageId(path);
+  return id ? (await adminDb().collection('foodImages').doc(id).get()).exists : false;
+}
+
+/** Checks the first bytes of the file so only real JPEG, PNG or WebP pictures are stored (never SVG or HTML). */
+function sniffImage(bytes: Buffer): 'image/jpeg' | 'image/png' | 'image/webp' | null {
+  if (bytes.length > 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg';
+  if (bytes.length > 8 && bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'image/png';
+  if (bytes.length > 12 && bytes.subarray(0, 4).toString('latin1') === 'RIFF' && bytes.subarray(8, 12).toString('latin1') === 'WEBP') return 'image/webp';
+  return null;
+}
+
+export async function uploadFoodImageAction(idToken: string, dataUrl: string): Promise<Result<{ path: string }>> {
+  try {
+    await requireRole(idToken, ['admin']);
+    const match = /^data:image\/(?:jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/.exec(typeof dataUrl === 'string' && dataUrl.length < 520_000 ? dataUrl : '');
+    if (!match) return fail('Choose a JPG, PNG or WebP picture.');
+    const bytes = Buffer.from(match[1], 'base64');
+    if (bytes.length < 200 || bytes.length > 380_000) return fail('The picture is too large or too small. Try another one.');
+    const type = sniffImage(bytes);
+    if (!type) return fail('That file is not a valid picture.');
+    const ref = adminDb().collection('foodImages').doc();
+    await ref.set({ bytes, type, size: bytes.length, createdAt: new Date().toISOString() });
+    return { ok: true, path: `${UPLOAD_PREFIX}${ref.id}` };
+  } catch (error) { return fail(message(error, 'Could not upload the picture.')); }
+}
+
 export async function setProductImageAction(idToken: string, productId: string, image: string): Promise<Result> {
   try {
     await requireRole(idToken, ['admin']);
-    if (image && !isAllowedFoodImage(image)) return fail('Choose a picture from the list.');
+    if (image && !(await imageOk(image))) return fail('Choose a picture from the list or upload one.');
     await adminDb().collection('products').doc(safeId(productId)).update({ image: image || null, updatedAt: new Date().toISOString() });
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not change the picture.')); }

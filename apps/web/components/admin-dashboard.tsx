@@ -7,7 +7,9 @@ import { UpiQr } from '@/components/upi-qr';
 import {
   deleteBakerProfileAction, inviteBakerAction, publishProductAction, removeBakerAction, saveBakerProfileAction,
   savePaymentSettingsAction, setOrderHandlingAction, setOrderStatusAction, setProductImageAction, setProductPriceAction, setProductVisibilityAction,
+  uploadFoodImageAction,
 } from '@/app/actions/session';
+import { shrinkImage } from '@/lib/resize-image';
 import { foodImages, productImage } from '@/lib/food-images';
 import { biharDistricts } from '@/lib/bihar-districts';
 import { firestore } from '@/lib/firebase/client';
@@ -40,6 +42,21 @@ export function AdminDashboard() {
   const [payment, setPayment] = useState<PaymentSettings | null>(null);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const [newPic, setNewPic] = useState('');
+  const [picBusy, setPicBusy] = useState(false);
+
+  /** Shrinks the chosen photo in the browser, then the server checks and stores it. Returns the picture path. */
+  const uploadPicture = useCallback(async (file: File | undefined): Promise<string | null> => {
+    if (!file) return null;
+    setPicBusy(true); setMessage('');
+    try {
+      const dataUrl = await shrinkImage(file);
+      const result = await uploadFoodImageAction(await getToken(), dataUrl);
+      if (!result.ok) { setMessage(result.error); return null; }
+      return result.path;
+    } catch (caught) { setMessage(caught instanceof Error ? caught.message : 'Could not upload the picture.'); return null; }
+    finally { setPicBusy(false); }
+  }, [getToken]);
   const [alertText, setAlertText] = useState('');
   const [alertsOn, setAlertsOn] = useState(false);
   const [editing, setEditing] = useState<BakerProfile | null>(null);
@@ -164,13 +181,17 @@ export function AdminDashboard() {
       <form className="form-shell checkout-form wide" onSubmit={(event) => { event.preventDefault(); const form = event.currentTarget; const d = new FormData(form); void act((token) => publishProductAction(token, {
         name: String(d.get('name')), sku: String(d.get('sku')), description: String(d.get('description')), makerName: '', makerId: String(d.get('makerId') ?? '') || undefined,
         priceRupees: Number(d.get('price')), storage: String(d.get('storage')), vegetarianEvidence: String(d.get('evidence')),
-        image: String(d.get('image') ?? '') || undefined,
-      }), 'Food added and visible in the shop.').then((ok) => { if (ok) form.reset(); }); }}>
+        image: newPic || String(d.get('image') ?? '') || undefined,
+      }), 'Food added and visible in the shop.').then((ok) => { if (ok) { form.reset(); setNewPic(''); } }); }}>
         <h2>Add a food item</h2>
         {profiles.length === 0 && <p className="notice">Add the baker or restaurant first (Bakers tab), then pick it here.</p>}
         <label htmlFor="p-maker">Made by (baker / restaurant)</label><select id="p-maker" name="makerId" required defaultValue=""><option value="" disabled>Choose baker or restaurant</option>{profiles.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.district}</option>)}</select>
         <label htmlFor="p-name">Food name</label><input id="p-name" name="name" required maxLength={180} />
-        <label htmlFor="p-image">Picture (optional; if the name matches a Bihar food, its picture is used automatically)</label>
+        <label htmlFor="p-upload">Upload your own food photo (JPG, PNG or WebP)</label>
+        <input id="p-upload" type="file" accept="image/jpeg,image/png,image/webp" disabled={picBusy || busy} onChange={(event) => { const input = event.currentTarget; void uploadPicture(input.files?.[0]).then((path) => { if (path) setNewPic(path); else input.value = ''; }); }} />
+        {picBusy && <p className="notice" role="status">Uploading picture…</p>}
+        {newPic && <p className="admin-upload-preview">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={newPic} alt="Uploaded food" width={96} height={96} /><button type="button" className="text-link" onClick={() => setNewPic('')}>Remove uploaded photo</button></p>}
+        <label htmlFor="p-image">Or choose a picture from the library (if the name matches a Bihar food, its picture is used automatically)</label>
         <select id="p-image" name="image" defaultValue=""><option value="">Automatic</option>{foodImages.map((img) => <option key={img.path} value={img.path}>{img.label}</option>)}</select>
         <label htmlFor="p-sku">Code (unique, e.g. RV-THEKUA-250)</label><input id="p-sku" name="sku" required maxLength={80} />
         <label htmlFor="p-price">Price in rupees</label><input id="p-price" name="price" type="number" step="0.01" min="1" max="100000" required />
@@ -184,7 +205,7 @@ export function AdminDashboard() {
         <div className="customer-order-head">{productImage(product) && <span className="admin-thumb">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={productImage(product) ?? ''} alt="" width={72} height={72} /></span>}<div><span className="eyebrow">{product.sku}{product.makerName ? ` · ${product.makerName}` : ''}{product.makerDistrict ? `, ${product.makerDistrict}` : ''}</span><h2>{product.name}</h2></div><div className="customer-order-status"><strong>{formatPaise(product.pricePaise)}</strong><span className={`pill ${product.visible ? 'st-delivered' : 'st-cancelled'}`}>{product.visible ? 'Visible in shop' : 'Hidden'}</span></div></div>
         <div className="admin-order-form">
           <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductPriceAction(token, product.id, Number(d.get('price'))), 'Price changed.'); }}><label>New price (₹)<input name="price" type="number" step="0.01" min="1" max="100000" required /></label><button className="btn secondary" type="submit" disabled={busy}>Change price</button></form>
-          <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductImageAction(token, product.id, String(d.get('image') ?? '')), 'Picture changed.'); }}><label>Picture<select name="image" defaultValue={product.image ?? ''}><option value="">Automatic</option>{foodImages.map((img) => <option key={img.path} value={img.path}>{img.label}</option>)}</select></label><button className="btn secondary" type="submit" disabled={busy}>Set picture</button></form>
+          <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductImageAction(token, product.id, String(d.get('image') ?? '')), 'Picture changed.'); }}><label>Picture<select name="image" defaultValue={product.image ?? ''}><option value="">Automatic</option>{foodImages.map((img) => <option key={img.path} value={img.path}>{img.label}</option>)}</select></label><button className="btn secondary" type="submit" disabled={busy}>Set picture</button><label>Or upload a photo<input type="file" accept="image/jpeg,image/png,image/webp" disabled={picBusy || busy} onChange={(event) => { const input = event.currentTarget; void uploadPicture(input.files?.[0]).then((path) => { if (path) void act((token) => setProductImageAction(token, product.id, path), 'Photo uploaded and set.'); input.value = ''; }); }} /></label></form>
           <button className="btn secondary" type="button" disabled={busy} onClick={() => void act((token) => setProductVisibilityAction(token, product.id, !product.visible), 'Updated.')}>{product.visible ? 'Hide from shop' : 'Show in shop'}</button>
         </div>
       </article>)}</div>}
