@@ -972,3 +972,20 @@ html[data-motion-ready="true"] .footer{position:relative;isolation:isolate;}
 .launch-strip{background:#f3e6d3;border-bottom:1px solid var(--line);font-size:12px;color:#4a3a2c}.launch-strip-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:7px;padding-bottom:7px}.launch-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#2f7d4f;box-shadow:0 0 0 4px #2f7d4f26}.launch-sep{opacity:.5}.launch-strip .text-link{margin-left:auto}
 .hero-live-badge{display:inline-flex;align-items:center;gap:8px;margin:0 0 10px;padding:6px 12px;border:1px solid var(--line);background:#fff8ed;border-radius:20px;font-size:12px}
 @media(max-width:560px){.launch-strip .text-link{margin-left:0}}
+
+/* India map: readable hero heading, and a visual district panel */
+.map-page-hero h1{color:#fff5e4}
+.dm-panel{display:grid;gap:22px;padding:22px 0}
+.dm-hero{position:relative;min-height:280px;border-radius:6px 34px 6px 6px;overflow:hidden;color:#fff;display:flex;align-items:flex-end;background:#2a1410}
+.dm-hero img{object-fit:cover}
+.dm-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(30,10,6,.85),rgba(30,10,6,.1) 70%)}
+.dm-hero-copy{position:relative;z-index:1;padding:22px 26px}
+.dm-hero-copy small{letter-spacing:.12em;color:#ffd9a8;font-weight:600}
+.dm-hero-copy h2{margin:4px 0 6px;font:500 clamp(34px,5vw,56px)/1.05 var(--serif);color:#fff}
+.dm-hero-copy p{margin:0;color:#f7e6d0;max-width:560px}
+.dm-foods{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.dm-food{background:#fff;border:1px solid #e4d6c3;border-radius:14px;overflow:hidden;display:grid}
+.dm-food span{position:relative;display:block;aspect-ratio:1/1}
+.dm-food img{object-fit:cover}
+.dm-food strong{padding:10px 12px;color:#5a1f24;font-size:15px}
+.dm-actions{display:flex;flex-wrap:wrap;gap:12px}

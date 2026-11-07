@@ -8,6 +8,7 @@ import { IndiaBoundaryMap } from '@/components/india-boundary-map';
 import { regions } from '@/lib/regions';
 import { biharDistricts, slugifyDistrict } from '@/lib/bihar-districts';
 import { useLocale } from '@/components/locale-provider';
+import { biharHomeFoodItems } from '@/lib/bihar-home-food-items';
 import { biharDrySnackByDistrict } from '@/lib/bihar-dry-snacks';
 
 type Step = 'regions' | 'districts' | 'foods';
@@ -138,6 +139,26 @@ export function IndiaMapExperience({ embedded = false }: { embedded?: boolean })
         </div>
       </div>}
 
+      {step === 'foods' && <div className="dm-panel">
+        {(() => {
+          const foods = (selectedDrySnackDistrict?.snacks ?? []).map((item) => ({ name: item.name, image: item.image, alt: item.imageAlt }));
+          const shown = foods.length >= 3 ? foods : [...foods, ...biharHomeFoodItems.slice(0, 6).map((item) => ({ name: item.name, image: item.image, alt: item.imageAlt }))].slice(0, 8);
+          const slug = encodeURIComponent(slugifyDistrict(selectedDistrict ?? ''));
+          return <>
+            <div className="dm-hero">
+              {shown[0] && <Image src={shown[0].image} alt={shown[0].alt} fill sizes="(max-width: 900px) 100vw, 900px" priority />}
+              <div className="dm-hero-copy"><small>{selectedRegion?.toUpperCase()} / DISTRICT</small><h2>{selectedDistrict}</h2><p>{isBihar ? 'Traditional vegetarian foods and flavours to taste from this district of Bihar.' : 'District guide coming soon.'}</p></div>
+            </div>
+            {isBihar ? <>
+              <div className="dm-foods">{shown.map((item) => <Link key={item.name} href="/bihar#order-now" className="dm-food"><span><Image src={item.image} alt={item.alt} fill sizes="(max-width: 700px) 45vw, 200px" /></span><strong>{item.name}</strong></Link>)}</div>
+              <div className="dm-actions">
+                <Link className="btn" href={`/explore-india/bihar/district/${slug}`}>Open {selectedDistrict} guide →</Link>
+                <Link className="btn secondary" href="/bihar#order-now">Order Bihar foods</Link>
+              </div>
+            </> : <p className="notice">Rasvani is live in Bihar today. {selectedRegion} will open soon.</p>}
+          </>;
+        })()}
+      </div>}
       {step === 'foods' && <div className="district-food-discovery">
         <div className="district-food-visual district-food-visual-pending" aria-label="District hero artwork placeholder; the research-list snack entries appear below">
           <div className="district-art-ornament" aria-hidden="true"><span>✳</span><i/><b/></div>
