@@ -13,6 +13,10 @@ type CartValue = {
   add: (line: Omit<CartLine, 'qty'>, qty?: number) => void;
   setQty: (key: string, qty: number) => void;
   remove: (key: string) => void;
+  /** Swap a line for another size/price of the same food, keeping the quantity (used when a food gets pack sizes after it was added). */
+  replaceLine: (oldKey: string, line: Omit<CartLine, 'qty'>) => void;
+  /** Refresh the price shown for a line without touching the quantity. */
+  reprice: (key: string, unitPaise: number, mrpPaise?: number) => void;
   clear: () => void;
 };
 
@@ -68,12 +72,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const setQty = useCallback((key: string, qty: number) => setLines((current) => current.map((item) => lineKey(item) === key ? { ...item, qty: clampQty(qty) } : item)), []);
   const remove = useCallback((key: string) => setLines((current) => current.filter((item) => lineKey(item) !== key)), []);
   const clear = useCallback(() => setLines([]), []);
+  const replaceLine = useCallback((oldKey: string, line: Omit<CartLine, 'qty'>) => setLines((current) => {
+    const old = current.find((item) => lineKey(item) === oldKey);
+    if (!old) return current;
+    const rest = current.filter((item) => lineKey(item) !== oldKey);
+    const same = rest.find((item) => lineKey(item) === lineKey(line));
+    if (same) return rest.map((item) => lineKey(item) === lineKey(line) ? { ...item, ...line, qty: clampQty(item.qty + old.qty) } : item);
+    return current.map((item) => lineKey(item) === oldKey ? { ...line, qty: old.qty } : item);
+  }), []);
+  const reprice = useCallback((key: string, unitPaise: number, mrpPaise?: number) => setLines((current) => current.map((item) => {
+    if (lineKey(item) !== key || (item.unitPaise === unitPaise && item.mrpPaise === mrpPaise)) return item;
+    const { mrpPaise: _old, ...rest } = item; void _old;
+    return { ...rest, unitPaise, ...(mrpPaise ? { mrpPaise } : {}) };
+  })), []);
 
   const value = useMemo<CartValue>(() => ({
-    lines, ready, add, setQty, remove, clear,
+    lines, ready, add, setQty, remove, clear, replaceLine, reprice,
     count: lines.reduce((sum, line) => sum + line.qty, 0),
     subtotalPaise: lines.reduce((sum, line) => sum + line.qty * line.unitPaise, 0),
-  }), [lines, ready, add, setQty, remove, clear]);
+  }), [lines, ready, add, setQty, remove, clear, replaceLine, reprice]);
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 

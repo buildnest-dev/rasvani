@@ -23,6 +23,8 @@ type ProductRow = { sizes?: PackSize[] | null; ratingCount?: number; ratingSum?:
 type BakerLogin = { id: string; email: string; name?: string };
 type Tab = 'orders' | 'products' | 'bakers' | 'payment';
 type Filter = 'new' | 'requests' | 'progress' | 'done' | 'all';
+/** A request that still needs the admin. A cancel request on an order that already left (dispatched/delivered/cancelled) is stale, so it is not listed. */
+const needsAdmin = (order: OrderDoc) => order.ticket?.status === 'open' && !(order.ticket.type === 'cancel' && ['dispatched', 'delivered', 'cancelled'].includes(order.status));
 const isFinal = (status: string) => (FINAL_STATUSES as readonly string[]).includes(status);
 
 /** One broken order must never hide the others: shows its basics instead of crashing the whole list. */
@@ -146,8 +148,8 @@ export function AdminDashboard() {
     setAlertsOn(result === 'granted'); beep();
   }
 
-  const shown = orders.filter((order) => filter === 'all' ? true : filter === 'requests' ? order.ticket?.status === 'open' : filter === 'new' ? order.status === 'placed' : filter === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed');
-  const count = (f: Filter) => orders.filter((order) => f === 'all' ? true : f === 'requests' ? order.ticket?.status === 'open' : f === 'new' ? order.status === 'placed' : f === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed').length;
+  const shown = orders.filter((order) => filter === 'all' ? true : filter === 'requests' ? needsAdmin(order) : filter === 'new' ? order.status === 'placed' : filter === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed');
+  const count = (f: Filter) => orders.filter((order) => f === 'all' ? true : f === 'requests' ? needsAdmin(order) : f === 'new' ? order.status === 'placed' : f === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed').length;
   const profileById = (id: string | null | undefined) => profiles.find((p) => p.id === id);
   const todayRevenue = orders.filter((o) => o.paymentStatus === 'paid').reduce((sum, o) => sum + payablePaise(o), 0);
 
@@ -246,11 +248,11 @@ export function AdminDashboard() {
       {products.length === 0 ? <p className="notice">No foods yet.</p> : <div className="customer-order-list">{products.map((product) => <article className="customer-order-card" key={product.id}>
         <div className="customer-order-head">{productImage(product) && <span className="admin-thumb">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={productImage(product) ?? ''} alt="" width={72} height={72} /></span>}<div><span className="eyebrow">{product.sku}{product.makerName ? ` · ${product.makerName}` : ''}{product.makerDistrict ? `, ${product.makerDistrict}` : ''}</span><h2>{product.name}</h2></div><div className="customer-order-status"><strong>{formatPaise(product.pricePaise)}</strong><span className={`pill ${product.visible ? 'st-delivered' : 'st-cancelled'}`}>{product.visible ? 'Visible in shop' : 'Hidden'}</span></div></div>
         <div className="admin-order-form">
-          <form className="admin-order-form" key={`${product.id}-${product.pricePaise}-${(product.sizes ?? []).map((x) => x.id + x.pricePaise).join()}`} onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductPricingAction(token, product.id, { priceRupees: Number(d.get('price') || 0) || undefined, mrpRupees: Number(d.get('mrp') || 0) || undefined, sizes: readSizes(d) }), 'Prices saved.'); }}>
+          <details className="admin-later admin-edit-prices"><summary>✎ Edit price &amp; pack sizes</summary><form className="admin-order-form" key={`${product.id}-${product.pricePaise}-${(product.sizes ?? []).map((x) => x.id + x.pricePaise).join()}`} onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductPricingAction(token, product.id, { priceRupees: Number(d.get('price') || 0) || undefined, mrpRupees: Number(d.get('mrp') || 0) || undefined, sizes: readSizes(d) }), 'Prices saved.'); }}>
             <label>Price (₹){product.sizes?.length ? ' — used only if all sizes are cleared' : ''}<input name="price" type="number" step="0.01" min="1" max="100000" defaultValue={product.sizes?.length ? '' : product.pricePaise / 100} /></label>
             <label>MRP (₹, optional)<input name="mrp" type="number" step="0.01" min="0" max="100000" defaultValue={!product.sizes?.length && product.mrpPaise ? product.mrpPaise / 100 : ''} /></label>
             <PackSizeFields sizes={product.sizes} />
-            <button className="btn secondary" type="submit" disabled={busy}>Save prices</button></form>
+            <button className="btn secondary" type="submit" disabled={busy}>Save prices</button></form></details>
           <AdminReviews productId={product.id} getToken={getToken} />
           <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductImageAction(token, product.id, String(d.get('image') ?? '')), 'Picture changed.'); }}><label>Picture<select name="image" defaultValue={product.image ?? ''}><option value="">Automatic</option>{foodImages.map((img) => <option key={img.path} value={img.path}>{img.label}</option>)}</select></label><button className="btn secondary" type="submit" disabled={busy}>Set picture</button><label>Or upload a photo<input type="file" accept="image/jpeg,image/png,image/webp" disabled={picBusy || busy} onChange={(event) => { const input = event.currentTarget; void uploadPicture(input.files?.[0]).then((path) => { if (path) void act((token) => setProductImageAction(token, product.id, path), 'Photo uploaded and set.'); input.value = ''; }); }} /></label></form>
           <button className="btn secondary" type="button" disabled={busy} onClick={() => void act((token) => setProductVisibilityAction(token, product.id, !product.visible), 'Updated.')}>{product.visible ? 'Hide from shop' : 'Show in shop'}</button>

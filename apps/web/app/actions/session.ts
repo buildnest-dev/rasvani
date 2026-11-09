@@ -102,7 +102,7 @@ export async function placeOrderAction(idToken: string, input: unknown, captchaT
       // The price is ALWAYS read from the product on the server for the chosen pack size; the browser's price is never trusted.
       const sizes = Array.isArray(product.sizes) ? (product.sizes as PackSize[]) : null;
       const choice = priceFor({ pricePaise: product.pricePaise, mrpPaise: product.mrpPaise ?? null, sizes }, data.lines[index].sizeId);
-      if (!choice || !Number.isInteger(choice.pricePaise) || choice.pricePaise < 100) return fail('The pack size of an item in your cart is no longer available. Please remove it and add it again.');
+      if (!choice || !Number.isInteger(choice.pricePaise) || choice.pricePaise < 100) return fail('An item in your cart needs its pack size chosen again. Please open your cart, pick the size, and place the order.');
       lines.push({
         productId: snap.id, name: choice.label ? `${String(product.name)} (${choice.label})` : String(product.name), ...(choice.label ? { sizeId: data.lines[index].sizeId, sizeLabel: choice.label } : {}),
         qty, unitPaise: choice.pricePaise, ...(choice.mrpPaise ? { mrpPaise: choice.mrpPaise } : {}), linePaise: choice.pricePaise * qty, makerName: product.makerName ?? null,
@@ -185,7 +185,16 @@ export async function setOrderStatusAction(idToken: string, orderId: string, sta
     const snap = await ref.get();
     if (!snap.exists) return fail('Order not found.');
     if (FINAL.has(snap.data()?.status)) return fail('This order is already final.');
-    await ref.update({ status, ...(payment ? { paymentStatus: payment } : {}), updatedAt: new Date().toISOString() });
+    const now = new Date().toISOString();
+    const update: Record<string, unknown> = { status, ...(payment ? { paymentStatus: payment } : {}), updatedAt: now };
+    // An open CANCELLATION request is settled by the move itself: cancelling closes it as approved; dispatching or
+    // delivering closes it (an order that has left cannot be cancelled; the customer can ask for a refund instead).
+    const ticket = snap.data()?.ticket;
+    if (ticket?.status === 'open' && ticket.type === 'cancel') {
+      if (status === 'cancelled') update.ticket = { ...ticket, status: 'approved', resolvedAt: now, adminNote: ticket.adminNote ?? null };
+      else if (status === 'dispatched' || status === 'delivered') update.ticket = { ...ticket, status: 'rejected', resolvedAt: now, adminNote: 'Your order had already been dispatched, so it could not be cancelled. If something is wrong, you can request a refund.' };
+    }
+    await ref.update(update);
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not update the order.')); }
 }

@@ -36,9 +36,7 @@ export function SiteMotionDirector() {
       '.product-detail-panel', '.product-detail-gallery figure', '.product-regional-card',
       '.producer-public-grid', '.journal-hero-grid', '.journal-pillar-art',
       '.better-choice-pillars article', '.better-choice-boundary',
-      '.form-shell', '.account-panel', '.warehouse-panel', '.admin-subsection',
-      '.producer-portal-page', '.editorial-panel', '.facility-review-card',
-      '.producer-portal-links', '.district-heritage-note', '.region-heritage-note',
+      '.district-heritage-note', '.region-heritage-note',
     ].join(',');
 
     const tiltSelectors = [
@@ -73,6 +71,7 @@ export function SiteMotionDirector() {
         return Array.from(new Set(found));
       };
       collect(revealSelectors).forEach((element, index) => {
+        if (element.closest('.admin-dash, .customer-orders-page, .cart-page, .checkout-form, [data-no-motion]')) return;
         if (!element.dataset.motionReveal) {
           element.dataset.motionReveal = 'true';
           element.style.setProperty('--motion-stagger', `${Math.min(index % 5, 4) * 65}ms`);
@@ -97,6 +96,13 @@ export function SiteMotionDirector() {
       }));
     });
     mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+    const failsafe = window.setInterval(() => {
+      document.querySelectorAll<HTMLElement>('[data-motion-reveal]:not(.motion-in-view)').forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        if (rect.bottom > 0 && rect.top < (window.innerHeight || 800)) element.classList.add('motion-in-view');
+      });
+    }, 1000);
 
     let activeTilt: HTMLElement | null = null;
     let scrollFrame = 0;
@@ -158,6 +164,7 @@ export function SiteMotionDirector() {
     document.addEventListener('pointerleave', onPointerLeave);
 
     return () => {
+      window.clearInterval(failsafe);
       mutationObserver.disconnect();
       revealObserver.disconnect();
       window.removeEventListener('scroll', onScroll);
