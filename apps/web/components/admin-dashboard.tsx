@@ -68,6 +68,7 @@ export function AdminDashboard() {
   const { getToken } = useAuth();
   const [tab, setTab] = useState<Tab>('orders');
   const [filter, setFilter] = useState<Filter>('new');
+  useEffect(() => { const on = (e: Event) => { const t = (e as CustomEvent).detail; if (t === 'orders' || t === 'products' || t === 'bakers' || t === 'payment') setTab(t); }; window.addEventListener('staff:tab', on); return () => window.removeEventListener('staff:tab', on); }, []);
   const [orders, setOrders] = useState<OrderDoc[]>([]);
   const [products, setProducts] = useState<ProductRow[]>([]);
   const [profiles, setProfiles] = useState<BakerProfile[]>([]);
@@ -152,6 +153,8 @@ export function AdminDashboard() {
 
   const shown = orders.filter((order) => filter === 'all' ? true : filter === 'requests' ? needsAdmin(order) : filter === 'new' ? order.status === 'placed' : filter === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed');
   const count = (f: Filter) => orders.filter((order) => f === 'all' ? true : f === 'requests' ? needsAdmin(order) : f === 'new' ? order.status === 'placed' : f === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed').length;
+  const requestCount = orders.filter(needsAdmin).length;
+  useEffect(() => { window.dispatchEvent(new CustomEvent('staff:state', { detail: { tab, newCount, requests: requestCount } })); }, [tab, newCount, requestCount]);
   const profileById = (id: string | null | undefined) => profiles.find((p) => p.id === id);
   const todayRevenue = orders.filter((o) => o.paymentStatus === 'paid').reduce((sum, o) => sum + payablePaise(o), 0);
 

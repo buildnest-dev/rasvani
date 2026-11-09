@@ -3,10 +3,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
+import { useEffect, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import { supportedLocales, useLocale } from '@/components/locale-provider';
 import { LocalizedCopy } from '@/components/localized-copy';
 import { useCart } from '@/components/cart-provider';
+import { useAuth } from '@/components/auth-provider';
 
 type MenuItemTarget = HTMLElement;
 function applyMenuTilt(event: ReactPointerEvent<MenuItemTarget>) {
@@ -29,6 +30,32 @@ function resetMenuTilt(event: ReactPointerEvent<MenuItemTarget>) {
 }
 function menuItemStyle(index: number): CSSProperties { return { '--menu-index': index } as CSSProperties; }
 
+const adminTabs = [['orders', 'Orders'], ['products', 'Foods & prices'], ['bakers', 'Bakers & restaurants'], ['payment', 'Payment QR']] as const;
+
+/** A focused header for the admin / baker consoles: no shopping links, just the console and its sections. */
+function StaffHeader({ kind }: { kind: 'admin' | 'baker' }) {
+  const { user, signOut } = useAuth();
+  const [state, setState] = useState<{ tab: string; newCount: number; requests: number }>({ tab: 'orders', newCount: 0, requests: 0 });
+  useEffect(() => {
+    document.body.classList.add('staff-mode');
+    const onState = (event: Event) => setState((event as CustomEvent).detail);
+    window.addEventListener('staff:state', onState);
+    return () => { document.body.classList.remove('staff-mode'); window.removeEventListener('staff:state', onState); };
+  }, []);
+  const go = (tab: string) => window.dispatchEvent(new CustomEvent('staff:tab', { detail: tab }));
+  const badge = (tab: string) => tab === 'orders' ? state.newCount + state.requests : 0;
+  return <header className="header staff-header"><div className="wrap staff-row">
+    <Link href="/" className="staff-brand" aria-label="Rasvani home"><Image className="brand-logo" src="/images/rasvani-mark.png" alt="" width={40} height={38} priority /><span>Rasvani</span></Link>
+    <span className="staff-pill">{kind === 'admin' ? 'Admin console' : 'Baker console'}</span>
+    {kind === 'admin' && <nav className="staff-nav" aria-label="Admin sections">{adminTabs.map(([key, label]) => <button key={key} type="button" className={state.tab === key ? 'is-on' : ''} aria-current={state.tab === key ? 'page' : undefined} onClick={() => go(key)}>{label}{badge(key) > 0 && <b>{badge(key)}</b>}</button>)}</nav>}
+    <div className="staff-right">
+      <Link className="staff-link" href="/shop">View shop ↗</Link>
+      {user && <span className="staff-user" title={user.email ?? ''}>{(user.email ?? '?')[0]?.toUpperCase()}</span>}
+      {user && <button className="staff-out" type="button" onClick={() => void signOut()}>Sign out</button>}
+    </div>
+  </div></header>;
+}
+
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -44,8 +71,10 @@ export function SiteHeader() {
     [translate('Food Stories'), '/food-stories'],
     [translate('Meet the Makers'), '/for-producers'],
   ] as const;
+  const staffKind = pathname === '/admin' || pathname.startsWith('/admin/') ? 'admin' : pathname === '/baker' || pathname.startsWith('/baker/') ? 'baker' : null;
   const isCurrent = (href: string) => href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
   const motionHandlers = { onPointerMove: applyMenuTilt, onPointerLeave: resetMenuTilt };
+  if (staffKind) return <StaffHeader kind={staffKind} />;
   return <LocalizedCopy><header className="header header-premium">
     <div className="wrap headrow">
       <Link href="/" className="brand brand-premium" aria-label="Rasvani home">
