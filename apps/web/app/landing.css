@@ -150,3 +150,25 @@
 .size-fields-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
 .size-fields-row{display:grid;grid-template-columns:54px 1fr 1fr;gap:6px;align-items:end}
 .size-fields-row input{width:100%}
+
+/* Flip card: "View details" turns the card over instead of opening another page */
+.shop-card.flip-card{padding:0;overflow:visible;perspective:1400px;background:transparent;border:0}
+.shop-card.flip-card:hover{transform:translateY(-4px);box-shadow:none;border-color:transparent}
+.flip-inner{position:relative;display:grid;transform-style:preserve-3d;transition:transform .75s cubic-bezier(.2,.7,.2,1)}
+.flip-card.is-flipped .flip-inner{transform:rotateY(180deg)}
+.flip-face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid #e4d6c3;border-radius:18px;background:#fffdf8;padding:12px;min-width:0}
+.flip-back{transform:rotateY(180deg);display:flex;flex-direction:column;gap:10px;max-height:640px;background:linear-gradient(160deg,#fffdf8,#f7ecda)}
+.flip-back-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.flip-back-head h2,.flip-back-head h3{text-transform:uppercase;letter-spacing:.02em;font-size:16px;margin:2px 0 4px}
+.flip-close{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid #e4d6c3;background:#fff;color:#5a1f24;font-size:15px;cursor:pointer}
+.flip-close:hover{background:#5a1f24;color:#fff}
+.flip-back-scroll{overflow-y:auto;flex:1;display:grid;gap:8px;align-content:start;padding-right:4px;min-height:140px}
+.flip-back-scroll h4{margin:8px 0 2px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#6b5a4d}
+.flip-desc{margin:0;line-height:1.6;white-space:pre-line}
+.flip-facts{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:#5f564b}
+.flip-sizes,.flip-reviews{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.flip-sizes li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border:1px solid #eadfce;border-radius:10px;background:#fff}
+.flip-reviews li{padding:8px 10px;border:1px solid #eadfce;border-radius:10px;background:#fff}
+.flip-reviews p{margin:4px 0 0;font-size:13px;white-space:pre-line}
+.flip-back-buy{border-top:1px solid #eadfce;padding-top:10px}
+@media(prefers-reduced-motion:reduce){.flip-inner{transition:none}}

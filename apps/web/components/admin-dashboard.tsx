@@ -24,7 +24,9 @@ type BakerLogin = { id: string; email: string; name?: string };
 type Tab = 'orders' | 'products' | 'bakers' | 'payment';
 type Filter = 'new' | 'requests' | 'progress' | 'done' | 'all';
 /** A request that still needs the admin. A cancel request on an order that already left (dispatched/delivered/cancelled) is stale, so it is not listed. */
-const needsAdmin = (order: OrderDoc) => order.ticket?.status === 'open' && !(order.ticket.type === 'cancel' && ['dispatched', 'delivered', 'cancelled'].includes(order.status));
+const needsAdmin = (order: OrderDoc) => order.ticket?.status === 'open'
+  && !(order.ticket.type === 'cancel' && ['dispatched', 'delivered', 'cancelled'].includes(order.status))
+  && !(order.ticket.type === 'refund' && order.ticket.reason === 'Order not received' && order.status === 'delivered');
 const isFinal = (status: string) => (FINAL_STATUSES as readonly string[]).includes(status);
 
 /** One broken order must never hide the others: shows its basics instead of crashing the whole list. */

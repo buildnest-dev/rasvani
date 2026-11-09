@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ProductArt } from '@/components/product-art';
-import { ProductBuy } from '@/components/product-buy';
-import { Stars } from '@/components/stars';
+import { ProductCard } from '@/components/product-card';
 import { BiharFoodsGrid, type BiharFoodCard } from '@/components/bihar-foods-grid';
 import { biharHomeFoodItems } from '@/lib/bihar-home-food-items';
 import { loadVisibleProducts } from '@/lib/firebase/catalogue';
@@ -38,12 +36,7 @@ export default async function BiharPage() {
       <div className="bh-head"><div><span className="eyebrow">ORDER TODAY IN BIHAR</span><h2 id="bh-order-h">Available to order now</h2></div><Link className="text-link" href="/shop">Open the shop →</Link></div>
       {!configured || failed ? <p className="status" role="status">We are refreshing the menu. Please check back shortly.</p>
         : products.length === 0 ? <div className="shop-empty"><h3>New foods are being added.</h3><p>Our first home bakers are joining. Order will open here very soon.</p></div>
-        : <div className="shop-grid">{products.map((product) => <article className="shop-card" key={product.id}>
-          <ProductArt product={product} sizes="(max-width: 700px) 90vw, (max-width: 1100px) 45vw, 30vw" />
-          <div className="shop-card-body"><div className="eyebrow">{product.makerName ? `${product.makerName}${product.makerDistrict ? ` · ${product.makerDistrict}` : ''}` : 'Home-made in Bihar'}</div>
-            <h3><Link href={`/shop/${encodeURIComponent(product.slug)}`}>{product.name}</Link></h3><Stars sum={product.ratingSum} count={product.ratingCount} /><p>{product.description?.trim() || 'Home-made vegetarian regional food.'}</p>
-            <ProductBuy productId={product.id} slug={product.slug} name={product.name} pricePaise={product.pricePaise} mrpPaise={product.mrpPaise} sizes={product.sizes} /></div>
-        </article>)}</div>}
+        : <div className="shop-grid">{products.map((product) => <ProductCard key={product.id} product={product} heading="h3" />)}</div>}
       <p className="notice">Home delivery in selected areas of Bihar, or order online and collect from a shop. Pay by cash or UPI. We call you to confirm every order.</p>
     </section>
 

@@ -194,6 +194,10 @@ export async function setOrderStatusAction(idToken: string, orderId: string, sta
       if (status === 'cancelled') update.ticket = { ...ticket, status: 'approved', resolvedAt: now, adminNote: ticket.adminNote ?? null };
       else if (status === 'dispatched' || status === 'delivered') update.ticket = { ...ticket, status: 'rejected', resolvedAt: now, adminNote: 'Your order had already been dispatched, so it could not be cancelled. If something is wrong, you can request a refund.' };
     }
+    // A refund request for "Order not received" is settled once the admin marks the order delivered (other refund reasons, such as damaged items, stay open).
+    if (ticket?.status === 'open' && ticket.type === 'refund' && ticket.reason === 'Order not received' && status === 'delivered') {
+      update.ticket = { ...ticket, status: 'rejected', resolvedAt: now, adminNote: 'Your order has now been marked as delivered. If there is still a problem, you can send a new refund request.' };
+    }
     await ref.update(update);
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not update the order.')); }
