@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { AddToCart } from '@/components/add-to-cart';
 import { ProductArt } from '@/components/product-art';
-import { PriceTag } from '@/components/price-tag';
+import { ProductBuy } from '@/components/product-buy';
+import { Stars } from '@/components/stars';
 import { BiharFoodsGrid, type BiharFoodCard } from '@/components/bihar-foods-grid';
 import { biharHomeFoodItems } from '@/lib/bihar-home-food-items';
 import { loadVisibleProducts } from '@/lib/firebase/catalogue';
@@ -41,8 +41,8 @@ export default async function BiharPage() {
         : <div className="shop-grid">{products.map((product) => <article className="shop-card" key={product.id}>
           <ProductArt product={product} sizes="(max-width: 700px) 90vw, (max-width: 1100px) 45vw, 30vw" />
           <div className="shop-card-body"><div className="eyebrow">{product.makerName ? `${product.makerName}${product.makerDistrict ? ` · ${product.makerDistrict}` : ''}` : 'Home-made in Bihar'}</div>
-            <h3><Link href={`/shop/${encodeURIComponent(product.slug)}`}>{product.name}</Link></h3><p>{product.description?.trim() || 'Home-made vegetarian regional food.'}</p>
-            <div className="shop-card-price"><PriceTag pricePaise={product.pricePaise} mrpPaise={product.mrpPaise} /><AddToCart productId={product.id} slug={product.slug} name={product.name} unitPaise={product.pricePaise} /></div></div>
+            <h3><Link href={`/shop/${encodeURIComponent(product.slug)}`}>{product.name}</Link></h3><Stars sum={product.ratingSum} count={product.ratingCount} /><p>{product.description?.trim() || 'Home-made vegetarian regional food.'}</p>
+            <ProductBuy productId={product.id} slug={product.slug} name={product.name} pricePaise={product.pricePaise} mrpPaise={product.mrpPaise} sizes={product.sizes} /></div>
         </article>)}</div>}
       <p className="notice">Home delivery in selected areas of Bihar, or order online and collect from a shop. Pay by cash or UPI. We call you to confirm every order.</p>
     </section>

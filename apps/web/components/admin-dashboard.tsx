@@ -6,17 +6,20 @@ import { useAuth } from '@/components/auth-provider';
 import { UpiQr } from '@/components/upi-qr';
 import {
   deleteBakerProfileAction, inviteBakerAction, deleteProductAction, publishProductAction, removeBakerAction, saveBakerProfileAction,
-  savePaymentSettingsAction, resolveOrderTicketAction, setOrderHandlingAction, setOrderStatusAction, setProductImageAction, setProductPriceAction, setProductVisibilityAction,
-  uploadFoodImageAction,
+  savePaymentSettingsAction, resolveOrderTicketAction, setOrderHandlingAction, setOrderStatusAction, setProductImageAction, setProductPricingAction, setProductVisibilityAction,
+  uploadFoodImageAction, loadReviews, deleteReviewAction, type PublicReview,
 } from '@/app/actions/session';
 import { shrinkImage } from '@/lib/resize-image';
 import { foodImages, productImage } from '@/lib/food-images';
 import { biharDistricts } from '@/lib/bihar-districts';
 import { firestore } from '@/lib/firebase/client';
 import { formatPaise } from '@/lib/money';
+import { PackSizeFields, readSizes } from '@/components/pack-size-fields';
+import { Stars } from '@/components/stars';
+import type { PackSize } from '@/lib/pack-sizes';
 import { FINAL_STATUSES, ORDER_STATUSES, payablePaise, statusLabel, upiLink, type BakerProfile, type OrderDoc, type PaymentSettings } from '@/lib/orders';
 
-type ProductRow = { id: string; name: string; sku: string; makerName: string | null; makerDistrict?: string | null; image?: string | null; pricePaise: number; mrpPaise?: number | null; visible: boolean };
+type ProductRow = { sizes?: PackSize[] | null; ratingCount?: number; ratingSum?: number; id: string; name: string; sku: string; makerName: string | null; makerDistrict?: string | null; image?: string | null; pricePaise: number; mrpPaise?: number | null; visible: boolean };
 type BakerLogin = { id: string; email: string; name?: string };
 type Tab = 'orders' | 'products' | 'bakers' | 'payment';
 type Filter = 'new' | 'requests' | 'progress' | 'done' | 'all';
@@ -42,6 +45,19 @@ function beep() {
     osc.connect(gain); gain.connect(ctx.destination); osc.type = 'sine'; osc.frequency.value = 880; gain.gain.value = 0.15;
     osc.start(); osc.stop(ctx.currentTime + 0.25); setTimeout(() => void ctx.close(), 400);
   } catch { /* sound is optional */ }
+}
+
+/** Lets the admin read the reviews of one food and remove an inappropriate one. */
+function AdminReviews({ productId, getToken }: { productId: string; getToken: () => Promise<string> }) {
+  const [reviews, setReviews] = useState<PublicReview[] | null>(null);
+  const [note, setNote] = useState('');
+  const load = useCallback(() => { void loadReviews(productId).then(setReviews); }, [productId]);
+  return <details className="admin-later" onToggle={(event) => { if ((event.currentTarget as HTMLDetailsElement).open && reviews === null) load(); }}>
+    <summary>Customer reviews</summary>
+    {reviews === null ? <p className="notice">Loading…</p> : reviews.length === 0 ? <p className="notice">No reviews yet.</p> : reviews.map((review) => <p className="notice" key={review.id}><strong>{review.name}</strong> <Stars sum={review.rating} count={1} showCount={false} /> {review.comment}{' '}
+      <button className="text-link" type="button" onClick={() => { if (!window.confirm('Remove this review?')) return; void getToken().then((token) => deleteReviewAction(token, review.id)).then((result) => { setNote(result.ok ? 'Review removed.' : result.error); load(); }); }}>Remove</button></p>)}
+    {note && <p className="status" role="status">{note}</p>}
+  </details>;
 }
 
 export function AdminDashboard() {
@@ -204,7 +220,7 @@ export function AdminDashboard() {
     {tab === 'products' && <>
       <form className="form-shell checkout-form wide" onSubmit={(event) => { event.preventDefault(); const form = event.currentTarget; const d = new FormData(form); void act((token) => publishProductAction(token, {
         name: String(d.get('name')), sku: String(d.get('sku')), description: String(d.get('description')), makerName: '', makerId: String(d.get('makerId') ?? '') || undefined,
-        priceRupees: Number(d.get('price')), mrpRupees: Number(d.get('mrp') || 0) || undefined, storage: String(d.get('storage')), vegetarianEvidence: String(d.get('evidence')),
+        priceRupees: Number(d.get('price') || 0) || undefined, mrpRupees: Number(d.get('mrp') || 0) || undefined, sizes: readSizes(d), storage: String(d.get('storage')), vegetarianEvidence: String(d.get('evidence')),
         image: newPic || String(d.get('image') ?? '') || undefined,
       }), 'Food added and visible in the shop.').then((ok) => { if (ok) { form.reset(); setNewPic(''); } }); }}>
         <h2>Add a food item</h2>
@@ -218,8 +234,9 @@ export function AdminDashboard() {
         <label htmlFor="p-image">Or choose a picture from the library (if the name matches a Bihar food, its picture is used automatically)</label>
         <select id="p-image" name="image" defaultValue=""><option value="">Automatic</option>{foodImages.map((img) => <option key={img.path} value={img.path}>{img.label}</option>)}</select>
         <label htmlFor="p-sku">Code (unique, e.g. RV-THEKUA-250)</label><input id="p-sku" name="sku" required maxLength={80} />
-        <label htmlFor="p-price">Price in rupees (selling price)</label><input id="p-price" name="price" type="number" step="0.01" min="1" max="100000" required />
+        <label htmlFor="p-price">Price in rupees (leave empty if you fill pack sizes below)</label><input id="p-price" name="price" type="number" step="0.01" min="1" max="100000" />
         <label htmlFor="p-mrp">MRP in rupees (optional, shown crossed out with % off)</label><input id="p-mrp" name="mrp" type="number" step="0.01" min="0" max="100000" />
+        <PackSizeFields />
         <label htmlFor="p-desc">Description (pack size / weight)</label><textarea id="p-desc" name="description" rows={3} maxLength={2000} />
         <label htmlFor="p-storage">Storage</label><select id="p-storage" name="storage" defaultValue="ambient"><option value="ambient">Room temperature</option><option value="chilled">Chilled</option><option value="frozen">Frozen</option><option value="other">Other</option></select>
         <label htmlFor="p-ev">How you confirmed it is 100% vegetarian</label><input id="p-ev" name="evidence" required maxLength={300} />
@@ -229,7 +246,12 @@ export function AdminDashboard() {
       {products.length === 0 ? <p className="notice">No foods yet.</p> : <div className="customer-order-list">{products.map((product) => <article className="customer-order-card" key={product.id}>
         <div className="customer-order-head">{productImage(product) && <span className="admin-thumb">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={productImage(product) ?? ''} alt="" width={72} height={72} /></span>}<div><span className="eyebrow">{product.sku}{product.makerName ? ` · ${product.makerName}` : ''}{product.makerDistrict ? `, ${product.makerDistrict}` : ''}</span><h2>{product.name}</h2></div><div className="customer-order-status"><strong>{formatPaise(product.pricePaise)}</strong><span className={`pill ${product.visible ? 'st-delivered' : 'st-cancelled'}`}>{product.visible ? 'Visible in shop' : 'Hidden'}</span></div></div>
         <div className="admin-order-form">
-          <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductPriceAction(token, product.id, Number(d.get('price')), Number(d.get('mrp') || 0) || undefined), 'Price changed.'); }}><label>New price (₹)<input name="price" type="number" step="0.01" min="1" max="100000" required /></label><label>MRP (₹, optional)<input name="mrp" type="number" step="0.01" min="0" max="100000" defaultValue={product.mrpPaise ? product.mrpPaise / 100 : ''} /></label><button className="btn secondary" type="submit" disabled={busy}>Change price</button></form>
+          <form className="admin-order-form" key={`${product.id}-${product.pricePaise}-${(product.sizes ?? []).map((x) => x.id + x.pricePaise).join()}`} onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductPricingAction(token, product.id, { priceRupees: Number(d.get('price') || 0) || undefined, mrpRupees: Number(d.get('mrp') || 0) || undefined, sizes: readSizes(d) }), 'Prices saved.'); }}>
+            <label>Price (₹){product.sizes?.length ? ' — used only if all sizes are cleared' : ''}<input name="price" type="number" step="0.01" min="1" max="100000" defaultValue={product.sizes?.length ? '' : product.pricePaise / 100} /></label>
+            <label>MRP (₹, optional)<input name="mrp" type="number" step="0.01" min="0" max="100000" defaultValue={!product.sizes?.length && product.mrpPaise ? product.mrpPaise / 100 : ''} /></label>
+            <PackSizeFields sizes={product.sizes} />
+            <button className="btn secondary" type="submit" disabled={busy}>Save prices</button></form>
+          <AdminReviews productId={product.id} getToken={getToken} />
           <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductImageAction(token, product.id, String(d.get('image') ?? '')), 'Picture changed.'); }}><label>Picture<select name="image" defaultValue={product.image ?? ''}><option value="">Automatic</option>{foodImages.map((img) => <option key={img.path} value={img.path}>{img.label}</option>)}</select></label><button className="btn secondary" type="submit" disabled={busy}>Set picture</button><label>Or upload a photo<input type="file" accept="image/jpeg,image/png,image/webp" disabled={picBusy || busy} onChange={(event) => { const input = event.currentTarget; void uploadPicture(input.files?.[0]).then((path) => { if (path) void act((token) => setProductImageAction(token, product.id, path), 'Photo uploaded and set.'); input.value = ''; }); }} /></label></form>
           <button className="btn secondary" type="button" disabled={busy} onClick={() => void act((token) => setProductVisibilityAction(token, product.id, !product.visible), 'Updated.')}>{product.visible ? 'Hide from shop' : 'Show in shop'}</button>
           <button className="btn secondary" type="button" disabled={busy} onClick={() => { if (window.confirm(`Remove "${product.name}" permanently? This cannot be undone. (Use Hide if you only want to pause it.)`)) void act((token) => deleteProductAction(token, product.id), 'Food removed.'); }}>Remove food</button>

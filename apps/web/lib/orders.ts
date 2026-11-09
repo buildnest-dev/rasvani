@@ -2,7 +2,7 @@ export const ORDER_STATUSES = ['placed', 'confirmed', 'accepted', 'preparing', '
 export const FINAL_STATUSES = ['delivered', 'cancelled'] as const;
 export const PAYMENTS = ['pending', 'paid', 'failed', 'refunded'] as const;
 
-export type OrderLine = { productId: string; name: string; qty: number; unitPaise: number; linePaise: number; makerName?: string | null };
+export type OrderLine = { productId: string; sizeId?: string; sizeLabel?: string; mrpPaise?: number; name: string; qty: number; unitPaise: number; linePaise: number; makerName?: string | null };
 export type OrderTicket = {
   type: 'cancel' | 'refund'; reason: string; details?: string | null; status: 'open' | 'approved' | 'rejected';
   requestedAt: string; resolvedAt?: string | null; adminNote?: string | null;

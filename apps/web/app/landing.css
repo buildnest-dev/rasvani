@@ -127,3 +127,26 @@
 /* Photo fills the card width and is centred (the old fixed 190px height made it a narrow left-aligned box) */
 .shop-card-art.has-img{width:100%;height:auto;padding:0;margin:0 auto}
 .shop-card-art.has-img.is-upload img{object-position:center}
+
+/* Pack sizes, stars, reviews */
+.product-buy-box{display:grid;gap:10px}
+.size-select select{width:100%;padding:9px 10px;border:1px solid #e4d6c3;border-radius:10px;background:#fffaf2;font:inherit}
+.size-chips{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.size-chips legend{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b5a4d;padding:0;margin-bottom:6px;float:none}
+.size-chips label{display:inline-flex;align-items:center;padding:9px 16px;border:1.5px solid #e4d6c3;border-radius:999px;cursor:pointer;font-weight:600;background:#fffaf2;color:#442329}
+.size-chips label.on{border-color:#5a1f24;background:#5a1f24;color:#fff}
+.size-chips input{position:absolute;opacity:0;pointer-events:none}
+.size-chips label:focus-within{outline:2px solid #c98a2b;outline-offset:2px}
+.stars{display:inline-flex;align-items:center;gap:6px;font-size:13px}
+.stars-row i{font-style:normal;color:#d9cfc2;font-size:15px}.stars-row i.on{color:#e0a100}
+.stars b{color:#442329}.stars small{color:#7a6c5f}
+.reviews{margin:36px 0}.reviews h2{font:500 26px var(--serif);color:var(--maroon);margin:0 0 12px}
+.reviews ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.reviews li{background:#fffaf2;border:1px solid #e4d6c3;border-radius:14px;padding:14px 16px}
+.reviews li p{margin:6px 0 0;white-space:pre-line}
+.order-review form{display:grid;gap:8px;margin:12px 0;padding-bottom:12px;border-bottom:1px solid #eadfce}
+.size-fields{border:1px solid #e4d6c3;border-radius:12px;padding:12px;margin:10px 0}
+.size-fields legend{font-size:12px;font-weight:700;padding:0 6px}
+.size-fields-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.size-fields-row{display:grid;grid-template-columns:54px 1fr 1fr;gap:6px;align-items:end}
+.size-fields-row input{width:100%}

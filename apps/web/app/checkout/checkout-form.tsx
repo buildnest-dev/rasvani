@@ -29,7 +29,7 @@ export function CheckoutForm() {
         address: text('address'), landmark: text('landmark'), notes: text('notes'), payment: text('payment'),
         lat: coords ? Number(coords.lat) : null, lng: coords ? Number(coords.lng) : null,
         website: text('website'),
-        lines: lines.map((line) => ({ productId: line.productId, qty: line.qty })),
+        lines: lines.map((line) => ({ productId: line.productId, sizeId: line.sizeId, qty: line.qty })),
       }, captchaToken ?? undefined);
       if (result.ok) router.push('/account/orders?placed=1'); else { setState({ error: result.error }); captchaRef.current?.reset(); }
     } catch { setState({ error: 'Something went wrong. Please try again.' }); captchaRef.current?.reset(); }
@@ -87,7 +87,7 @@ export function CheckoutForm() {
       <p className="notice">No payment is taken on this page. Rasvani calls you to confirm the order, any delivery charge, and delivery or pickup. Delivery charge, if any, is added by Rasvani before you pay.</p>
     </form>
     <aside className="cart-summary"><h2>Your order</h2>
-      <ul className="cart-summary-lines">{lines.map((line) => <li key={line.productId}><span>{line.name} × {line.qty}</span><strong>{formatPaise(line.unitPaise * line.qty)}</strong></li>)}</ul>
+      <ul className="cart-summary-lines">{lines.map((line) => <li key={`${line.productId}:${line.sizeId ?? ''}`}><span>{line.name}{line.sizeLabel ? ` (${line.sizeLabel})` : ''} × {line.qty}</span><strong>{formatPaise(line.unitPaise * line.qty)}</strong></li>)}</ul>
       <div className="cart-summary-row"><span>Subtotal</span><strong>{formatPaise(subtotalPaise)}</strong></div>
       <p className="notice">Final prices are re-checked on the server when you place the order.</p>
       <Link href="/cart" className="text-link">← Edit cart</Link>

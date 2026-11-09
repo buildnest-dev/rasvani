@@ -1,12 +1,13 @@
 'use server';
 
-import { randomBytes } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import { z } from 'zod';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminDb, requireRole, verifySession, type Role } from '@/lib/firebase/admin';
 import { verifyCaptcha } from '@/lib/captcha';
 import { UPLOAD_PREFIX, isLibraryImage, uploadedImageId } from '@/lib/food-images';
 import { biharDistricts } from '@/lib/bihar-districts';
+import { COMMON_SIZES, isSizeId, priceFor, sizeLabel, validMrp, type PackSize } from '@/lib/pack-sizes';
 import { CANCEL_REASONS, FINAL_STATUSES, ORDER_STATUSES, PAYMENTS, REFUND_REASONS, ticketTypeFor } from '@/lib/orders';
 
 type Result<T = object> = ({ ok: true } & T) | { ok: false; error: string };
@@ -57,7 +58,7 @@ const orderSchema = z.object({
   pincode: clean(6), address: clean(300), landmark: clean(120), notes: clean(400),
   payment: z.enum(['cod', 'upi']),
   lat: z.number().min(6).max(38).nullable(), lng: z.number().min(68).max(98).nullable(),
-  lines: z.array(z.object({ productId: z.string().min(1).max(60), qty: z.number().int().min(1).max(20) })).min(1).max(50),
+  lines: z.array(z.object({ productId: z.string().min(1).max(60), sizeId: z.string().max(10).optional(), qty: z.number().int().min(1).max(20) })).min(1).max(50),
 });
 const paymentLabels = { cod: 'Cash on delivery / pay at collection', upi: 'Pay by UPI QR to Rasvani' } as const;
 
@@ -82,7 +83,7 @@ export async function placeOrderAction(idToken: string, input: unknown, captchaT
     if (!/^8[0-5]\d{4}$/.test(data.pincode)) return fail('Home delivery is only for Bihar. Enter a valid Bihar pincode.');
     if (data.address.length < 8) return fail('Enter your full delivery address.');
   } else if (data.pincode && !/^\d{6}$/.test(data.pincode)) return fail('Pincode must be 6 digits.');
-  if (new Set(data.lines.map((line) => line.productId)).size !== data.lines.length) return fail('Your cart has a duplicate item.');
+  if (new Set(data.lines.map((line) => `${line.productId}:${line.sizeId ?? ''}`)).size !== data.lines.length) return fail('Your cart has a duplicate item.');
 
   try {
     const db = adminDb();
@@ -93,12 +94,19 @@ export async function placeOrderAction(idToken: string, input: unknown, captchaT
     const open = mine.docs.filter((d) => !FINAL.has(d.data().status)).length;
     if (recent >= 8 || open >= 5) return fail('You have several orders in progress. Please wait for Rasvani to confirm them, or write to rasvanifoods@gmail.com.');
     const snaps = await Promise.all(data.lines.map((line) => db.collection('products').doc(safeId(line.productId)).get()));
-    const lines: { productId: string; name: string; qty: number; unitPaise: number; linePaise: number; makerName: string | null }[] = [];
+    const lines: { productId: string; name: string; sizeId?: string; sizeLabel?: string; qty: number; unitPaise: number; mrpPaise?: number; linePaise: number; makerName: string | null }[] = [];
     for (const [index, snap] of snaps.entries()) {
       const product = snap.data();
       if (!snap.exists || !product || product.visible !== true || !Number.isInteger(product.pricePaise)) return fail('An item in your cart is no longer available. Please remove it and try again.');
       const qty = data.lines[index].qty;
-      lines.push({ productId: snap.id, name: String(product.name), qty, unitPaise: product.pricePaise, linePaise: product.pricePaise * qty, makerName: product.makerName ?? null });
+      // The price is ALWAYS read from the product on the server for the chosen pack size; the browser's price is never trusted.
+      const sizes = Array.isArray(product.sizes) ? (product.sizes as PackSize[]) : null;
+      const choice = priceFor({ pricePaise: product.pricePaise, mrpPaise: product.mrpPaise ?? null, sizes }, data.lines[index].sizeId);
+      if (!choice || !Number.isInteger(choice.pricePaise) || choice.pricePaise < 100) return fail('The pack size of an item in your cart is no longer available. Please remove it and add it again.');
+      lines.push({
+        productId: snap.id, name: choice.label ? `${String(product.name)} (${choice.label})` : String(product.name), ...(choice.label ? { sizeId: data.lines[index].sizeId, sizeLabel: choice.label } : {}),
+        qty, unitPaise: choice.pricePaise, ...(choice.mrpPaise ? { mrpPaise: choice.mrpPaise } : {}), linePaise: choice.pricePaise * qty, makerName: product.makerName ?? null,
+      });
     }
     const totalPaise = lines.reduce((sum, line) => sum + line.linePaise, 0);
     if (data.payment === 'upi') {
@@ -201,11 +209,25 @@ export async function assignBakerAction(idToken: string, orderId: string, bakerU
   } catch (error) { return fail(message(error, 'Could not assign the baker.')); }
 }
 
+const sizesInput = z.array(z.object({ id: z.string().max(10), priceRupees: z.number().min(1).max(100000), mrpRupees: z.number().min(0).max(100000).optional() })).max(COMMON_SIZES.length);
+/** Turns the admin's size rows into stored pack sizes: known ids only, no repeats, in the standard order, MRP only when higher. */
+function buildSizes(rows: z.infer<typeof sizesInput> | undefined): PackSize[] | string {
+  const out: PackSize[] = [];
+  for (const row of rows ?? []) {
+    if (!isSizeId(row.id)) return 'Choose pack sizes from the list.';
+    if (out.some((item) => item.id === row.id)) return 'Each pack size can be added only once.';
+    const pricePaise = Math.round(row.priceRupees * 100);
+    out.push({ id: row.id, label: sizeLabel(row.id), pricePaise, mrpPaise: validMrp(pricePaise, row.mrpRupees ? Math.round(row.mrpRupees * 100) : null) });
+  }
+  const order = new Map<string, number>(COMMON_SIZES.map((size, index) => [size.id, index]));
+  return out.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+}
+
 const productSchema = z.object({
   name: z.string().trim().min(2).max(180), sku: z.string().trim().min(2).max(80),
   description: z.string().trim().max(2000), makerName: z.string().trim().max(120), makerId: z.string().trim().max(60).optional(),
   image: z.string().trim().max(120).optional(),
-  priceRupees: z.number().min(1).max(100000), mrpRupees: z.number().min(0).max(100000).optional(), storage: z.enum(['ambient', 'chilled', 'frozen', 'other']),
+  priceRupees: z.number().min(1).max(100000).optional(), mrpRupees: z.number().min(0).max(100000).optional(), sizes: sizesInput.optional(), storage: z.enum(['ambient', 'chilled', 'frozen', 'other']),
   vegetarianEvidence: z.string().trim().min(3, 'Write how you confirmed it is 100% vegetarian.').max(300),
 });
 
@@ -215,6 +237,11 @@ export async function publishProductAction(idToken: string, input: unknown): Pro
     const parsed = productSchema.safeParse(input);
     if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'Check the product fields.');
     const d = parsed.data;
+    const sizes = buildSizes(d.sizes);
+    if (typeof sizes === 'string') return fail(sizes);
+    if (sizes.length === 0 && !d.priceRupees) return fail('Enter a price, or add at least one pack size with its price.');
+    const basePaise = sizes.length > 0 ? sizes[0].pricePaise : Math.round((d.priceRupees ?? 0) * 100);
+    const baseMrp = sizes.length > 0 ? sizes[0].mrpPaise : validMrp(basePaise, d.mrpRupees ? Math.round(d.mrpRupees * 100) : null);
     if (d.image && !(await imageOk(d.image))) return fail('Choose a picture from the list or upload one.');
     let makerName = d.makerName; let makerDistrict: string | null = null; let makerId: string | null = null;
     if (d.makerId) {
@@ -226,21 +253,26 @@ export async function publishProductAction(idToken: string, input: unknown): Pro
     const slugBase = d.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80) || 'product';
     await ref.set({
       name: d.name, sku: d.sku.toUpperCase(), slug: `${slugBase}-${ref.id.slice(0, 5).toLowerCase()}`, description: d.description || null,
-      image: d.image || null, makerName: makerName || null, makerId, makerDistrict, pricePaise: Math.round(d.priceRupees * 100), mrpPaise: mrpPaiseFor(d.priceRupees, d.mrpRupees), storage: d.storage,
-      vegetarianEvidence: d.vegetarianEvidence, visible: true, createdAt: new Date().toISOString(),
+      image: d.image || null, makerName: makerName || null, makerId, makerDistrict, pricePaise: basePaise, mrpPaise: baseMrp, sizes: sizes.length > 0 ? sizes : null, storage: d.storage,
+      vegetarianEvidence: d.vegetarianEvidence, visible: true, ratingCount: 0, ratingSum: 0, createdAt: new Date().toISOString(),
     });
     return { ok: true, id: ref.id };
   } catch (error) { return fail(message(error, 'Could not publish the product.')); }
 }
 
-/** The crossed-out MRP is only kept when it is higher than the selling price. */
-const mrpPaiseFor = (priceRupees: number, mrpRupees?: number): number | null => mrpRupees && mrpRupees > priceRupees ? Math.round(mrpRupees * 100) : null;
-
-export async function setProductPriceAction(idToken: string, productId: string, priceRupees: number, mrpRupees?: number): Promise<Result> {
+const pricingInput = z.object({ priceRupees: z.number().min(1).max(100000).optional(), mrpRupees: z.number().min(0).max(100000).optional(), sizes: sizesInput.optional() });
+/** Admin changes the selling price / MRP, or the pack sizes with a price for each. */
+export async function setProductPricingAction(idToken: string, productId: string, input: unknown): Promise<Result> {
   try {
     await requireRole(idToken, ['admin']);
-    if (!Number.isFinite(priceRupees) || priceRupees < 1 || priceRupees > 100000) return fail('Price must be between ₹1 and ₹1,00,000.');
-    await adminDb().collection('products').doc(safeId(productId)).update({ pricePaise: Math.round(priceRupees * 100), mrpPaise: mrpPaiseFor(priceRupees, mrpRupees), updatedAt: new Date().toISOString() });
+    const parsed = pricingInput.safeParse(input);
+    if (!parsed.success) return fail('Prices must be between ₹1 and ₹1,00,000.');
+    const sizes = buildSizes(parsed.data.sizes);
+    if (typeof sizes === 'string') return fail(sizes);
+    if (sizes.length === 0 && !parsed.data.priceRupees) return fail('Enter a price, or add at least one pack size with its price.');
+    const basePaise = sizes.length > 0 ? sizes[0].pricePaise : Math.round((parsed.data.priceRupees ?? 0) * 100);
+    const baseMrp = sizes.length > 0 ? sizes[0].mrpPaise : validMrp(basePaise, parsed.data.mrpRupees ? Math.round(parsed.data.mrpRupees * 100) : null);
+    await adminDb().collection('products').doc(safeId(productId)).update({ pricePaise: basePaise, mrpPaise: baseMrp, sizes: sizes.length > 0 ? sizes : null, updatedAt: new Date().toISOString() });
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not change the price.')); }
 }
@@ -436,6 +468,8 @@ export async function deleteProductAction(idToken: string, productId: string): P
     if (!snap.exists) return fail('This food was already removed.');
     const image = String(snap.data()?.image ?? '');
     await ref.delete();
+    const orphans = await adminDb().collection('reviews').where('productId', '==', ref.id).limit(100).get();
+    await Promise.all(orphans.docs.map((d) => d.ref.delete()));
     const pic = uploadedImageId(image);
     if (pic) {
       const stillUsed = await adminDb().collection('products').where('image', '==', image).limit(1).get();
@@ -443,4 +477,77 @@ export async function deleteProductAction(idToken: string, productId: string): P
     }
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not remove the food.')); }
+}
+
+/* -------------------------------- Reviews -------------------------------- */
+const reviewInput = z.object({ rating: z.number().int().min(1).max(5), comment: z.string().trim().max(500) });
+/** One review per customer per food. The id is a hash so the public list never exposes a user id. */
+const reviewId = (productId: string, uid: string) => createHash('sha256').update(`${safeId(productId)}:${safeId(uid)}`).digest('hex').slice(0, 40);
+export type PublicReview = { id: string; name: string; rating: number; comment: string; createdAt: string };
+
+/** Only a customer whose order containing this product was DELIVERED may review it, once per product (they can edit it). */
+export async function submitReviewAction(idToken: string, productId: string, input: unknown): Promise<Result> {
+  try {
+    const session = await verifySession(idToken);
+    if (!session.emailVerified) return fail('Please verify your email first.');
+    const parsed = reviewInput.safeParse(input);
+    if (!parsed.success) return fail('Choose a star rating from 1 to 5 (comment up to 500 characters).');
+    const db = adminDb();
+    const productRef = db.collection('products').doc(safeId(productId));
+    const orders = await db.collection('orders').where('userId', '==', session.uid).limit(200).get();
+    const delivered = orders.docs.filter((d) => d.data().status === 'delivered' && Array.isArray(d.data().lines) && d.data().lines.some((l: { productId?: string }) => l.productId === productRef.id));
+    if (delivered.length === 0) return fail('You can review a food after your order with it is delivered.');
+    const first = String(delivered[0].data().address?.name ?? 'Customer').trim().split(/\s+/)[0].slice(0, 20) || 'Customer';
+    const ref = db.collection('reviews').doc(reviewId(productRef.id, session.uid));
+    const now = new Date().toISOString();
+    await db.runTransaction(async (tx) => {
+      const [product, old] = await Promise.all([tx.get(productRef), tx.get(ref)]);
+      if (!product.exists) throw new Error('This food is no longer available.');
+      const oldRating = old.exists ? Number(old.data()?.rating ?? 0) : 0;
+      tx.set(ref, { productId: productRef.id, userId: session.uid, name: first, rating: parsed.data.rating, comment: parsed.data.comment, createdAt: old.exists ? String(old.data()?.createdAt ?? now) : now, updatedAt: now });
+      tx.update(productRef, {
+        ratingCount: Number(product.data()?.ratingCount ?? 0) + (old.exists ? 0 : 1),
+        ratingSum: Math.max(0, Number(product.data()?.ratingSum ?? 0) + parsed.data.rating - oldRating),
+      });
+    });
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not save your review.')); }
+}
+
+/** Reviews of one food for the public page. Read on the server so no user id or email ever reaches the browser. */
+export async function loadReviews(productId: string): Promise<PublicReview[]> {
+  try {
+    const snap = await adminDb().collection('reviews').where('productId', '==', safeId(productId)).limit(100).get();
+    return snap.docs.map((d) => ({ id: d.id, name: String(d.data().name ?? 'Customer'), rating: Number(d.data().rating) || 0, comment: String(d.data().comment ?? ''), createdAt: String(d.data().createdAt ?? '') }))
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  } catch { return []; }
+}
+
+/** The signed-in customer's own reviews, so the order page can show "Edit your review". */
+export async function myReviewsAction(idToken: string): Promise<Result<{ reviews: Record<string, { rating: number; comment: string }> }>> {
+  try {
+    const session = await verifySession(idToken);
+    const snap = await adminDb().collection('reviews').where('userId', '==', session.uid).limit(200).get();
+    const reviews: Record<string, { rating: number; comment: string }> = {};
+    for (const d of snap.docs) reviews[String(d.data().productId)] = { rating: Number(d.data().rating) || 0, comment: String(d.data().comment ?? '') };
+    return { ok: true, reviews };
+  } catch (error) { return fail(message(error, 'Could not load your reviews.')); }
+}
+
+/** Admin removes an inappropriate review and the product's rating is recalculated. */
+export async function deleteReviewAction(idToken: string, id: string): Promise<Result> {
+  try {
+    await requireRole(idToken, ['admin']);
+    const db = adminDb();
+    const ref = db.collection('reviews').doc(safeId(id));
+    await db.runTransaction(async (tx) => {
+      const review = await tx.get(ref);
+      if (!review.exists) return;
+      const productRef = db.collection('products').doc(safeId(String(review.data()?.productId)));
+      const product = await tx.get(productRef);
+      tx.delete(ref);
+      if (product.exists) tx.update(productRef, { ratingCount: Math.max(0, Number(product.data()?.ratingCount ?? 0) - 1), ratingSum: Math.max(0, Number(product.data()?.ratingSum ?? 0) - Number(review.data()?.rating ?? 0)) });
+    });
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not remove the review.')); }
 }

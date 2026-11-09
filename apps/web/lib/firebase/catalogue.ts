@@ -1,9 +1,10 @@
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { firebaseConfigured, firestore } from '@/lib/firebase/client';
+import type { PackSize } from '@/lib/pack-sizes';
 
 export type Product = {
   id: string; name: string; slug: string; sku: string; description: string | null; makerName: string | null; makerDistrict?: string | null; image?: string | null;
-  pricePaise: number; mrpPaise?: number | null; storage: string;
+  pricePaise: number; mrpPaise?: number | null; sizes?: PackSize[] | null; ratingSum?: number; ratingCount?: number; storage: string;
 };
 
 // Public read of visible products only (Firestore rules allow exactly this query).

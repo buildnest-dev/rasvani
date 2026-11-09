@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { AddToCart } from '@/components/add-to-cart';
+import { ProductBuy } from '@/components/product-buy';
+import { ReviewList } from '@/components/review-list';
+import { Stars } from '@/components/stars';
+import { loadReviews } from '@/app/actions/session';
 import { ProductArt } from '@/components/product-art';
-import { PriceTag } from '@/components/price-tag';
 import { loadVisibleProducts } from '@/lib/firebase/catalogue';
 import { formatPaise } from '@/lib/money';
 
@@ -23,6 +25,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   if (!product) notFound();
   const maker = product.makerName ?? 'A Bihar home baker';
   const where = product.makerDistrict ? `${product.makerDistrict}, Bihar` : 'Bihar';
+  const reviews = await loadReviews(product.id);
   const related = products.filter((item) => item.id !== product.id).slice(0, 3);
   return <section className="wrap shop-page pd-page">
     <Link className="text-link" href="/bihar#order-now">← Back to Bihar</Link>
@@ -31,18 +34,19 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       <div className="pd-info">
         <span className="eyebrow">{maker}</span>
         <h1>{product.name}</h1>
-        <p className="pd-price"><PriceTag pricePaise={product.pricePaise} mrpPaise={product.mrpPaise} /></p>
+        <Stars sum={product.ratingSum} count={product.ratingCount} />
         <div className="pd-from"><span aria-hidden="true">✳</span><div><small>Made by</small><strong>{maker}</strong><em>{where}</em></div></div>
         <ul className="pd-facts">
           <li><b>100%</b> vegetarian</li>
           <li><b>{storageLabels[product.storage] ?? 'Storage on pack'}</b></li>
           <li><b>Delivery</b> in selected areas of Bihar, or collect from a shop</li>
         </ul>
-        <div className="product-buy"><AddToCart productId={product.id} slug={product.slug} name={product.name} unitPaise={product.pricePaise} showQuantity /></div>
+        <div className="product-buy pd-price"><ProductBuy productId={product.id} slug={product.slug} name={product.name} pricePaise={product.pricePaise} mrpPaise={product.mrpPaise} sizes={product.sizes} layout="chips" showQuantity /></div>
         <p className="notice">Pay by cash on delivery or by UPI QR. Rasvani calls you to confirm every order and any delivery charge.</p>
       </div>
     </div>
     <div className="pd-about"><h2>About this food</h2><p>{product.description?.trim() || 'Home-made vegetarian regional food from Bihar.'}</p></div>
+    <ReviewList reviews={reviews} />
     {related.length > 0 && <div className="pd-related"><h2>You may also like</h2><div className="pd-related-row">{related.map((item) => <Link key={item.id} href={`/shop/${encodeURIComponent(item.slug)}`} className="pd-rel-card"><ProductArt product={item} sizes="120px" className="pd-rel-art" /><span><strong>{item.name}</strong><small>{formatPaise(item.pricePaise)}</small></span></Link>)}</div></div>}
   </section>;
 }

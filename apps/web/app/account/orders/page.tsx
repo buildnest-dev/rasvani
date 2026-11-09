@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { useAuth } from '@/components/auth-provider';
 import { useCart } from '@/components/cart-provider';
+import { OrderReviewForm } from '@/components/order-review-form';
 import { UpiQr } from '@/components/upi-qr';
-import { requestOrderTicketAction, submitPaymentRefAction } from '@/app/actions/session';
+import { myReviewsAction, requestOrderTicketAction, submitPaymentRefAction } from '@/app/actions/session';
 import { firestore } from '@/lib/firebase/client';
 import { formatPaise } from '@/lib/money';
 import { CANCEL_REASONS, REFUND_REASONS, ticketTypeFor, payablePaise, progressSteps, statusLabel, statusNote, upiLink, type OrderDoc, type PaymentSettings } from '@/lib/orders';
@@ -19,6 +20,9 @@ export default function MyOrdersPage() {
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const [placed, setPlaced] = useState(false);
+  const [mine, setMine] = useState<Record<string, { rating: number; comment: string }>>({});
+  const loadMine = useCallback(async () => { try { const r = await myReviewsAction(await getToken()); if (r.ok) setMine(r.reviews); } catch { /* reviews are optional */ } }, [getToken]);
+  useEffect(() => { if (user) void loadMine(); }, [user, loadMine]);
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('placed')) { setPlaced(true); clear(); }
@@ -97,6 +101,7 @@ Rasvani will review your request and reply here.`);
                 : <form className="admin-order-form" onSubmit={(event) => { event.preventDefault(); void sendRef(order.id, event.currentTarget); }}><label>After paying, enter the UPI transaction ID<input name="ref" required minLength={6} maxLength={30} pattern="[A-Za-z0-9]{6,30}" autoComplete="off" /></label><button className="btn" type="submit">I have paid</button></form>}</div></div>}
           {order.paymentMethod === 'upi' && order.paymentStatus !== 'paid' && order.status !== 'cancelled' && !payment?.upiId && <p className="notice">UPI details are being set up. Rasvani will share them on the call.</p>}
           <p className="notice"><strong>{a.fulfilment === 'pickup' ? 'Takeaway: collect from shop' : 'Home delivery'}</strong>{place ? ` · ${place}` : ''} · Phone {a.phone}</p>
+          {order.status === 'delivered' && <OrderReviewForm lines={order.lines} mine={mine} onSaved={() => void loadMine()} />}
           {order.ticket && <div className={`notice ticket-box ticket-${order.ticket.status}`} role="status">
             <strong>{order.ticket.type === 'cancel' ? 'Cancellation request' : 'Refund request'} · {order.ticket.status === 'open' ? 'Waiting for Rasvani' : order.ticket.status === 'approved' ? 'Approved' : 'Not approved'}</strong>
             <br />Reason: {order.ticket.reason}{order.ticket.details ? ` — ${order.ticket.details}` : ''}
