@@ -290,6 +290,26 @@ export async function setProductPricingAction(idToken: string, productId: string
   } catch (error) { return fail(message(error, 'Could not change the price.')); }
 }
 
+const detailsInput = z.object({
+  name: z.string().trim().min(2, 'Enter the food name.').max(180),
+  description: z.string().trim().max(2000),
+  storage: z.enum(['ambient', 'chilled', 'frozen', 'other']),
+  makerName: z.string().trim().max(120),
+});
+/** Admin edits the name, description, storage and maker label of an already listed food. */
+export async function updateProductDetailsAction(idToken: string, productId: string, input: unknown): Promise<Result> {
+  try {
+    await requireRole(idToken, ['admin']);
+    const parsed = detailsInput.safeParse(input);
+    if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'Check the details.');
+    const d = parsed.data;
+    const ref = adminDb().collection('products').doc(safeId(productId));
+    if (!(await ref.get()).exists) return fail('That food was not found.');
+    await ref.update({ name: d.name, description: d.description || null, storage: d.storage, makerName: d.makerName || null, updatedAt: new Date().toISOString() });
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not save the details.')); }
+}
+
 /** A picture is valid if it is in the built-in library, or it is an uploaded picture that really exists. */
 async function imageOk(path: string): Promise<boolean> {
   if (isLibraryImage(path)) return true;
@@ -563,4 +583,36 @@ export async function deleteReviewAction(idToken: string, id: string): Promise<R
     });
     return { ok: true };
   } catch (error) { return fail(message(error, 'Could not remove the review.')); }
+}
+
+/* -------------------------------- Customer profile -------------------------------- */
+const customerProfileSchema = z.object({
+  name: z.string().trim().min(2, 'Enter your name.').max(80),
+  phone: z.string().trim().refine((v) => v === '' || /^[6-9]\d{9}$/.test(v), 'Enter a valid 10-digit mobile number, or leave it empty.'),
+  district: z.string().trim().refine((v) => v === '' || (biharDistricts as readonly string[]).includes(v), 'Choose a district from the list.'),
+  pincode: z.string().trim().refine((v) => v === '' || /^\d{6}$/.test(v), 'Pincode must be 6 digits.'),
+  address: z.string().trim().max(300),
+  landmark: z.string().trim().max(120),
+});
+export type CustomerProfile = z.infer<typeof customerProfileSchema>;
+
+/** The signed-in customer's own saved details (name, phone, delivery address). Never anyone else's. */
+export async function getProfileAction(idToken: string): Promise<Result<{ profile: CustomerProfile | null }>> {
+  try {
+    const session = await verifySession(idToken);
+    const snap = await adminDb().collection('profiles').doc(safeId(session.uid)).get();
+    const d = snap.data();
+    if (!d) return { ok: true, profile: null };
+    return { ok: true, profile: { name: String(d.name ?? ''), phone: String(d.phone ?? ''), district: String(d.district ?? ''), pincode: String(d.pincode ?? ''), address: String(d.address ?? ''), landmark: String(d.landmark ?? '') } };
+  } catch (error) { return fail(message(error, 'Could not load your profile.')); }
+}
+
+export async function saveProfileAction(idToken: string, input: unknown): Promise<Result> {
+  try {
+    const session = await verifySession(idToken);
+    const parsed = customerProfileSchema.safeParse(input);
+    if (!parsed.success) return fail(parsed.error.issues[0]?.message ?? 'Please check your details.');
+    await adminDb().collection('profiles').doc(safeId(session.uid)).set({ ...parsed.data, email: session.email, updatedAt: new Date().toISOString() }, { merge: true });
+    return { ok: true };
+  } catch (error) { return fail(message(error, 'Could not save your profile.')); }
 }

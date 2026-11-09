@@ -1006,8 +1006,8 @@ html[data-motion-ready="true"] .footer{position:relative;isolation:isolate;}
 @media(max-width:1240px){.hx-label{display:none}.hx-btn{padding:0 10px}.hx-primary .hx-label{display:none}}
 @media(max-width:900px){.hx-lang select{max-width:70px}.hx-btn{height:40px}.hx-lang{height:40px}}
 /* Keep the header on one line: labels only on very wide screens, compact nav below that */
-@media(max-width:1700px){.hx-label{display:none}.hx-btn{width:42px;padding:0;justify-content:center}.hx-lang select{max-width:64px}}
-@media(min-width:1241px) and (max-width:1700px){.nav-premium{gap:2px}.nav-premium .menu-item-3d{padding-inline:8px;font-size:12.5px}.nav-current-note{display:none}}
+@media(max-width:2100px){.hx-label{display:none}.hx-btn{width:42px;padding:0;justify-content:center}.hx-lang select{max-width:64px}}
+@media(min-width:1241px) and (max-width:2100px){.nav-premium{gap:2px}.nav-premium .menu-item-3d{padding-inline:8px;font-size:12.5px}.nav-current-note{display:none}}
 @media(max-width:700px){
   .header-actions{gap:2px}
   .header-actions .orders-link,.header-actions .hx-primary{display:none}
@@ -1019,3 +1019,39 @@ html[data-motion-ready="true"] .footer{position:relative;isolation:isolate;}
 .ticket-box.ticket-approved{border-left-color:#2f7d4f}
 .ticket-box.ticket-rejected{border-left-color:#b3261e}
 .customer-order-cancel select,.customer-order-cancel textarea{width:100%}
+
+/* 100% Veg badge next to the logo (Indian veg mark: green square with a green dot) */
+.veg-badge{display:inline-flex;align-items:center;gap:7px;flex:none;padding:6px 12px 6px 8px;border-radius:999px;background:#eaf5ec;border:1px solid #bfdcc5;color:#1d6b35;font:700 12px/1 inherit;font-family:inherit;letter-spacing:.02em;white-space:nowrap}
+.veg-mark{display:inline-block;width:16px;height:16px;border:2px solid #1d8a3c;border-radius:3px;position:relative;background:#fff}
+.veg-mark:after{content:"";position:absolute;inset:3px;border-radius:50%;background:#1d8a3c}
+@media(max-width:1699px) and (min-width:901px){.veg-badge b{display:none}.veg-badge{padding:6px}}
+@media(max-width:900px){.veg-badge b{display:none}.veg-badge{padding:5px;order:1}}
+@media(max-width:420px){.veg-badge{display:none}}
+
+/* ---- Customer profile ---- */
+.pf-page{padding:34px 0 70px;background:linear-gradient(180deg,#fbf3e6,var(--cream) 320px)}
+.pf-shell{display:grid;gap:22px}
+.pf-hero{display:flex;align-items:center;gap:20px;flex-wrap:wrap;background:linear-gradient(120deg,var(--maroon),#7a2c31);color:#fff8ed;border-radius:22px;padding:26px 28px;box-shadow:0 18px 40px -22px rgba(90,31,36,.7)}
+.pf-avatar{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;font:700 32px var(--serif);background:var(--gold);color:var(--maroon);border:4px solid rgba(255,255,255,.35);flex:none}
+.pf-id{flex:1;min-width:200px}.pf-id h1{margin:0;font:600 clamp(26px,4vw,36px)/1.1 var(--serif)}
+.pf-mail,.pf-since{margin:6px 0 0;font-size:14px;opacity:.92;word-break:break-all}.pf-since{opacity:.75;font-size:13px}
+.pf-tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.pf-tag.ok{background:#dff3e4;color:#1d5a30}.pf-tag.warn{background:#fde6d3;color:#8a3b10}
+.pf-hero-actions{display:flex;gap:10px;align-items:center}.pf-out{background:transparent;color:#fff8ed;border:1px solid rgba(255,255,255,.5);border-radius:99px;padding:10px 16px;cursor:pointer}.pf-out:hover{background:rgba(255,255,255,.12)}
+.pf-banner{background:#fff4dc;border:1px solid var(--gold);border-radius:14px;padding:14px 18px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}.pf-banner p{margin:0;width:100%}
+.pf-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.pf-stats>div{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:grid;gap:4px}
+.pf-stats b{font:700 26px var(--serif);color:var(--maroon)}.pf-stats span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.pf-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;align-items:start}
+.pf-side{display:grid;gap:22px}
+.pf-card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 10px 30px -24px rgba(45,41,38,.5)}
+.pf-card h2{margin:0 0 6px;font:600 21px var(--serif);color:var(--maroon)}
+.pf-help{color:var(--muted);font-size:13.5px;margin:4px 0 12px;line-height:1.5}
+.pf-fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.pf-fields label{display:grid;gap:6px;font-size:13px;font-weight:600}.pf-fields .wide{grid-column:1/-1}
+.pf-fields input,.pf-fields select,.pf-fields textarea{font:inherit;font-weight:400;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;width:100%}
+.pf-fields input:focus,.pf-fields select:focus,.pf-fields textarea:focus{outline:3px solid rgba(214,164,77,.55);border-color:var(--gold)}
+.pf-save{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap}.pf-note{font-size:13.5px}.pf-note.ok{color:#1d5a30}.pf-note.error{color:#a12a1a}
+.pf-order{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0}.pf-order .pf-tag{margin:0}.pf-total{font:700 22px var(--serif);margin:0 0 8px}
+.pf-links{list-style:none;margin:8px 0;padding:0;display:grid;gap:6px}.pf-links a{display:block;padding:11px 14px;border-radius:12px;background:#fbf3e6;font-weight:600;font-size:14px}.pf-links a:hover{background:#f4e3c8;color:var(--maroon)}
+@media(max-width:900px){.pf-grid{grid-template-columns:1fr}.pf-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.pf-fields{grid-template-columns:1fr}.pf-hero{padding:20px}.pf-avatar{width:68px;height:68px;font-size:26px}}

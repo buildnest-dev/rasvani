@@ -6,7 +6,7 @@ import { useAuth } from '@/components/auth-provider';
 import { UpiQr } from '@/components/upi-qr';
 import {
   deleteBakerProfileAction, inviteBakerAction, deleteProductAction, publishProductAction, removeBakerAction, saveBakerProfileAction,
-  savePaymentSettingsAction, resolveOrderTicketAction, setOrderHandlingAction, setOrderStatusAction, setProductImageAction, setProductPricingAction, setProductVisibilityAction,
+  savePaymentSettingsAction, resolveOrderTicketAction, setOrderHandlingAction, setOrderStatusAction, setProductImageAction, setProductPricingAction, setProductVisibilityAction, updateProductDetailsAction,
   uploadFoodImageAction, loadReviews, deleteReviewAction, type PublicReview,
 } from '@/app/actions/session';
 import { shrinkImage } from '@/lib/resize-image';
@@ -19,7 +19,7 @@ import { Stars } from '@/components/stars';
 import type { PackSize } from '@/lib/pack-sizes';
 import { FINAL_STATUSES, ORDER_STATUSES, payablePaise, statusLabel, upiLink, type BakerProfile, type OrderDoc, type PaymentSettings } from '@/lib/orders';
 
-type ProductRow = { sizes?: PackSize[] | null; ratingCount?: number; ratingSum?: number; id: string; name: string; sku: string; makerName: string | null; makerDistrict?: string | null; image?: string | null; pricePaise: number; mrpPaise?: number | null; visible: boolean };
+type ProductRow = { description?: string | null; storage?: string; sizes?: PackSize[] | null; ratingCount?: number; ratingSum?: number; id: string; name: string; sku: string; makerName: string | null; makerDistrict?: string | null; image?: string | null; pricePaise: number; mrpPaise?: number | null; visible: boolean };
 type BakerLogin = { id: string; email: string; name?: string };
 type Tab = 'orders' | 'products' | 'bakers' | 'payment';
 type Filter = 'new' | 'requests' | 'progress' | 'done' | 'all';
@@ -250,6 +250,12 @@ export function AdminDashboard() {
       {products.length === 0 ? <p className="notice">No foods yet.</p> : <div className="customer-order-list">{products.map((product) => <article className="customer-order-card" key={product.id}>
         <div className="customer-order-head">{productImage(product) && <span className="admin-thumb">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={productImage(product) ?? ''} alt="" width={72} height={72} /></span>}<div><span className="eyebrow">{product.sku}{product.makerName ? ` · ${product.makerName}` : ''}{product.makerDistrict ? `, ${product.makerDistrict}` : ''}</span><h2>{product.name}</h2></div><div className="customer-order-status"><strong>{formatPaise(product.pricePaise)}</strong><span className={`pill ${product.visible ? 'st-delivered' : 'st-cancelled'}`}>{product.visible ? 'Visible in shop' : 'Hidden'}</span></div></div>
         <div className="admin-order-form">
+          <details className="admin-later admin-edit-prices"><summary>✎ Edit name, description &amp; storage</summary><form className="admin-order-form" key={`d-${product.id}-${product.name}-${product.storage}-${product.description}`} onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => updateProductDetailsAction(token, product.id, { name: String(d.get('name') ?? ''), description: String(d.get('description') ?? ''), storage: String(d.get('storage') ?? 'ambient'), makerName: String(d.get('makerName') ?? '') }), 'Details saved.'); }}>
+            <label>Food name<input name="name" defaultValue={product.name} required minLength={2} maxLength={180} /></label>
+            <label>Maker label<input name="makerName" defaultValue={product.makerName ?? ''} maxLength={120} /></label>
+            <label>Description<textarea name="description" defaultValue={product.description ?? ''} rows={3} maxLength={2000} /></label>
+            <label>Storage<select name="storage" defaultValue={product.storage ?? 'ambient'}><option value="ambient">Room temperature</option><option value="chilled">Chilled</option><option value="frozen">Frozen</option><option value="other">Other</option></select></label>
+            <button className="btn secondary" type="submit" disabled={busy}>Save details</button></form></details>
           <details className="admin-later admin-edit-prices"><summary>✎ Edit price &amp; pack sizes</summary><form className="admin-order-form" key={`${product.id}-${product.pricePaise}-${(product.sizes ?? []).map((x) => x.id + x.pricePaise).join()}`} onSubmit={(event) => { event.preventDefault(); const d = new FormData(event.currentTarget); void act((token) => setProductPricingAction(token, product.id, { priceRupees: Number(d.get('price') || 0) || undefined, mrpRupees: Number(d.get('mrp') || 0) || undefined, sizes: readSizes(d) }), 'Prices saved.'); }}>
             <label>Price (₹){product.sizes?.length ? ' — used only if all sizes are cleared' : ''}<input name="price" type="number" step="0.01" min="1" max="100000" defaultValue={product.sizes?.length ? '' : product.pricePaise / 100} /></label>
             <label>MRP (₹, optional)<input name="mrp" type="number" step="0.01" min="0" max="100000" defaultValue={!product.sizes?.length && product.mrpPaise ? product.mrpPaise / 100 : ''} /></label>

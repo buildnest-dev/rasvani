@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/components/auth-provider';
 import { CaptchaField, captchaConfigured, type CaptchaHandle } from '@/components/captcha-field';
 import { useCart } from '@/components/cart-provider';
-import { placeOrderAction } from '@/app/actions/session';
+import { getProfileAction, placeOrderAction } from '@/app/actions/session';
 import { biharDistricts } from '@/lib/bihar-districts';
 import { formatPaise } from '@/lib/money';
 
@@ -18,6 +18,18 @@ export function CheckoutForm() {
   const [pending, setPending] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<CaptchaHandle>(null);
+
+  // Pre-fill from the saved profile, but only fields the customer has not typed into yet.
+  useEffect(() => {
+    let alive = true;
+    void getToken().then((token) => getProfileAction(token)).then((result) => {
+      if (!alive || !result.ok || !result.profile) return;
+      const fill = (id: string, value: string) => { const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null; if (el && value && !el.value) el.value = value; };
+      const p = result.profile;
+      fill('co-name', p.name); fill('co-phone', p.phone); fill('co-district', p.district); fill('co-pin', p.pincode); fill('co-address', p.address); fill('co-landmark', p.landmark);
+    }).catch(() => undefined);
+    return () => { alive = false; };
+  }, [getToken]);
 
   async function submit(form: HTMLFormElement) {
     const data = new FormData(form);

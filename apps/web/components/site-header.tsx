@@ -51,6 +51,7 @@ export function SiteHeader() {
       <Link href="/" className="brand brand-premium" aria-label="Rasvani home">
         <Image className="brand-logo" src="/images/rasvani-mark.png" alt="" width={50} height={47} priority /><span>Rasvani<span className="tag">India, Served by Region.</span></span>
       </Link>
+      <span className="veg-badge" role="img" aria-label="100% pure vegetarian"><i className="veg-mark" aria-hidden="true" /><b>100% Veg</b></span>
       <nav className="nav nav-premium" aria-label="Main navigation">
         {links.map(([label, href], index) => <Link key={href} href={href} aria-current={isCurrent(href) ? 'page' : undefined} aria-label={`${label}${isCurrent(href) ? ', current section' : ''}`} title={label} className={`menu-item-3d ${isCurrent(href) ? 'is-current' : ''}`} style={menuItemStyle(index)} {...motionHandlers}><span>{label}</span>{isCurrent(href) && <span className="nav-current-note" aria-hidden="true">YOU ARE HERE</span>}</Link>)}
       </nav>
