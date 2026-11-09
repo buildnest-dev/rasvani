@@ -17,6 +17,9 @@ export function middleware(request: NextRequest) {
   const area = host.startsWith('admin.') ? '/admin' : host.startsWith('baker.') ? '/baker' : null;
   if (area) {
     if (pathname === '/') { const url = request.nextUrl.clone(); url.pathname = area; return NextResponse.rewrite(url); }
+    // Clean admin URLs: admin.<domain>/orders is served by /admin/orders.
+    const section = area === '/admin' ? /^\/(orders|products|bakers|payment)$/.exec(pathname) : null;
+    if (section) { const url = request.nextUrl.clone(); url.pathname = `/admin/${section[1]}`; return NextResponse.rewrite(url); }
     if (!pathname.startsWith(area)) { const url = request.nextUrl.clone(); url.pathname = '/'; return NextResponse.redirect(url); }
     return NextResponse.next();
   }

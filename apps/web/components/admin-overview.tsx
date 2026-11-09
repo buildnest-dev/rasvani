@@ -11,7 +11,7 @@ const DAY = 86_400_000;
 const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 
 /** The dashboard home: key numbers, a 7-day trend, what needs attention, and the latest orders. */
-export function AdminOverview({ orders, products, requests }: { orders: OrderDoc[]; products: FoodLite[]; requests: number }) {
+export function AdminOverview({ base, orders, products, requests }: { base: string; orders: OrderDoc[]; products: FoodLite[]; requests: number }) {
   const data = useMemo(() => {
     const now = new Date();
     const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(now.getTime() - (6 - i) * DAY); return { key: dayKey(d), label: d.toLocaleDateString('en-IN', { weekday: 'short' }), orders: 0, paise: 0 }; });
@@ -33,10 +33,10 @@ export function AdminOverview({ orders, products, requests }: { orders: OrderDoc
   const hidden = products.filter((p) => !p.visible).length;
   const noPhoto = products.filter((p) => !p.image).length;
   const attention: [string, string, string][] = [];
-  if (data.fresh) attention.push([`${data.fresh} new order${data.fresh > 1 ? 's' : ''} waiting`, 'Confirm and assign a baker', '/admin/orders']);
-  if (requests) attention.push([`${requests} cancel / refund request${requests > 1 ? 's' : ''}`, 'Approve or reject', '/admin/orders']);
-  if (noPhoto) attention.push([`${noPhoto} food${noPhoto > 1 ? 's' : ''} without a photo`, 'Photos help sell', '/admin/products']);
-  if (hidden) attention.push([`${hidden} food${hidden > 1 ? 's' : ''} hidden from the shop`, 'Show them when ready', '/admin/products']);
+  if (data.fresh) attention.push([`${data.fresh} new order${data.fresh > 1 ? 's' : ''} waiting`, 'Confirm and assign a baker', `${base}/orders`]);
+  if (requests) attention.push([`${requests} cancel / refund request${requests > 1 ? 's' : ''}`, 'Approve or reject', `${base}/orders`]);
+  if (noPhoto) attention.push([`${noPhoto} food${noPhoto > 1 ? 's' : ''} without a photo`, 'Photos help sell', `${base}/products`]);
+  if (hidden) attention.push([`${hidden} food${hidden > 1 ? 's' : ''} hidden from the shop`, 'Show them when ready', `${base}/products`]);
   const kpis: [string, string, string, string][] = [
     ['New orders', String(data.fresh), 'Need confirmation', 'is-red'],
     ['In progress', String(data.active), 'Being prepared / delivered', 'is-amber'],
@@ -64,9 +64,9 @@ export function AdminOverview({ orders, products, requests }: { orders: OrderDoc
 
     <div className="ao-grid ao-grid-b">
       <section className="ao-card" aria-labelledby="ao-recent">
-        <div className="ao-card-head"><h2 id="ao-recent">Latest orders</h2><Link href="/admin/orders">View all →</Link></div>
+        <div className="ao-card-head"><h2 id="ao-recent">Latest orders</h2><Link href={`${base}/orders`}>View all →</Link></div>
         {orders.length === 0 ? <p className="ao-empty">No orders yet. They appear here the moment a customer orders.</p>
-          : <div className="ao-table" role="table" aria-label="Latest orders">{orders.slice(0, 6).map((o) => <Link key={o.id} href="/admin/orders" className="ao-row" role="row">
+          : <div className="ao-table" role="table" aria-label="Latest orders">{orders.slice(0, 6).map((o) => <Link key={o.id} href={`${base}/orders`} className="ao-row" role="row">
             <div role="cell"><b>{o.orderNumber}</b><span>{o.address?.name ?? 'Customer'}{o.address?.district ? ` · ${o.address.district}` : ''}</span></div>
             <div role="cell" className="ao-amt">{formatPaise(payablePaise(o))}</div>
             <div role="cell"><span className={`pill st-${o.status}`}>{statusLabel(o.status)}</span></div>
@@ -74,7 +74,7 @@ export function AdminOverview({ orders, products, requests }: { orders: OrderDoc
       </section>
 
       <section className="ao-card" aria-labelledby="ao-top">
-        <div className="ao-card-head"><h2 id="ao-top">Best sellers</h2><Link href="/admin/products">Foods →</Link></div>
+        <div className="ao-card-head"><h2 id="ao-top">Best sellers</h2><Link href={`${base}/products`}>Foods →</Link></div>
         {data.top.length === 0 ? <p className="ao-empty">Sales will show here after the first orders.</p>
           : <ol className="ao-top">{data.top.map(([name, qty], i) => <li key={name}><span>{i + 1}</span><b>{name}</b><em>{qty} sold</em></li>)}</ol>}
       </section>
