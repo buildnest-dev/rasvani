@@ -1,9 +1,12 @@
 'use client';
 
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { collection, doc, onSnapshot, query, where } from 'firebase/firestore';
 import { useAuth } from '@/components/auth-provider';
 import { UpiQr } from '@/components/upi-qr';
+import { AdminOverview } from '@/components/admin-overview';
 import {
   deleteBakerProfileAction, inviteBakerAction, deleteProductAction, publishProductAction, removeBakerAction, saveBakerProfileAction,
   savePaymentSettingsAction, resolveOrderTicketAction, setOrderHandlingAction, setOrderStatusAction, setProductImageAction, setProductPricingAction, setProductVisibilityAction, updateProductDetailsAction,
@@ -21,7 +24,8 @@ import { FINAL_STATUSES, ORDER_STATUSES, payablePaise, statusLabel, upiLink, typ
 
 type ProductRow = { description?: string | null; storage?: string; sizes?: PackSize[] | null; ratingCount?: number; ratingSum?: number; id: string; name: string; sku: string; makerName: string | null; makerDistrict?: string | null; image?: string | null; pricePaise: number; mrpPaise?: number | null; visible: boolean };
 type BakerLogin = { id: string; email: string; name?: string };
-type Tab = 'orders' | 'products' | 'bakers' | 'payment';
+type Tab = 'overview' | 'orders' | 'products' | 'bakers' | 'payment';
+const sectionOf = (path: string): Tab => { const m = /^\/admin\/(orders|products|bakers|payment)/.exec(path.toLowerCase()); return (m?.[1] as Tab | undefined) ?? 'overview'; };
 type Filter = 'new' | 'requests' | 'progress' | 'done' | 'all';
 /** A request that still needs the admin. A cancel request on an order that already left (dispatched/delivered/cancelled) is stale, so it is not listed. */
 const needsAdmin = (order: OrderDoc) => order.ticket?.status === 'open'
@@ -65,10 +69,12 @@ function AdminReviews({ productId, getToken }: { productId: string; getToken: ()
 }
 
 export function AdminDashboard() {
-  const { getToken } = useAuth();
-  const [tab, setTab] = useState<Tab>('orders');
+  const { getToken, user, signOut } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+  const tab = sectionOf(pathname);
+  const [navOpen, setNavOpen] = useState(false);
   const [filter, setFilter] = useState<Filter>('new');
-  useEffect(() => { const on = (e: Event) => { const t = (e as CustomEvent).detail; if (t === 'orders' || t === 'products' || t === 'bakers' || t === 'payment') setTab(t); }; window.addEventListener('staff:tab', on); return () => window.removeEventListener('staff:tab', on); }, []);
   const [orders, setOrders] = useState<OrderDoc[]>([]);
   const [products, setProducts] = useState<ProductRow[]>([]);
   const [profiles, setProfiles] = useState<BakerProfile[]>([]);
@@ -154,23 +160,29 @@ export function AdminDashboard() {
   const shown = orders.filter((order) => filter === 'all' ? true : filter === 'requests' ? needsAdmin(order) : filter === 'new' ? order.status === 'placed' : filter === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed');
   const count = (f: Filter) => orders.filter((order) => f === 'all' ? true : f === 'requests' ? needsAdmin(order) : f === 'new' ? order.status === 'placed' : f === 'done' ? isFinal(order.status) : !isFinal(order.status) && order.status !== 'placed').length;
   const requestCount = orders.filter(needsAdmin).length;
-  useEffect(() => { window.dispatchEvent(new CustomEvent('staff:state', { detail: { tab, newCount, requests: requestCount } })); }, [tab, newCount, requestCount]);
   const profileById = (id: string | null | undefined) => profiles.find((p) => p.id === id);
   const todayRevenue = orders.filter((o) => o.paymentStatus === 'paid').reduce((sum, o) => sum + payablePaise(o), 0);
 
-  return <div className="admin-dash">
-    <div className="admin-stats">
-      <div><span>New orders</span><strong>{newCount}</strong></div>
-      <div><span>In progress</span><strong>{count('progress')}</strong></div>
-      <div><span>Completed</span><strong>{orders.filter((o) => o.status === 'delivered').length}</strong></div>
-      <div><span>Payment received</span><strong>{formatPaise(todayRevenue)}</strong></div>
-    </div>
-    <div className="admin-tabs" role="tablist">
-      {([['orders', `Orders${newCount ? ` · ${newCount} new` : ''}${count('requests') ? ` · ${count('requests')} requests` : ''}`], ['products', 'Foods & prices'], ['bakers', 'Bakers & restaurants'], ['payment', 'Payment QR']] as [Tab, string][]).map(([item, label]) =>
-        <button key={item} role="tab" aria-selected={tab === item} className={`btn ${tab === item ? '' : 'secondary'}`} onClick={() => setTab(item)}>{label}</button>)}
-    </div>
-    {alertText && <div className="admin-alert" role="alert"><strong>{alertText}</strong><button className="btn secondary" type="button" onClick={() => { setAlertText(''); setTab('orders'); setFilter('new'); }}>View</button></div>}
-    {!alertsOn && tab === 'orders' && <p className="notice">Want a pop-up when an order arrives? <button type="button" className="text-link" onClick={() => void enableAlerts()}>Turn on order alerts</button> (sound plays while this page is open).</p>}
+  const titles: Record<Tab, [string, string]> = { overview: ['Dashboard', 'How Rasvani is doing right now'], orders: ['Orders', 'Confirm, assign bakers, deliver and settle requests'], products: ['Foods & prices', 'What customers can buy, and for how much'], bakers: ['Bakers & restaurants', 'Your makers and their logins'], payment: ['Payment QR', 'Where customers send UPI payments'] };
+  const nav: [Tab, string, string, number][] = [['overview', 'Dashboard', '/admin', 0], ['orders', 'Orders', '/admin/orders', newCount + requestCount], ['products', 'Foods & prices', '/admin/products', 0], ['bakers', 'Bakers & restaurants', '/admin/bakers', 0], ['payment', 'Payment QR', '/admin/payment', 0]];
+  const icons: Record<Tab, string> = { overview: 'M3 13h8V3H3v10Zm0 8h8v-6H3v6Zm10 0h8V11h-8v10Zm0-18v6h8V3h-8Z', orders: 'M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6ZM3 6h18M16 10a4 4 0 0 1-8 0', products: 'M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8ZM7.5 7.5h.01', bakers: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8', payment: 'M3 5h18v14H3V5Zm0 5h18M7 15h3' };
+  const [title, subtitle] = titles[tab];
+  return <div className="adm-shell">
+    <aside className={`adm-side${navOpen ? ' is-open' : ''}`} aria-label="Admin navigation">
+      <Link href="/" className="adm-brand"><span className="adm-logo">R</span><span>Rasvani<small>Admin console</small></span></Link>
+      <nav>{nav.map(([key, label, href, badge]) => <Link key={key} href={href} className={tab === key ? 'is-on' : ''} aria-current={tab === key ? 'page' : undefined} onClick={() => setNavOpen(false)}>
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={icons[key]} /></svg><span>{label}</span>{badge > 0 && <b>{badge}</b>}</Link>)}</nav>
+      <div className="adm-side-foot"><Link href="/shop">↗ View shop</Link><div className="adm-me"><span>{(user?.email ?? '?')[0]?.toUpperCase()}</span><div><b>Admin</b><small title={user?.email ?? ''}>{user?.email}</small></div></div><button type="button" onClick={() => void signOut()}>Sign out</button></div>
+    </aside>
+    {navOpen && <button type="button" className="adm-scrim" aria-label="Close menu" onClick={() => setNavOpen(false)} />}
+    <div className="adm-main">
+      <header className="adm-top"><button type="button" className="adm-burger" aria-label="Open menu" onClick={() => setNavOpen(true)}>☰</button>
+        <div><h1>{title}</h1><p>{subtitle}</p></div>
+        <div className="adm-top-right">{!alertsOn && <button type="button" className="adm-bell" onClick={() => void enableAlerts()}>🔔 Order alerts</button>}{alertsOn && <span className="adm-bell on">🔔 Alerts on</span>}</div></header>
+      <div className="admin-dash adm-content">
+    {alertText && <div className="admin-alert" role="alert"><strong>{alertText}</strong><button className="btn secondary" type="button" onClick={() => { setAlertText(''); setFilter('new'); router.push('/admin/orders'); }}>View</button></div>}
+    {tab === 'overview' && <AdminOverview orders={orders} products={products} requests={requestCount} />}
+    {false && <p className="notice"><button type="button" className="text-link" onClick={() => void enableAlerts()}>Turn on order alerts</button> (sound plays while this page is open).</p>}
     {message && <p className="status" role="status">{message}</p>}
 
     {tab === 'orders' && <>
@@ -309,5 +321,5 @@ export function AdminDashboard() {
       </form>
       <div className="form-shell"><h2>Preview</h2>{payment ? <><UpiQr link={upiLink(payment, 10000, 'PREVIEW')} label="Sample UPI QR for 100 rupees" /><p className="notice">Sample QR for ₹100. Scan it with your UPI app to confirm it points to the right account.</p></> : <p className="notice">Save your UPI ID to see the QR.</p>}</div>
     </div>}
-  </div>;
+  </div></div></div>;
 }
