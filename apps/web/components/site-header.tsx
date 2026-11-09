@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
+import { useEffect, useState, useSyncExternalStore, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import { supportedLocales, useLocale } from '@/components/locale-provider';
 import { LocalizedCopy } from '@/components/localized-copy';
 import { useCart } from '@/components/cart-provider';
@@ -56,7 +56,14 @@ function StaffHeader({ kind }: { kind: 'admin' | 'baker' }) {
   </div></header>;
 }
 
+const noopSubscribe = () => () => undefined;
+/** admin.<domain> / baker.<domain> show the console at "/", so the host name decides there (null while rendering on the server). */
+function useStaffHost(): 'admin' | 'baker' | null {
+  return useSyncExternalStore(noopSubscribe, () => { const h = window.location.hostname.toLowerCase(); return h.startsWith('admin.') ? 'admin' : h.startsWith('baker.') ? 'baker' : null; }, () => null);
+}
+
 export function SiteHeader() {
+  const hostKind = useStaffHost();
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const { locale, setLocale, t, translate } = useLocale();
@@ -71,7 +78,7 @@ export function SiteHeader() {
     [translate('Food Stories'), '/food-stories'],
     [translate('Meet the Makers'), '/for-producers'],
   ] as const;
-  const staffKind = pathname === '/admin' || pathname.startsWith('/admin/') ? 'admin' : pathname === '/baker' || pathname.startsWith('/baker/') ? 'baker' : null;
+  const staffKind = hostKind ?? (pathname === '/admin' || pathname.startsWith('/admin/') ? 'admin' : pathname === '/baker' || pathname.startsWith('/baker/') ? 'baker' : null);
   const isCurrent = (href: string) => href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
   const motionHandlers = { onPointerMove: applyMenuTilt, onPointerLeave: resetMenuTilt };
   if (staffKind) return <StaffHeader kind={staffKind} />;
