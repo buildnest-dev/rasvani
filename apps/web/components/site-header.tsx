@@ -34,7 +34,11 @@ const adminTabs = [['orders', 'Orders'], ['products', 'Foods & prices'], ['baker
 
 /** A focused header for the admin / baker consoles: no shopping links, just the console and its sections. */
 function StaffHeader({ kind }: { kind: 'admin' | 'baker' }) {
-  const { user, signOut } = useAuth();
+  const { user, role, loading, signOut } = useAuth();
+  // Shows the real console chrome (branded nav, section tabs) only once we have confirmed the signed-in
+  // account actually holds this role — never to a visitor or to a signed-in account without access, even
+  // briefly. The page body below still re-checks the role itself; this only decides what the header shows.
+  const authorized = !loading && role === kind;
   const [state, setState] = useState<{ tab: string; newCount: number; requests: number }>({ tab: 'orders', newCount: 0, requests: 0 });
   useEffect(() => {
     document.body.classList.add('staff-mode');
@@ -47,7 +51,7 @@ function StaffHeader({ kind }: { kind: 'admin' | 'baker' }) {
   return <header className="header staff-header"><div className="wrap staff-row">
     <Link href="/" className="staff-brand" aria-label="Rasvani home"><Image className="brand-logo" src="/images/rasvani-mark.png" alt="" width={40} height={38} priority /><span>Rasvani</span></Link>
     <span className="staff-pill">{kind === 'admin' ? 'Admin console' : 'Baker console'}</span>
-    {kind === 'admin' && <nav className="staff-nav" aria-label="Admin sections">{adminTabs.map(([key, label]) => <button key={key} type="button" className={state.tab === key ? 'is-on' : ''} aria-current={state.tab === key ? 'page' : undefined} onClick={() => go(key)}>{label}{badge(key) > 0 && <b>{badge(key)}</b>}</button>)}</nav>}
+    {authorized && kind === 'admin' && <nav className="staff-nav" aria-label="Admin sections">{adminTabs.map(([key, label]) => <button key={key} type="button" className={state.tab === key ? 'is-on' : ''} aria-current={state.tab === key ? 'page' : undefined} onClick={() => go(key)}>{label}{badge(key) > 0 && <b>{badge(key)}</b>}</button>)}</nav>}
     <div className="staff-right">
       <Link className="staff-link" href="/shop">View shop ↗</Link>
       {user && <span className="staff-user" title={user.email ?? ''}>{(user.email ?? '?')[0]?.toUpperCase()}</span>}
