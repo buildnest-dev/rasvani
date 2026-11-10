@@ -35,6 +35,12 @@ function translateNode(node: ReactNode, translate: (text: string) => string): Re
  * entered; only reviewed UI phrase entries in the shared glossary are changed.
  */
 export function LocalizedCopy({ children }: { children: ReactNode }) {
-  const { translate } = useLocale();
+  const { locale, translate } = useLocale();
+  // English is the default locale and translateSiteCopy() is a guaranteed no-op for it (returns the
+  // source string unchanged). Walking and cloning every element in the tree to translate nothing was
+  // the single heaviest script-execution cost on every page load for the large majority of visitors
+  // who never change the language. Render children as-is instead; only walk the tree once a non-English
+  // locale is actually selected.
+  if (locale === 'en') return <>{children}</>;
   return <>{Children.map(children, (child) => translateNode(child, translate))}</>;
 }
