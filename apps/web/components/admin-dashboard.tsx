@@ -16,7 +16,7 @@ import {
 import { shrinkImage } from '@/lib/resize-image';
 import { foodImages, productImage } from '@/lib/food-images';
 import { biharDistricts } from '@/lib/bihar-districts';
-import { firestore } from '@/lib/firebase/client';
+import { firestore } from '@/lib/firebase/firestore';
 import { formatPaise } from '@/lib/money';
 import { PackSizeFields, readSizes } from '@/components/pack-size-fields';
 import { Stars } from '@/components/stars';

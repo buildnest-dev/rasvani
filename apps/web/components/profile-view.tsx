@@ -7,7 +7,8 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { getProfileAction, saveProfileAction, type CustomerProfile } from '@/app/actions/session';
 import { useAuth } from '@/components/auth-provider';
 import { biharDistricts } from '@/lib/bihar-districts';
-import { firebaseAuth, firestore } from '@/lib/firebase/client';
+import { firebaseAuth } from '@/lib/firebase/client';
+import { firestore } from '@/lib/firebase/firestore';
 import { formatPaise } from '@/lib/money';
 import { FINAL_STATUSES, payablePaise, statusLabel, type OrderDoc } from '@/lib/orders';
 

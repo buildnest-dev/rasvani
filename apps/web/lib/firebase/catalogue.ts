@@ -1,5 +1,6 @@
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { firebaseConfigured, firestore } from '@/lib/firebase/client';
+import { firebaseConfigured } from '@/lib/firebase/client';
+import { firestore } from '@/lib/firebase/firestore';
 import type { PackSize } from '@/lib/pack-sizes';
 
 export type Product = {

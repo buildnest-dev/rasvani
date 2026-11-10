@@ -8,7 +8,7 @@ import { useCart } from '@/components/cart-provider';
 import { OrderReviewForm } from '@/components/order-review-form';
 import { UpiQr } from '@/components/upi-qr';
 import { myReviewsAction, requestOrderTicketAction, submitPaymentRefAction } from '@/app/actions/session';
-import { firestore } from '@/lib/firebase/client';
+import { firestore } from '@/lib/firebase/firestore';
 import { formatPaise } from '@/lib/money';
 import { CANCEL_REASONS, REFUND_REASONS, ticketTypeFor, payablePaise, progressSteps, statusLabel, statusNote, upiLink, type OrderDoc, type PaymentSettings } from '@/lib/orders';
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { useAuth } from '@/components/auth-provider';
 import { bakerUpdateOrderAction } from '@/app/actions/session';
-import { firestore } from '@/lib/firebase/client';
+import { firestore } from '@/lib/firebase/firestore';
 import { formatPaise } from '@/lib/money';
 import { statusLabel, type OrderDoc } from '@/lib/orders';
 

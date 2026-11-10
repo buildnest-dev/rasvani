@@ -1,6 +1,5 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
-import { getFirestore, type Firestore } from 'firebase/firestore';
 
 // Public web configuration (safe to expose; access is controlled by Firestore rules and Auth).
 const config = {
@@ -18,4 +17,8 @@ export function firebaseApp(): FirebaseApp {
   return getApps().length ? getApp() : initializeApp(config);
 }
 export const firebaseAuth = (): Auth => getAuth(firebaseApp());
-export const firestore = (): Firestore => getFirestore(firebaseApp());
+
+// Firestore (~245 KiB) lives in its own module (./firestore) on purpose: every page needs Auth, for the
+// sign-in state in the header, but only the pages that actually read/write live data (cart, orders, admin,
+// the catalogue) need Firestore. Keeping the two imports apart lets the bundler leave Firestore out of
+// pages — like the homepage — that only need to know whether someone is signed in.
