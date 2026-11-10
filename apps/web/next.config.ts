@@ -36,11 +36,22 @@ const securityHeaders = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self), payment=(), usb=()' },
 ];
 
+// Staff and private screens: never indexed, never cached by shared browsers or proxies.
+const privateHeaders = [
+  { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive' },
+  { key: 'Cache-Control', value: 'private, no-store' },
+];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   images: { formats: ['image/avif', 'image/webp'] },
-  async headers() { return [{ source: '/(.*)', headers: securityHeaders }]; },
+  async headers() {
+    return [
+      { source: '/(.*)', headers: securityHeaders },
+      ...['/admin/:path*', '/baker/:path*', '/account/:path*', '/cart', '/checkout/:path*', '/orders', '/products', '/bakers', '/payment'].map((source) => ({ source, headers: privateHeaders })),
+    ];
+  },
 };
 
 export default nextConfig;

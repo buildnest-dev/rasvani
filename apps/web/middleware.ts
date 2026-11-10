@@ -14,8 +14,11 @@ export function middleware(request: NextRequest) {
 
   if (RETIRED_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))) return new NextResponse('Not found', { status: 404 });
 
+  // Public assets the staff screens themselves need (food pictures, icons). Without this they were redirected to "/" on admin./baker. hosts.
+  const STAFF_ASSETS = /^\/(api\/food-image\/[A-Za-z0-9_-]{1,64}|icon\.png|apple-icon\.png|favicon\.ico|robots\.txt)$/;
   const area = host.startsWith('admin.') ? '/admin' : host.startsWith('baker.') ? '/baker' : null;
   if (area) {
+    if (STAFF_ASSETS.test(pathname)) return NextResponse.next();
     if (pathname === '/') { const url = request.nextUrl.clone(); url.pathname = area; return NextResponse.rewrite(url); }
     // Clean admin URLs: admin.<domain>/orders is served by /admin/orders.
     const section = area === '/admin' ? /^\/(orders|products|bakers|payment)$/.exec(pathname) : null;
