@@ -109,17 +109,17 @@
 .hs-search .lp-search{max-width:640px;margin:0 auto}
 @media(max-width:700px){.hs-arrow{display:none}.hs-shade{background:linear-gradient(0deg,rgba(35,12,8,.85),rgba(35,12,8,.3))}.hs-copy{justify-content:flex-end;padding-bottom:56px}}
 
-/* Product slides: a real packed-food photo (contained, never cropped) beside its name and price */
-.hs-slide-product .hs-shade{background:linear-gradient(115deg,#2a1410,#4a241a 55%,#6a3420)}
-.hs-copy-product{flex-direction:row;align-items:center;gap:clamp(24px,5vw,64px)}
-.hs-product-art{flex:none;width:clamp(180px,26vw,320px);aspect-ratio:1/1;border-radius:20px;background:#fff8ec;display:grid;place-items:center;padding:18px;box-shadow:0 24px 50px -20px rgba(0,0,0,.55)}
-.hs-product-art img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+/* Product slides: the real packed-food photo fills the banner, same as the lifestyle slides, with its
+   name, price and a "Shop this food" button over a readable scrim — not a small box floating in empty space. */
+.hs-product-art{position:absolute;inset:0}
+.hs-product-art img{object-fit:cover}
+.hs-shade-product{background:linear-gradient(90deg,rgba(25,10,6,.92),rgba(25,10,6,.55) 55%,rgba(25,10,6,.1))}
 .hs-title-product{font-size:clamp(32px,4.5vw,56px)}
 .hs-copy-product .price-tag{margin:4px 0 10px}
 .hs-copy-product .price-tag strong{font-size:clamp(22px,2.6vw,30px);color:#fff}
 .hs-copy-product .price-tag s{color:#d8c4ae}
 .hs-copy-product .price-tag em{color:#ffb36b}
-@media(max-width:700px){.hs-copy-product{flex-direction:column;align-items:flex-start;padding-bottom:36px}.hs-product-art{width:clamp(140px,42vw,220px)}}
+@media(max-width:700px){.hs-shade-product{background:linear-gradient(0deg,rgba(25,10,6,.9),rgba(25,10,6,.25))}}
 @media(prefers-reduced-motion:reduce){.hs-slide{transition:none}}
 
 /* Photos uploaded by the admin are shown whole (never cropped) on a soft background */

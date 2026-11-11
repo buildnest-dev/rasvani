@@ -35,7 +35,7 @@ export function HeroSlider({ products = [] }: { products?: HeroProduct[] }) {
     pricePaise: product.pricePaise, mrpPaise: product.mrpPaise, href: `/shop/${encodeURIComponent(product.slug)}`,
   }));
   const slides = productSlides.length > 0
-    ? [...productSlides, { kind: 'vision' as const, key: 'vision', ...visionSlide }]
+    ? [{ kind: 'vision' as const, key: 'vision', ...visionSlide }, ...productSlides]
     : fallbackSlides.map((slide) => ({ kind: 'vision' as const, key: slide.title, ...slide }));
 
   const go = useCallback((n: number) => setIndex((n + slides.length) % slides.length), [slides.length]);
@@ -51,16 +51,14 @@ export function HeroSlider({ products = [] }: { products?: HeroProduct[] }) {
     {slides.map((slide, i) => {
       const on = i === index;
       if (slide.kind === 'product') return <div key={slide.key} className={`hs-slide hs-slide-product${on ? ' on' : ''}`} aria-hidden={!on} role="group" aria-label={`${i + 1} of ${slides.length}`}>
-        <div className="hs-shade" />
+        <div className="hs-product-art">{slide.image ? <Image src={slide.image} alt={slide.name} fill sizes="(max-width: 700px) 100vw, 56vw" priority={i === 0} /> : null}</div>
+        <div className="hs-shade hs-shade-product" />
         <div className="wrap hs-copy hs-copy-product">
-          <div className="hs-product-art">{slide.image ? <Image src={slide.image} alt={slide.name} width={420} height={420} sizes="(max-width: 700px) 60vw, 360px" priority={i === 0} /> : null}</div>
-          <div>
-            <p className="hs-eyebrow">{slide.maker}</p>
-            {i === 0 ? <h1 className="hs-title hs-title-product">{slide.name}</h1> : <p className="hs-title hs-title-product" role="heading" aria-level={2}>{slide.name}</p>}
-            <PriceTag pricePaise={slide.pricePaise} mrpPaise={slide.mrpPaise} />
-            <p className="hs-text">Packed and shipped the way you&apos;ll actually receive it.</p>
-            <Link href={slide.href} className="hs-cta" tabIndex={on ? 0 : -1}>Shop this food →</Link>
-          </div>
+          <p className="hs-eyebrow">{slide.maker}</p>
+          {i === 0 ? <h1 className="hs-title hs-title-product">{slide.name}</h1> : <p className="hs-title hs-title-product" role="heading" aria-level={2}>{slide.name}</p>}
+          <PriceTag pricePaise={slide.pricePaise} mrpPaise={slide.mrpPaise} />
+          <p className="hs-text">Packed and shipped the way you&apos;ll actually receive it.</p>
+          <Link href={slide.href} className="hs-cta" tabIndex={on ? 0 : -1}>Shop this food →</Link>
         </div>
       </div>;
       return <div key={slide.key} className={`hs-slide${on ? ' on' : ''}`} aria-hidden={!on} role="group" aria-label={`${i + 1} of ${slides.length}`}>
