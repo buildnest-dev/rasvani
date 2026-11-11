@@ -51,7 +51,10 @@ export function HeroSlider({ products = [] }: { products?: HeroProduct[] }) {
     {slides.map((slide, i) => {
       const on = i === index;
       if (slide.kind === 'product') return <div key={slide.key} className={`hs-slide hs-slide-product${on ? ' on' : ''}`} aria-hidden={!on} role="group" aria-label={`${i + 1} of ${slides.length}`}>
-        <div className="hs-product-art">{slide.image ? <Image src={slide.image} alt={slide.name} fill sizes="(max-width: 700px) 100vw, 56vw" priority={i === 0} /> : null}</div>
+        <div className="hs-product-art">{slide.image ? <>
+          <Image aria-hidden="true" alt="" src={slide.image} fill sizes="(max-width: 700px) 100vw, 56vw" priority={i === 0} className="hs-product-bg" />
+          <Image src={slide.image} alt={slide.name} fill sizes="(max-width: 700px) 100vw, 56vw" priority={i === 0} className="hs-product-fg" />
+        </> : null}</div>
         <div className="hs-shade hs-shade-product" />
         <div className="wrap hs-copy hs-copy-product">
           <p className="hs-eyebrow">{slide.maker}</p>

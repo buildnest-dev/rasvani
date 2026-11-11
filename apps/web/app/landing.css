@@ -109,10 +109,13 @@
 .hs-search .lp-search{max-width:640px;margin:0 auto}
 @media(max-width:700px){.hs-arrow{display:none}.hs-shade{background:linear-gradient(0deg,rgba(35,12,8,.85),rgba(35,12,8,.3))}.hs-copy{justify-content:flex-end;padding-bottom:56px}}
 
-/* Product slides: the real packed-food photo fills the banner, same as the lifestyle slides, with its
-   name, price and a "Shop this food" button over a readable scrim — not a small box floating in empty space. */
-.hs-product-art{position:absolute;inset:0}
-.hs-product-art img{object-fit:cover}
+/* Product slides: the banner is filled (no empty space, like the lifestyle slides), but the actual pack
+   is never cropped — a softly blurred, darkened copy of the same photo covers the banner as a backdrop,
+   and the real photo sits on top at its full, uncropped shape. */
+.hs-product-art{position:absolute;inset:0;overflow:hidden}
+.hs-product-bg{object-fit:cover;filter:blur(32px) saturate(1.15) brightness(.6);transform:scale(1.2)}
+.hs-product-fg{object-fit:contain;object-position:right center;padding:clamp(16px,6vw,72px);filter:drop-shadow(0 20px 40px rgba(0,0,0,.45))}
+@media(max-width:700px){.hs-product-fg{object-position:center}}
 .hs-shade-product{background:linear-gradient(90deg,rgba(25,10,6,.92),rgba(25,10,6,.55) 55%,rgba(25,10,6,.1))}
 .hs-title-product{font-size:clamp(32px,4.5vw,56px)}
 .hs-copy-product .price-tag{margin:4px 0 10px}
