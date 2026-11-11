@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { biharHomeFoodItems } from '@/lib/bihar-home-food-items';
-import { HeroSlider } from '@/components/hero-slider';
+import { HeroSlider, type HeroProduct } from '@/components/hero-slider';
 import { regions } from '@/lib/regions';
 
 const featuredNames = ['Silao Khaja', 'Thekua', 'Tilkut', 'Sattu Ladoo'];
@@ -11,9 +11,9 @@ const featured = featuredNames
 const states = regions.slice(0, 28);
 
 /** India-first landing page. Bihar is the only live state today; every other state is marked "soon". */
-export function HomeLanding() {
+export function HomeLanding({ heroProducts = [] }: { heroProducts?: HeroProduct[] }) {
   return <div className="landing">
-    <HeroSlider />
+    <HeroSlider products={heroProducts} />
     <section className="hs-search"><div className="wrap">
       <form action="/explore-india" method="get" role="search" className="lp-search">
         <label className="sr-only" htmlFor="lp-q">Search regional foods</label>
