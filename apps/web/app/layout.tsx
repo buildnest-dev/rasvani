@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { DM_Sans, Playfair_Display } from 'next/font/google';
+import { Fraunces, Plus_Jakarta_Sans } from 'next/font/google';
 import Image from 'next/image';
 import Link from 'next/link';
 import './globals.css';
@@ -15,12 +15,14 @@ import { AuthProvider } from '@/components/auth-provider';
 import { SiteMotionDirector } from '@/components/site-motion-director';
 import { LocalizedCopy } from '@/components/localized-copy';
 
-// Self-hosted, preloaded and swap-displayed by Next.js instead of the old @import from fonts.googleapis.com,
-// which blocked rendering on an extra round trip to Google before any text could paint (this was most of the
-// slow First/Largest Contentful Paint in Lighthouse). The CSS variables below feed the existing --sans/--serif
-// custom properties, so no other file needs to change.
-const sans = DM_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-sans', display: 'swap' });
-const serif = Playfair_Display({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-serif', display: 'swap' });
+// Self-hosted, preloaded and swap-displayed by Next.js instead of an @import from fonts.googleapis.com,
+// which would block rendering on a round trip to Google before any text could paint. The CSS variables
+// below feed the existing --sans/--serif custom properties, so no other file needs to change.
+// Fraunces (warm, artisanal display serif) for headings; Plus Jakarta Sans (clean, high-x-height, reads
+// well on mobile in bright sunlight) for body copy and UI — the pairing requested for an all-India,
+// mobile-first food brand.
+const sans = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-sans', display: 'swap' });
+const serif = Fraunces({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-serif', display: 'swap' });
 
 export const metadata: Metadata = {
   title: { default: 'Rasvani — India, Served by Region', template: '%s | Rasvani' },
