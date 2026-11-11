@@ -116,6 +116,13 @@
 .hs-product-bg{object-fit:cover;filter:blur(32px) saturate(1.15) brightness(.6);transform:scale(1.2)}
 .hs-product-fg{object-fit:contain;object-position:right center;padding:clamp(16px,6vw,72px);filter:drop-shadow(0 20px 40px rgba(0,0,0,.45))}
 @media(max-width:700px){.hs-product-fg{object-position:center}}
+
+/* Opening slide: a single designed graphic with its own headline, map and stats baked in — shown
+   uncropped (contain) with a blurred copy of itself filling the banner behind it, same trick as the
+   product slides. The whole slide is one link through to the India map. */
+.hs-slide-banner{display:block;cursor:pointer}
+.hs-slide-banner:focus-visible{outline:3px solid var(--gold);outline-offset:-3px}
+.hs-banner-fg{object-fit:contain}
 .hs-shade-product{background:linear-gradient(90deg,rgba(25,10,6,.92),rgba(25,10,6,.55) 55%,rgba(25,10,6,.1))}
 .hs-title-product{font-size:clamp(32px,4.5vw,56px)}
 .hs-copy-product .price-tag{margin:4px 0 10px}
